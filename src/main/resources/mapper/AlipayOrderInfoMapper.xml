@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatiorg//DTD Mapper 3.0//EN" "http://mybatiorg/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.victor.mapper.AlipayOrderInfoMapper" >
+
+    <select id="queryAlipayOrderInfo" resultType="com.victor.pojo.AlipayOrderEntity" parameterType="com.victor.pojo.AlipayOrderEntity">
+      SELECT
+        partner,
+        notify_url,
+        out_trade_no,
+        subject,
+        product_code,
+        total_fee,
+        seller_id,
+        seller_email,
+        buyer_id,
+        buyer_email,
+        operator_code,
+        operator_id,
+        body,
+        show_url,
+        currency,
+        price,
+        quantity,
+        goods_detail,
+        extend_params,
+        it_b_pay,
+        royalty_type,
+        royalty_parameters,
+        channel_parameters,
+        dynamicid_type,
+        dynamic_id,
+        remark,
+        error,
+        detail_error_code,
+        detail_error_des,
+        result_code,
+        trade_no,
+        trade_status,
+        refund_code,
+        refund_time,
+        cancel_code,
+        cancel_time,
+        machine_code,
+        cashier,
+        refund_fee,
+        disabled,
+        createuserid,
+        createusername,
+        createusercode,
+        createdatetime,
+        createip,
+        updateuserid,
+        updateusername,
+        updateusercode,
+        updatedatetime,
+        updateip,
+        id,
+        brandid,
+        ouid,
+        storecode,
+        orgcode
+    FROM
+	ESALE_MOBILEPAY_ORDER
+        <where>
+            1=1
+            <if test="id!=null">
+                AND id = #{id}
+            </if>
+            <if test="ouid!=null">
+                AND ouid = #{ouid}
+            </if>
+            <if test="brandId!=null">
+                AND brandId = #{brandId}
+            </if>
+            <if test="storecode!=null">
+                AND storecode = #{storecode}
+            </if>
+            <if test="orgcode!=null">
+                AND orgcode = #{orgcode}
+            </if>
+            <if test="out_trade_no!=null">
+                AND out_trade_no = #{out_trade_no}
+            </if>
+            <if test="trade_no!=null">
+                AND trade_no = #{trade_no}
+            </if>
+        </where>
+
+    </select>
+
+    <update id="updateAlipayOrderInfo" parameterType="com.victor.pojo.AlipayOrderEntity">
+        update ESALE_MOBILEPAY_ORDER
+        <set>
+            <if test="notify_url!=null">
+                 notify_url = #{notify_url},
+            </if>
+            <if test="error!=null">
+                error = #{error},
+            </if>
+            <if test="detail_error_code!=null">
+                detail_error_code = #{detail_error_code},
+            </if>
+            <if test="detail_error_des!=null">
+                detail_error_des = #{detail_error_des},
+            </if>
+            <if test="result_code!=null">
+                result_code = #{result_code},
+            </if>
+            <if test="trade_no!=null">
+                trade_no = #{trade_no},
+            </if>
+            <if test="trade_status!=null">
+                trade_status = #{trade_status},
+            </if>
+            <if test="refund_code!=null">
+                refund_code = #{refund_code},
+                refund_time = now(),
+            </if>
+            <if test="cancel_code!=null">
+                cancel_code = #{cancel_code},
+                cancel_time=now()
+            </if>
+            <if test="refund_fee!=null">
+                refund_fee = #{refund_fee},
+            </if>
+            <if test="updateUserid!=null">
+                updateUserid = #{updateUserid},
+            </if>
+            <if test="updateUsername!=null">
+                updateUsername = #{updateUsername},
+            </if>
+            <if test="updateUserCode!=null">
+                updateUserCode = #{updateUserCode},
+            </if>
+            <if test="updateIp!=null">
+                updateIp = #{updateIp},
+            </if>
+            updateDatetime = #{updateDatetime}
+        </set>
+        <where>
+            1=1
+            <if test="id!=null">
+                AND id = #{id}
+            </if>
+            <if test="ouid!=null">
+                AND ouid = #{ouid}
+            </if>
+            <if test="brandId!=null">
+                AND brandId = #{brandId}
+            </if>
+            <if test="storecode!=null">
+                AND storecode = #{storecode}
+            </if>
+            <if test="orgcode!=null">
+                AND orgcode = #{orgcode}
+            </if>
+            <if test="out_trade_no!=null">
+                AND out_trade_no = #{out_trade_no}
+            </if>
+        </where>
+    </update>
+
+    <insert id="insertAlipayOrderInfo" parameterType="com.victor.pojo.AlipayOrderEntity">
+        insert into ESALE_MOBILEPAY_ORDER(
+        partner,notify_url,out_trade_no,subject,product_code,total_fee,seller_id,seller_email,buyer_id,buyer_email,
+        operator_code,operator_id,body,show_url,currency,price,quantity,goods_detail,extend_params,it_b_pay,
+        royalty_type, royalty_parameters,channel_parameters,dynamicid_type,dynamic_id,remark,error,detail_error_code,
+        detail_error_des,result_code,trade_no,trade_status, refund_code, refund_time,cancel_code,cancel_time,machine_code,
+        cashier,refund_fee,disabled,createuserid,createusername, createusercode,createdatetime, createip,id,brandid,
+        ouid,storecode, orgcode)
+        values(
+        #{partner},#{notify_url},#{out_trade_no},#{subject},#{product_code},#{total_fee},#{seller_id},#{seller_email},#{buyer_id},#{buyer_email},
+        #{operator_code},#{operator_id},#{body},#{show_url},#{currency},#{price},#{quantity},#{goods_detail},#{extend_params},#{it_b_pay},
+        #{royalty_type},#{ royalty_parameters},#{channel_parameters},#{dynamicid_type},#{dynamic_id},#{remark},#{error},#{detail_error_code},
+        #{detail_error_des},#{result_code},#{trade_no},#{trade_status},#{ refund_code},#{ refund_time},#{cancel_code},#{cancel_time},#{machine_code},
+        #{cashier},#{refund_fee},#{disabled},#{createuserid},#{createusername},#{ createusercode},now(),#{ createip},#{id},#{brandid},
+        #{ouid},#{storecode},#{orgcode}
+        )
+    </insert>
+</mapper>
