@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.victor.mapper.UserInfoMapper" >
+    <select id="queryUserInfo" parameterType="com.victor.pojo.UserInfo" resultType="com.victor.pojo.UserInfo">
+        select user_id,user_name,password,addtime,updatetime from user_info
+        <where>
+            1=1
+            <if test="user_name!=null">
+               and user_name=#{user_name}
+            </if>
+            <if test="password!=null">
+              and password=#{password}
+            </if>
+        </where>
+
+    </select>
+</mapper>
