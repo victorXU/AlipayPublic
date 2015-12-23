@@ -1,16 +1,17 @@
 package com.victor.service.impl;
 
-import java.util.Map;
-
-import javax.annotation.Resource;
-
 import com.victor.mapper.AlipayStoreInfoMapper;
 import com.victor.pojo.AlipayOrderEntity;
+import com.victor.pojo.AlipayStoreInfo;
 import com.victor.service.CommonService;
 import com.victor.util.StringTools;
 import com.victor.util.UigXmlMgr;
 import org.dom4j.Element;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -35,24 +36,26 @@ public class CommonServiceImpl implements CommonService {
 			// 信息:
 			// 127.0.0.1发送的URL请求串内容是：/JsZshService.uig?version=1.0.1&instId=1000203&type=QGGReq&msgId=&msgTime=20090601010101&billKey=65429345&commodityId=10040125002501&sign=06ddfd8f956e4b7f78d2841614882ece
 			// 得到请求MAP对
-			String instId = requestMap.get("instId");
-			if (StringTools.isNotEmpty(instId)) {
-				entity.setInstId(instId);
+			String brandid = requestMap.get("brandid");
+			if (StringTools.isNotEmpty(brandid)) {
+				entity.setBrandid(brandid);
 			}else {
 				entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0001",
-						"机构标识不合法", "instId中填写的接收报文的机构的简称和约定的不一致").outputXMLStr());
+						"机构标识不合法", "brandid中填写的接收报文的机构的简称和约定的不一致").outputXMLStr());
 			}
-			String type = requestMap.get("type");
-			if (StringTools.isNotEmpty(type)) {
-				entity.setType(type);
+			String ouid = requestMap.get("ouid");
+			if (StringTools.isNotEmpty(ouid)) {
+				entity.setOuid(ouid);
 			}else {
 				entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "关键数据为空",
-						 "type参数为空").outputXMLStr());
+						 "ouid参数为空").outputXMLStr());
 			}
 			
 //			 读取instid对应的key
-			Map<String, String> resultMap = alipayStoreInfoMapper.queryAlipayOrderInfo(entity.getInstId());
-			if (resultMap == null || resultMap.size() == 0) {
+			AlipayStoreInfo alipayStoreInfo = new AlipayStoreInfo();
+			alipayStoreInfo.setBrandid(brandid);
+			List<AlipayStoreInfo> alipayStoreInfos = alipayStoreInfoMapper.queryAlipayOrderInfo(alipayStoreInfo);
+			if (alipayStoreInfos == null || alipayStoreInfos.size() == 0) {
 				entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
 						"id不存在", "instId对应的key不存在！").outputXMLStr());
 				return false;

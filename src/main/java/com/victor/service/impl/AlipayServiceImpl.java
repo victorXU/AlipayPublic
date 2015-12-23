@@ -1,10 +1,8 @@
 package com.victor.service.impl;
 
 
-
 import com.victor.mapper.AlipayOrderInfoMapper;
 import com.victor.pojo.AlipayOrderEntity;
-import com.victor.pojo.PaymentDT;
 import com.victor.pojo.ResponseEntity;
 import com.victor.service.AliPayService;
 import com.victor.util.MD5;

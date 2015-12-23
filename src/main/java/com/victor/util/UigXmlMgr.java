@@ -1,15 +1,10 @@
  package com.victor.util;
 
  import com.victor.pojo.AlipayOrderEntity;
- import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.springframework.stereotype.Component;
-
-import szwx855.base.dt.UigHeadDT;
-import szwx855.base.xml.BaseUigXmlMgr;
+ import org.dom4j.*;
+ import org.springframework.stereotype.Component;
+ import szwx855.base.dt.UigHeadDT;
+ import szwx855.base.xml.BaseUigXmlMgr;
 
 
 @Component("uigXmlMgr")

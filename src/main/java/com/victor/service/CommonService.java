@@ -12,5 +12,5 @@ public interface CommonService {
 
     public boolean validateRequest(Map<String, String> requestMap, AlipayOrderEntity entity);
 
-    public UigXmlMgr returnResponseXml(UigXmlMgr headXml,UigXmlMgr zshResponse,AlipayOrderEntity entity);
+    public UigXmlMgr returnResponseXml(UigXmlMgr headXml, UigXmlMgr zshResponse, AlipayOrderEntity entity);
 }

@@ -1,14 +1,20 @@
 package com.victor.pojo;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Created by Administrator on 2015/12/19.
  */
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class AlipayOrderEntity extends AlipayBaseEntity {
 
-    private String partner;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String partner;
     private String notify_url;
     private String out_trade_no;
     private String subject;
@@ -64,5 +70,5 @@ public class AlipayOrderEntity extends AlipayBaseEntity {
     private String storecode;
     private String orgcode;
 
-    private String validateResult;// ÑéÖ¤ÇëÇó²ÎÊýµÄ·µ»Ø½á¹û
+    private String validateResult;// ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½Ø½ï¿½ï¿½
 }

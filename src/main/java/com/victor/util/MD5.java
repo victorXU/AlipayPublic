@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class MD5 {
 
-    public static Logger logger = Logger.getLogger("WEB-APP");   //ÈÕÖ¾¼ÇÂ¼
+    public static Logger logger = Logger.getLogger("WEB-APP");   //ï¿½ï¿½Ö¾ï¿½ï¿½Â¼
 
     public MD5() {
 
@@ -42,31 +42,30 @@ public class MD5 {
     }
 
 
-    public static String byte2hex(byte[] b) { //¶þÐÐÖÆ×ª×Ö·û??
+    public static String byte2hex(byte[] b) { //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½Ö·ï¿½??
         String hs = "";
         String stmp = "";
         for (int n = 0; n < b.length; n++) {
-            stmp = (java.lang.Integer.toHexString(b[n] & 0XFF));
+            stmp = (Integer.toHexString(b[n] & 0XFF));
             if (stmp.length() == 1) {
                 hs = hs + "0" + stmp;
             } else {
                 hs = hs + stmp;
             }
             if (n < b.length - 1) {
-                hs = hs;
             }
         }
         return hs;
     }
 
     /**
-     * Copyright (c) 2013  ½­ËÕÕ¬Éú»î All rights reserved
+     * Copyright (c) 2013  ï¿½ï¿½ï¿½ï¿½Õ¬ï¿½ï¿½ï¿½ All rights reserved
      *
      * @return :
-     * @author : ÁÖ½¡
+     * @author : ï¿½Ö½ï¿½
      * @createTime : 2013-7-24
      * @version : 1.0
-     * @comments : È¡Ëæ»úÃÜÔ¿
+     * @comments : È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ô¿
      * @params :
      * @requestNum :
      * @documentPath:
@@ -99,12 +98,12 @@ public class MD5 {
         MD5 te = new MD5();
 
         String aa = "ks6543217";
-        //ÊÖ»ú
+        //ï¿½Ö»ï¿½
         String s = "agentid=test_agent_id_1&source=esales&mobilenum=15850528638&merchantKey=111111";
-        //ÓÎÏ·
+        //ï¿½ï¿½Ï·
         String s1 = "commandid=gamequery&protocolid=normal&merchantid=zhaishenghuo&version=1&mark=&merchantKey=q2cz6k9r5v1l1x1ezzapd1vgc4pmr45p0xhs0e59qhcexev9sz1nwl61kpzekia6w24b9k7s6y3at1dmov6prrye17483vesey7lg79vxabp45ol5b43v8jh2vzevf1x";
-        //¿É³äÖµÓÎÏ·²éÑ¯½Ó¿ÚÐ£Ñé
-        String s2 = "<?xml version=\"1.0\" encoding=\"GBK\"?><response><code>0</code><gameinfolist><gameinfo><gameid>GAME30196</gameid><gamename>Î÷Î÷Èý¹úonline</gamename></gameinfo><gameinfo><gameid>GAME30193</gameid><gamename>ÎäÁÖY??/gamename></gameinfo><gameinfo><gameid>GAME27380</gameid><gamename>¶«ÓÎ??/gamename></gameinfo><gameinfo><gameid>GAME51189</gameid><gamename>QQ·Û×ê(??</gamename></gameinfo><gameinfo><gameid>GAME0013</gameid><gamename>ÍêÃÀÊÀ½ç</gamename></gameinfo><gameinfo><gameid>GAME5781</gameid><gamename>QQºì×ê</gamename></gameinfo><gameinfo><gameid>GAME5581</gameid><gamename>Q??/gamename></gameinfo><gameinfo><gameid>GAME0133</gameid><gamename>ÏÉ¾³´«Ëµ</gamename></gameinfo><gameinfo><gameid>GAME4980</gameid><gamename>Q??/gamename></gameinfo><gameinfo><gameid>GAME23782</gameid><gamename>´ó»°Î÷ÓÎ2(ÍøÒ×)</gamename></gameinfo><gameinfo><gameid>GAME36781</gameid><gamename>51ÐÂìÅ??/gamename></gameinfo><gameinfo><gameid>GAME1147</gameid><gamename>Îè½Ö??/gamename></gameinfo><gameinfo><gameid>GAME51196</gameid><gamename>¾ÅÒõÕæ¾­</gamename></gameinfo><gameinfo><gameid>GAME51192</gameid><gamename>QQ½»ÓÑ(??</gamename></gameinfo><gameinfo><gameid>GAME51188</gameid><gamename>µØÏÂ³ÇÓëÓÂÊ¿DNFºÚ×ê(??</gamename></gameinfo></gameinfolist></response>";
+        //ï¿½É³ï¿½Öµï¿½ï¿½Ï·ï¿½ï¿½Ñ¯ï¿½Ó¿ï¿½Ð£ï¿½ï¿½
+        String s2 = "<?xml version=\"1.0\" encoding=\"GBK\"?><response><code>0</code><gameinfolist><gameinfo><gameid>GAME30196</gameid><gamename>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½online</gamename></gameinfo><gameinfo><gameid>GAME30193</gameid><gamename>ï¿½ï¿½ï¿½ï¿½Y??/gamename></gameinfo><gameinfo><gameid>GAME27380</gameid><gamename>ï¿½ï¿½ï¿½ï¿½??/gamename></gameinfo><gameinfo><gameid>GAME51189</gameid><gamename>QQï¿½ï¿½ï¿½ï¿½(??</gamename></gameinfo><gameinfo><gameid>GAME0013</gameid><gamename>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½</gamename></gameinfo><gameinfo><gameid>GAME5781</gameid><gamename>QQï¿½ï¿½ï¿½ï¿½</gamename></gameinfo><gameinfo><gameid>GAME5581</gameid><gamename>Q??/gamename></gameinfo><gameinfo><gameid>GAME0133</gameid><gamename>ï¿½É¾ï¿½ï¿½ï¿½Ëµ</gamename></gameinfo><gameinfo><gameid>GAME4980</gameid><gamename>Q??/gamename></gameinfo><gameinfo><gameid>GAME23782</gameid><gamename>ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2(ï¿½ï¿½ï¿½ï¿½)</gamename></gameinfo><gameinfo><gameid>GAME36781</gameid><gamename>51ï¿½ï¿½ï¿½ï¿½??/gamename></gameinfo><gameinfo><gameid>GAME1147</gameid><gamename>ï¿½ï¿½ï¿½??/gamename></gameinfo><gameinfo><gameid>GAME51196</gameid><gamename>ï¿½ï¿½ï¿½ï¿½ï¿½æ¾­</gamename></gameinfo><gameinfo><gameid>GAME51192</gameid><gamename>QQï¿½ï¿½ï¿½ï¿½(??</gamename></gameinfo><gameinfo><gameid>GAME51188</gameid><gamename>ï¿½ï¿½ï¿½Â³ï¿½ï¿½ï¿½ï¿½ï¿½Ê¿DNFï¿½ï¿½ï¿½ï¿½(??</gamename></gameinfo></gameinfolist></response>";
         String sign = te.encode("123456" + te.encode(s2 + "&123456") + "123456");
 
         //aa = te.encode(sign);

@@ -3,7 +3,10 @@ package com.victor.controller;
 import com.victor.pojo.AlipayOrderEntity;
 import com.victor.service.CommonService;
 import com.victor.service.ZshInterfacePayService;
-import com.victor.util.*;
+import com.victor.util.RequestUtil;
+import com.victor.util.SpringContextUtils;
+import com.victor.util.UigXmlMgr;
+import com.victor.util.ZshConfig;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +22,7 @@ import java.util.Map;
 
 /**
  * 
- * 微信支付入口
+ * 支付宝支付入口
  * <p>
  * [功能详细描述]
  * <p>

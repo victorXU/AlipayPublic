@@ -16,172 +16,168 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Administrator on 2015/12/21.
- */
-public class AlipayPayOrderReqServiceImpl  implements ZshInterfacePayService {
+public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
+	 @Resource
+	    private UigXmlMgr uigXmlMgr;
 
-    @Resource
-    private UigXmlMgr uigXmlMgr;
+	    @Resource
+	    private CommonService commonService;
 
-    @Resource
-    private CommonService commonService;
+	    @Resource
+	    private AlipayOrderInfoMapper alipayOrderInfoMapper;
+	    /**
+	     * [ä¸€å¥è¯åŠŸèƒ½ç®€è¿°]<p>
+	     * [åŠŸèƒ½è¯¦ç»†æè¿°]<p>
+	     * @author victor
+	     * @version 1.0, 2015-9-15
+	     * @see
+	     * @since V1.0
+	     * @param requestMap
+	     * @param entity
+	     * @return
+	     */
+	    public String execute(Map<String, String> requestMap, AlipayOrderEntity entity) {
+	        try {
+	            Map<String, String> dataMap = new HashMap<String, String>();
+	            // ----------------------------éªŒè¯ä¼ å…¥å‚æ•°å¼€å§‹----------------------------
+	            if (!validateRequest(requestMap, entity, dataMap)) {
+	                return entity.getValidateResult();
+	            }
+	            // ----------------------------éªŒè¯ä¼ å…¥å‚æ•°ç»“æŸ----------------------------
+	            //----------------------------æ’åºå¼€å§‹----------------------------
+	            String dataSend = RequestUtil.orderSendBefore(dataMap).toString();
+	            //----------------------------æ’åºç»“æŸ----------------------------
 
-    @Resource
-    private AlipayOrderInfoMapper alipayOrderInfoMapper;
-    /**
-     * [Ò»¾ä»°¹¦ÄÜ¼òÊö]<p>
-     * [¹¦ÄÜÏêÏ¸ÃèÊö]<p>
-     * @author victor
-     * @version 1.0, 2015-9-15
-     * @see
-     * @since V1.0
-     * @param requestMap
-     * @param entity
-     * @return
-     */
-    public String execute(Map<String, String> requestMap, AlipayOrderEntity entity) {
-        try {
-            Map<String, String> dataMap = new HashMap<String, String>();
-            // ----------------------------ÑéÖ¤´«Èë²ÎÊı¿ªÊ¼----------------------------
-            if (!validateRequest(requestMap, entity, dataMap)) {
-                return entity.getValidateResult();
-            }
-            // ----------------------------ÑéÖ¤´«Èë²ÎÊı½áÊø----------------------------
-            //----------------------------ÅÅĞò¿ªÊ¼----------------------------
-            String dataSend = RequestUtil.orderSendBefore(dataMap).toString();
-            //----------------------------ÅÅĞò½áÊø----------------------------
-
-            //----------------------------¼ÓÃÜ¿ªÊ¼----------------------------
-            String mysign = MD5.encode(dataSend + entity.getPartner(), ZshConfig.GBK);
-            //----------------------------¼ÓÃÜ½áÊø----------------------------
+	            //----------------------------åŠ å¯†å¼€å§‹----------------------------
+	            String mysign = MD5.encode(dataSend + entity.getPartner(), ZshConfig.GBK);
+	            //----------------------------åŠ å¯†ç»“æŸ----------------------------
 
 
-            //----------------------------´¦ÀíÖĞÎÄ¿ªÊ¼----------------------------
-            dataMap.put("subject", URLEncoder.encode(entity.getSubject(), ZshConfig.GBK));
-            dataMap.put("sign",mysign);
-            dataMap.put("sign_type", "MD5");
-            dataSend = RequestUtil.orderSendBefore(dataMap).toString();
-            // ----------------------------·¢ËÍµ½Ò×¸¶±¦¿ªÊ¼----------------------------
-            String response = RequestUtil.post("https://mapi.alipay.com/gateway.do", dataSend);
-            // ----------------------------·¢ËÍµ½Ò×¸¶±¦½áÊø----------------------------
-            // Ö§¸¶±¦·µ»Ø±¨ÎÄ¶ÔÏó¡£
-            UigXmlMgr zshResponse = uigXmlMgr.parseXmlForAlipay(response);
+	            //----------------------------å¤„ç†ä¸­æ–‡å¼€å§‹----------------------------
+	            dataMap.put("subject", URLEncoder.encode(entity.getSubject(), ZshConfig.GBK));
+	            dataMap.put("sign",mysign);
+	            dataMap.put("sign_type", "MD5");
+	            dataSend = RequestUtil.orderSendBefore(dataMap).toString();
+	            // ----------------------------å‘é€åˆ°æ˜“ä»˜å®å¼€å§‹----------------------------
+	            String response = RequestUtil.post("https://mapi.alipay.com/gateway.do", dataSend);
+	            // ----------------------------å‘é€åˆ°æ˜“ä»˜å®ç»“æŸ----------------------------
+	            // æ”¯ä»˜å®è¿”å›æŠ¥æ–‡å¯¹è±¡ã€‚
+	            UigXmlMgr zshResponse = uigXmlMgr.parseXmlForAlipay(response);
 
-            // ·â×°µÚÈı·½·µ»Ø±¨ÎÄÍ·ĞÅÏ¢¡£
-            UigXmlMgr headXml = uigXmlMgr.headResponseXml(entity);
+	            // å°è£…ç¬¬ä¸‰æ–¹è¿”å›æŠ¥æ–‡å¤´ä¿¡æ¯ã€‚
+	            UigXmlMgr headXml = uigXmlMgr.headResponseXml(entity);
 
-            // ·µ»Ø±¨ÎÄÍ·ºÍ¸ù¾İĞ­Òé×é×°µÄ±¨ÎÄÊı¾İ
-            UigXmlMgr returnXml = commonService.returnResponseXml(headXml, zshResponse, entity);
-            // ¸üĞÂÒ×¸¶±¦·µ»Ø½á¹û
-            int result = createMobilePayOrder(entity, response);
-            if (result==0) {
-                return uigXmlMgr.initErrorXML(entity, "0009", "ÏúÕË»ú¹¹´¦ÀíµÄÊ±ºò³öÏÖÒì³£¡£", "¸üĞÂÎ¢ĞÅ·µ»Ø½á¹ûÊ§°Ü!").outputXMLStr();
-            } else {
-                return returnXml.outputXMLStr();
-            }
+	            // è¿”å›æŠ¥æ–‡å¤´å’Œæ ¹æ®åè®®ç»„è£…çš„æŠ¥æ–‡æ•°æ®
+	            UigXmlMgr returnXml = commonService.returnResponseXml(headXml, zshResponse, entity);
+	            // æ›´æ–°æ˜“ä»˜å®è¿”å›ç»“æœ
+	            int result = createMobilePayOrder(entity, response);
+	            if (result==0) {
+	                return uigXmlMgr.initErrorXML(entity, "0009", "é”€è´¦æœºæ„å¤„ç†çš„æ—¶å€™å‡ºç°å¼‚å¸¸ã€‚", "æ›´æ–°å¾®ä¿¡è¿”å›ç»“æœå¤±è´¥!").outputXMLStr();
+	            } else {
+	                return returnXml.outputXMLStr();
+	            }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            LogUtil.debug(">>>ÓÃ»§²éÑ¯Ê§°Ü£¬×é×°±¨ÎÄÊ§°Ü£¡" + e.fillInStackTrace());
-            return uigXmlMgr.initErrorXML(entity, "0009", "ÏúÕË»ú¹¹´¦ÀíµÄÊ±ºò³öÏÖÒì³£¡£", e.getMessage()).outputXMLStr();
-        }
-    }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            LogUtil.debug(">>>ç”¨æˆ·æŸ¥è¯¢å¤±è´¥ï¼Œç»„è£…æŠ¥æ–‡å¤±è´¥ï¼" + e.fillInStackTrace());
+	            return uigXmlMgr.initErrorXML(entity, "0009", "é”€è´¦æœºæ„å¤„ç†çš„æ—¶å€™å‡ºç°å¼‚å¸¸ã€‚", e.getMessage()).outputXMLStr();
+	        }
+	    }
 
-    /**
-     * ·Ç¿ÕÑéÖ¤,²¢ÇÒ°Ñ²»Îª¿ÕµÄ¿É¿Õ×Ö¶ÎÌí¼Óµ½mapÖĞ
-     * <p>
-     * [¹¦ÄÜÏêÏ¸ÃèÊö]
-     * <p>
-     *
-     * @author victor
-     * @version 1.0, 2015-7-16
-     * @see
-     * @since V1.0
-     * @param requestMap
-     * @param entity
-     */
-    private boolean validateRequest(Map<String, String> requestMap, AlipayOrderEntity entity, Map<String, String> dataMap) {
-        List<String> emptyList = new ArrayList<String>() {
+	    /**
+	     * éç©ºéªŒè¯,å¹¶ä¸”æŠŠä¸ä¸ºç©ºçš„å¯ç©ºå­—æ®µæ·»åŠ åˆ°mapä¸­
+	     * <p>
+	     * [åŠŸèƒ½è¯¦ç»†æè¿°]
+	     * <p>
+	     *
+	     * @author victor
+	     * @version 1.0, 2015-7-16
+	     * @see
+	     * @since V1.0
+	     * @param requestMap
+	     * @param entity
+	     */
+	    private boolean validateRequest(Map<String, String> requestMap, AlipayOrderEntity entity, Map<String, String> dataMap) {
+	        List<String> emptyList = new ArrayList<String>() {
 
-            private static final long serialVersionUID = 1L;
+	            private static final long serialVersionUID = 1L;
 
-            {
-                add("notify_url");
-                add("seller_id");
-                add("buyer_id");
-                add("buyer_email");
-                add("operator_type");
-                add("operator_id");
-                add("body");
-                add("show_url");
-                add("currency");
-                add("price");
-                add("quantity");
-                add("goods_detail");
-                add("extend_params");
-                add("it_b_pay");
-                add("dynamic_id_type");
-                add("dynamic_id ");
-            }
-        };
-        String param="";
-        for (String s : emptyList) {
-            param = requestMap.get(s);
-            if (StringTools.isNotEmpty(param)) {
-                dataMap.put(s, param);
-            }
-        }
-        String total_fee = requestMap.get("total_fee");
-        if (StringTools.isEmpty(total_fee)) {
-            entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "¹Ø¼üÊı¾İÎª¿Õ", "total_fee²ÎÊıÎª¿Õ").outputXMLStr());
-            return false;
-        } else {
-            dataMap.put("total_fee", total_fee);
-        }
-        String product_code = requestMap.get("product_code");
-        if (StringTools.isEmpty(product_code)) {
-            entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "¹Ø¼üÊı¾İÎª¿Õ", "product_code²ÎÊıÎª¿Õ").outputXMLStr());
-            return false;
-        } else {
-            dataMap.put("product_code", product_code);
-        }
+	            {
+	                add("notify_url");
+	                add("seller_id");
+	                add("buyer_id");
+	                add("buyer_email");
+	                add("operator_type");
+	                add("operator_id");
+	                add("body");
+	                add("show_url");
+	                add("currency");
+	                add("price");
+	                add("quantity");
+	                add("goods_detail");
+	                add("extend_params");
+	                add("it_b_pay");
+	                add("dynamic_id_type");
+	                add("dynamic_id ");
+	            }
+	        };
+	        String param="";
+	        for (String s : emptyList) {
+	            param = requestMap.get(s);
+	            if (StringTools.isNotEmpty(param)) {
+	                dataMap.put(s, param);
+	            }
+	        }
+	        String total_fee = requestMap.get("total_fee");
+	        if (StringTools.isEmpty(total_fee)) {
+	            entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "å…³é”®æ•°æ®ä¸ºç©º", "total_feeå‚æ•°ä¸ºç©º").outputXMLStr());
+	            return false;
+	        } else {
+	            dataMap.put("total_fee", total_fee);
+	        }
+	        String product_code = requestMap.get("product_code");
+	        if (StringTools.isEmpty(product_code)) {
+	            entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "å…³é”®æ•°æ®ä¸ºç©º", "product_codeå‚æ•°ä¸ºç©º").outputXMLStr());
+	            return false;
+	        } else {
+	            dataMap.put("product_code", product_code);
+	        }
 
-        String notify_url = requestMap.get("notify_url");
-        if (StringTools.isNotEmpty(notify_url)) {
-            entity.setNotify_url(notify_url);
-        }
-        String out_trade_no = RequestUtil.getGUID();
-        dataMap.put("service", "alipay.acquire.createandpay ");
-        dataMap.put("partner", entity.getPartner());
-        dataMap.put("_input_charset", "utf-8");
-        dataMap.put("out_trade_no", out_trade_no);
-        dataMap.put("product_code", "QR_CODE_OFFLINE");
-        dataMap.put("seller_email", entity.getSeller_email());
+	        String notify_url = requestMap.get("notify_url");
+	        if (StringTools.isNotEmpty(notify_url)) {
+	            entity.setNotify_url(notify_url);
+	        }
+	        String out_trade_no = RequestUtil.getGUID();
+	        dataMap.put("service", "alipay.acquire.createandpay ");
+	        dataMap.put("partner", entity.getPartner());
+	        dataMap.put("_input_charset", "utf-8");
+	        dataMap.put("out_trade_no", out_trade_no);
+	        dataMap.put("product_code", "QR_CODE_OFFLINE");
+	        dataMap.put("seller_email", entity.getSeller_email());
 
-        entity.setOut_trade_no(out_trade_no);
-        return true;
-    }
+	        entity.setOut_trade_no(out_trade_no);
+	        return true;
+	    }
 
-    private int createMobilePayOrder(AlipayOrderEntity entity, String response) throws Exception{
-        // ½«×Ö·û´®×ª»¯ÎªXMLÎÄµµ¶ÔÏó
-        Document document = DocumentHelper.parseText(response);
-        // »ñµÃÎÄµµµÄ¸ù½Úµã
-        Element root = document.getRootElement();
-        Element alipay = (Element) root.selectSingleNode("/alipay");
-        String is_success = alipay.elementText("is_success");
+	    private int createMobilePayOrder(AlipayOrderEntity entity, String response) throws Exception{
+	        // å°†å­—ç¬¦ä¸²è½¬åŒ–ä¸ºXMLæ–‡æ¡£å¯¹è±¡
+	        Document document = DocumentHelper.parseText(response);
+	        // è·å¾—æ–‡æ¡£çš„æ ¹èŠ‚ç‚¹
+	        Element root = document.getRootElement();
+	        Element alipay = (Element) root.selectSingleNode("/alipay");
+	        String is_success = alipay.elementText("is_success");
 
-        if (is_success != null&& ("T".equalsIgnoreCase(is_success) || "success".equalsIgnoreCase(is_success))) {
-            Element response_alipay = (Element) root.selectSingleNode("/alipay/response/alipay");
-            entity.setResult_code(response_alipay.elementText("result_code"));
-            entity.setError(response_alipay.elementText("detail_error_code"));
-            entity.setShow_url(response_alipay.elementText("small_pic_url"));
-            if ("SUCCESS".equals(entity.getResult_code())) {
-                entity.setTrade_status("WAIT_BUYER_PAY");
-            }
-            return alipayOrderInfoMapper.insertAlipayOrderInfo(entity);
-        }else {
-            return 1;
-        }
-    }
+	        if (is_success != null&& ("T".equalsIgnoreCase(is_success) || "success".equalsIgnoreCase(is_success))) {
+	            Element response_alipay = (Element) root.selectSingleNode("/alipay/response/alipay");
+	            entity.setResult_code(response_alipay.elementText("result_code"));
+	            entity.setError(response_alipay.elementText("detail_error_code"));
+	            entity.setShow_url(response_alipay.elementText("small_pic_url"));
+	            if ("SUCCESS".equals(entity.getResult_code())) {
+	                entity.setTrade_status("WAIT_BUYER_PAY");
+	            }
+	            return alipayOrderInfoMapper.insertAlipayOrderInfo(entity);
+	        }else {
+	            return 1;
+	        }
+	    }
 }
