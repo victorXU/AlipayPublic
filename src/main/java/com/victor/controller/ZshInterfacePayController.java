@@ -3,10 +3,7 @@ package com.victor.controller;
 import com.victor.pojo.AlipayOrderEntity;
 import com.victor.service.CommonService;
 import com.victor.service.ZshInterfacePayService;
-import com.victor.util.RequestUtil;
-import com.victor.util.SpringContextUtils;
-import com.victor.util.UigXmlMgr;
-import com.victor.util.ZshConfig;
+import com.victor.util.*;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,7 +32,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("/zsh")
 public class ZshInterfacePayController {
-	public Logger logger = Logger.getLogger("WEB-APP");
 	@Resource
 	private CommonService commonService;
 
@@ -50,7 +46,7 @@ public class ZshInterfacePayController {
 		AlipayOrderEntity entity = new AlipayOrderEntity();
 		try {
 			request.setCharacterEncoding(ZshConfig.UTF_8);
-			logger.debug(request.getRemoteHost() + "发送的URL请求串内容是：" + request.getRequestURI() + "?" + request.getQueryString());
+			LogUtil.debug("【调用支付宝接口】开始，"+request.getRemoteHost() + "发送的URL请求串内容是：" + request.getRequestURI() + "?" + request.getQueryString());
 
 			Map<String, String> requestMap = RequestUtil.getRequestParams(request);
 			// 解析串的合法性。
@@ -61,8 +57,9 @@ public class ZshInterfacePayController {
 			String result = doAction(requestMap, entity);
 			return result;
 		} catch (UnsupportedEncodingException e) {
+			LogUtil.debug("【调用支付宝接口】异常，UnsupportedEncodingException="+e.getMessage());
 			e.printStackTrace();
-			return uigXmlMgr.initErrorXML(entity, "0009", "销账机构处理的时候出现异常。", e.getMessage()).outputXMLStr();
+			return uigXmlMgr.initErrorXML(entity, "0009", "【调用支付宝接口】异常。", e.getMessage()).outputXMLStr();
 		}
 
 	}

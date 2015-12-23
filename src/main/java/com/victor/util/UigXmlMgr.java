@@ -169,7 +169,7 @@ public class UigXmlMgr extends BaseUigXmlMgr {
 	 */
 	public void addElementSign(UigXmlMgr uigXmlMgr,AlipayOrderEntity body){
 		
-		try {
+		/*try {
 			
 			//第一次加密 ：
 			String oneMd5 = md5.encode(uigXmlMgr.m_Document.asXML().replaceAll("\\n|\r", ""),ZshConfig.UTF_8);
@@ -183,9 +183,9 @@ public class UigXmlMgr extends BaseUigXmlMgr {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 	}
-	
+
 	
 	/**
 	 * 

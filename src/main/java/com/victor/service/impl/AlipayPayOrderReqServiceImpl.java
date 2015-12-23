@@ -17,11 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
-	 @Resource
+	 	@Resource
 	    private UigXmlMgr uigXmlMgr;
-
-	    @Resource
-	    private CommonService commonService;
 
 	    @Resource
 	    private AlipayOrderInfoMapper alipayOrderInfoMapper;
@@ -61,26 +58,18 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
 	            // ----------------------------发送到易付宝开始----------------------------
 	            String response = RequestUtil.post("https://mapi.alipay.com/gateway.do", dataSend);
 	            // ----------------------------发送到易付宝结束----------------------------
-	            // 支付宝返回报文对象。
-	            UigXmlMgr zshResponse = uigXmlMgr.parseXmlForAlipay(response);
-
-	            // 封装第三方返回报文头信息。
-	            UigXmlMgr headXml = uigXmlMgr.headResponseXml(entity);
-
-	            // 返回报文头和根据协议组装的报文数据
-	            UigXmlMgr returnXml = commonService.returnResponseXml(headXml, zshResponse, entity);
 	            // 更新易付宝返回结果
 	            int result = createMobilePayOrder(entity, response);
 	            if (result==0) {
-	                return uigXmlMgr.initErrorXML(entity, "0009", "销账机构处理的时候出现异常。", "更新微信返回结果失败!").outputXMLStr();
+	                return uigXmlMgr.initErrorXML(entity, "0009", "【支付宝支付接口】异常", "更新微信返回结果失败!").outputXMLStr();
 	            } else {
-	                return returnXml.outputXMLStr();
+	                return response;
 	            }
 
 	        } catch (Exception e) {
 	            e.printStackTrace();
-	            LogUtil.debug(">>>用户查询失败，组装报文失败！" + e.fillInStackTrace());
-	            return uigXmlMgr.initErrorXML(entity, "0009", "销账机构处理的时候出现异常。", e.getMessage()).outputXMLStr();
+				LogUtil.debug("【支付宝支付接口】异常！" + e.getMessage());
+				return uigXmlMgr.initErrorXML(entity, "0009", "【支付宝支付接口】异常。", e.getMessage()).outputXMLStr();
 	        }
 	    }
 

@@ -57,23 +57,15 @@ public class AlipayQueryOrderReqServiceImpl implements ZshInterfacePayService {
 			dataMap.put("sign_type", "MD5");
 			dataMap.put("sign",mysign);
 			dataSend = RequestUtil.orderSendBefore(dataMap).toString();
-			// ----------------------------发送到易付宝开始----------------------------
+			// ----------------------------发送到支付宝开始----------------------------
 			String response = RequestUtil.post("https://mapi.alipay.com/gateway.do", dataSend);
-			// ----------------------------发送到易付宝结束----------------------------
-			// 支付宝返回报文对象。
-			UigXmlMgr zshResponse = uigXmlMgr.parseXmlForAlipay(response);
-
-			// 封装第三方返回报文头信息。
-			UigXmlMgr headXml = uigXmlMgr.headResponseXml(bean);
-
-			// 返回报文头和根据协议组装的报文数据
-			UigXmlMgr returnXml = commonService.returnResponseXml(headXml, zshResponse, bean);
-			return returnXml.outputXMLStr();
+			// ----------------------------发送到支付宝结束----------------------------
+			return response;
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			LogUtil.debug(">>>用户查询失败，组装报文失败！" + e.fillInStackTrace());
-			return uigXmlMgr.initErrorXML(bean, "0009", "销账机构处理的时候出现异常。", e.getMessage()).outputXMLStr();
+			LogUtil.debug("【支付宝查询接口】异常！" + e.getMessage());
+			return uigXmlMgr.initErrorXML(bean, "0009", "【支付宝查询接口】异常。", e.getMessage()).outputXMLStr();
 		}
 	}
 	
@@ -93,6 +85,7 @@ public class AlipayQueryOrderReqServiceImpl implements ZshInterfacePayService {
 	private boolean validateRequest(Map<String, String> requestMap, AlipayOrderEntity bean, Map<String, String> dataMap) {
 		String out_trade_no = requestMap.get("out_trade_no");
 		if (StringTools.isEmpty(out_trade_no)) {
+			LogUtil.debug("【支付宝查询接口】out_trade_no参数为空！" );
 			bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean, "0004", "关键数据为空", "out_trade_no参数为空").outputXMLStr());
 			return false;
 		} else {
