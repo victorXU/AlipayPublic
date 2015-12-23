@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="AlipayPublic:war">
-    <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="webChat_servant.war">
-      <element id="artifact" artifact-name="AlipayPublic:war exploded" />
-    </root>
-  </artifact>
-</component>
