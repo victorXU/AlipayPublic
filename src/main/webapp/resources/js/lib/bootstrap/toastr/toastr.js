@@ -10,9 +10,9 @@
  * Project: https://github.com/CodeSeven/toastr
  */
 ;
-(function(define) {
-    define(['jquery'], function($) {
-        return (function() {
+(function (define) {
+    define(['jquery'], function ($) {
+        return (function () {
             var version = '2.0.1';
             var $container;
             var listener;
@@ -105,7 +105,7 @@
                     $toastElement[options.hideMethod]({
                         duration: options.hideDuration,
                         easing: options.hideEasing,
-                        complete: function() {
+                        complete: function () {
                             removeToast($toastElement);
                         }
                     });
@@ -115,12 +115,13 @@
                     $container[options.hideMethod]({
                         duration: options.hideDuration,
                         easing: options.hideEasing,
-                        complete: function() {
+                        complete: function () {
                             $container.remove();
                         }
                     });
                 }
             }
+
             //#endregion
 
             //#region Internal Methods
@@ -169,7 +170,7 @@
 
             function notify(map) {
                 var
-                options = getOptions(),
+                    options = getOptions(),
                     iconClass = map.iconClass || options.iconClass;
 
                 if (typeof(map.optionsOverride) !== 'undefined') {
@@ -181,7 +182,7 @@
 
                 $container = getContainer(options);
                 var
-                intervalId = null,
+                    intervalId = null,
                     $toastElement = $('<div/>'),
                     $titleElement = $('<div/>'),
                     $messageElement = $('<div/>'),
@@ -243,7 +244,7 @@
                     $toastElement.click(hideToast);
                 }
                 if (options.closeButton && $closeElement) {
-                    $closeElement.click(function(event) {
+                    $closeElement.click(function (event) {
                         if (event.stopPropagation) {
                             event.stopPropagation();
                         } else if (event.cancelBubble !== undefined && event.cancelBubble !== true) {
@@ -254,7 +255,7 @@
                 }
 
                 if (options.onclick) {
-                    $toastElement.click(function() {
+                    $toastElement.click(function () {
                         options.onclick();
                         hideToast();
                     });
@@ -267,7 +268,7 @@
                     var audioElement = document.createElement("audio");
                     audioElement.setAttribute("src", "assets/sound/alert.mp3");
                     $.get();
-                    audioElement.addEventListener("load", function() {
+                    audioElement.addEventListener("load", function () {
                         audioElement.play()
                     }, true);
                     audioElement.pause();
@@ -287,14 +288,14 @@
                     return $toastElement[options.hideMethod]({
                         duration: options.hideDuration,
                         easing: options.hideEasing,
-                        complete: function() {
+                        complete: function () {
                             removeToast($toastElement);
                             if (options.onHidden) {
                                 options.onHidden();
                             }
                             response.state = 'hidden';
                             response.endTime = new Date(),
-                            publish(response);
+                                publish(response);
                         }
                     });
                 }
@@ -346,11 +347,12 @@
                     $container.remove();
                 }
             }
+
             //#endregion
 
         })();
     });
-}(typeof define === 'function' && define.amd ? define : function(deps, factory) {
+}(typeof define === 'function' && define.amd ? define : function (deps, factory) {
     if (typeof module !== 'undefined' && module.exports) { //Node
         module.exports = factory(require('jquery'));
     } else {

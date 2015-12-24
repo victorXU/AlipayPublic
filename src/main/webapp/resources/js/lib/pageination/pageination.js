@@ -9,7 +9,7 @@
  * Released under the MIT license.
  */
 
-(function(global, $) {
+(function (global, $) {
 
     if (typeof $ === 'undefined') {
         throwError('Pagination requires jQuery.');
@@ -26,7 +26,7 @@
         pluginName = 'pagination2';
     }
 
-    $.fn[pluginName] = function(options) {
+    $.fn[pluginName] = function (options) {
 
         if (typeof options === 'undefined') {
             return this;
@@ -36,7 +36,7 @@
 
         var pagination = {
 
-            initialize: function() {
+            initialize: function () {
                 var self = this;
 
                 // Save attributes of current instance
@@ -54,8 +54,8 @@
 
                 // Inline style
                 /*if (attributes.inlineStyle === true) {
-                    addStyle();
-                }*/
+                 addStyle();
+                 }*/
 
                 // Passed to the callback function
                 var model = self.model = {
@@ -64,7 +64,7 @@
                 };
 
                 // "dataSource"`s type is unknown, parse it to find true data
-                self.parseDataSource(attributes.dataSource, function(dataSource) {
+                self.parseDataSource(attributes.dataSource, function (dataSource) {
 
                     // Whether simulated pagination
                     self.sync = Helpers.isArray(dataSource);
@@ -105,7 +105,7 @@
 
             },
 
-            render: function(isBoot) {
+            render: function (isBoot) {
 
                 var self = this;
                 var model = self.model;
@@ -149,7 +149,7 @@
             },
 
             // Create template
-            createTemplate: function(args) {
+            createTemplate: function (args) {
 
                 var self = this;
                 var currentPage = args.currentPage;
@@ -342,7 +342,7 @@
             },
 
             // Go to the specified page
-            go: function(number, callback) {
+            go: function (number, callback) {
 
                 var self = this;
                 var model = self.model;
@@ -383,10 +383,10 @@
                 $.extend(formatAjaxParams.data || {}, postData);
 
                 formatAjaxParams.url = attributes.dataSource;
-                formatAjaxParams.success = function(response) {
+                formatAjaxParams.success = function (response) {
                     render(self.filterDataByLocator(response));
                 };
-                formatAjaxParams.error = function(jqXHR, textStatus, errorThrown) {
+                formatAjaxParams.error = function (jqXHR, textStatus, errorThrown) {
                     attributes.formatAjaxError && attributes.formatAjaxError(jqXHR, textStatus, errorThrown);
                     self.enable();
                 };
@@ -443,7 +443,7 @@
                 }
             },
 
-            doCallback: function(data, customCallback) {
+            doCallback: function (data, customCallback) {
                 var self = this;
                 var model = self.model;
 
@@ -454,7 +454,7 @@
                 }
             },
 
-            destroy: function() {
+            destroy: function () {
 
                 // Before destroy
                 if (this.callHook('beforeDestroy') === false) return;
@@ -469,15 +469,15 @@
                 this.callHook('afterDestroy');
             },
 
-            previous: function(callback) {
+            previous: function (callback) {
                 this.go(this.model.pageNumber - 1, callback);
             },
 
-            next: function(callback) {
+            next: function (callback) {
                 this.go(this.model.pageNumber + 1, callback);
             },
 
-            disable: function() {
+            disable: function () {
                 var self = this;
                 var source = self.sync ? 'sync' : 'async';
 
@@ -491,7 +491,7 @@
                 self.callHook('afterDisable', source);
             },
 
-            enable: function() {
+            enable: function () {
                 var self = this;
                 var source = self.sync ? 'sync' : 'async';
 
@@ -505,7 +505,7 @@
                 self.callHook('afterEnable', source);
             },
 
-            show: function() {
+            show: function () {
                 var self = this;
 
                 if (self.model.el.is(':visible')) return;
@@ -513,7 +513,7 @@
                 self.model.el.show();
             },
 
-            hide: function() {
+            hide: function () {
                 var self = this;
 
                 if (!self.model.el.is(':visible')) return;
@@ -522,7 +522,7 @@
             },
 
             // Replace the variables of template
-            replaceVariables: function(template, variables) {
+            replaceVariables: function (template, variables) {
 
                 var formattedString;
 
@@ -537,7 +537,7 @@
             },
 
             // Get data segments
-            getDataSegment: function(number) {
+            getDataSegment: function (number) {
                 var pageSize = attributes.pageSize;
                 var dataSource = attributes.dataSource;
                 var totalNumber = attributes.totalNumber;
@@ -549,12 +549,12 @@
             },
 
             // Get total page
-            getTotalPage: function() {
+            getTotalPage: function () {
                 return Math.ceil(attributes.totalNumber / attributes.pageSize);
             },
 
             // Get locator
-            getLocator: function(locator) {
+            getLocator: function (locator) {
                 var result;
 
                 if (typeof locator === 'string') {
@@ -569,7 +569,7 @@
             },
 
             // Filter data by "locator"
-            filterDataByLocator: function(dataSource) {
+            filterDataByLocator: function (dataSource) {
 
                 var locator = this.getLocator(attributes.locator);
                 var filteredData;
@@ -577,10 +577,11 @@
                 // Data source is an Object, use "locator" to locate the true data
                 if (Helpers.isObject(dataSource)) {
                     try {
-                        $.each(locator.split('.'), function(index, item) {
+                        $.each(locator.split('.'), function (index, item) {
                             filteredData = (filteredData ? filteredData : dataSource)[item];
                         });
-                    } catch (e) {}
+                    } catch (e) {
+                    }
 
                     if (!filteredData) {
                         throwError('dataSource.' + locator + ' is undefined.');
@@ -593,7 +594,7 @@
             },
 
             // Parse dataSource
-            parseDataSource: function(dataSource, callback) {
+            parseDataSource: function (dataSource, callback) {
 
                 var self = this;
                 var args = arguments;
@@ -603,7 +604,7 @@
                 } else if (Helpers.isArray(dataSource)) {
                     callback(attributes.dataSource = dataSource);
                 } else if ($.isFunction(dataSource)) {
-                    attributes.dataSource(function(data) {
+                    attributes.dataSource(function (data) {
                         if ($.isFunction(data)) {
                             throwError('Unexpect parameter of the "done" Function.');
                         }
@@ -621,7 +622,7 @@
                 }
             },
 
-            callHook: function(hook) {
+            callHook: function (hook) {
                 var paginationData = container.data('pagination');
                 var result;
 
@@ -635,7 +636,7 @@
                 }
 
                 if (paginationData.hooks && paginationData.hooks[hook]) {
-                    $.each(paginationData.hooks[hook], function(index, item) {
+                    $.each(paginationData.hooks[hook], function (index, item) {
                         if (item.apply(global, args) === false) {
                             result = false;
                         }
@@ -645,13 +646,13 @@
                 return result !== false;
             },
 
-            observer: function() {
+            observer: function () {
 
                 var self = this;
                 var el = self.model.el;
 
                 // Go to page
-                container.on(eventPrefix + 'go', function(event, pageNumber, done) {
+                container.on(eventPrefix + 'go', function (event, pageNumber, done) {
 
                     pageNumber = parseInt($.trim(pageNumber));
 
@@ -665,7 +666,7 @@
                 });
 
                 // Page click
-                el.delegate('.J-paginationjs-page', 'click', function(event) {
+                el.delegate('.J-paginationjs-page', 'click', function (event) {
                     var current = $(event.currentTarget);
                     var pageNumber = $.trim(current.attr('data-num'));
 
@@ -683,7 +684,7 @@
                 });
 
                 // Previous click
-                el.delegate('.J-paginationjs-previous', 'click', function(event) {
+                el.delegate('.J-paginationjs-previous', 'click', function (event) {
                     var current = $(event.currentTarget);
                     var pageNumber = $.trim(current.attr('data-num'));
 
@@ -701,7 +702,7 @@
                 });
 
                 // Next click
-                el.delegate('.J-paginationjs-next', 'click', function(event) {
+                el.delegate('.J-paginationjs-next', 'click', function (event) {
                     var current = $(event.currentTarget);
                     var pageNumber = $.trim(current.attr('data-num'));
 
@@ -719,7 +720,7 @@
                 });
 
                 // Go button click
-                el.delegate('.J-paginationjs-go-button', 'click', function() {
+                el.delegate('.J-paginationjs-go-button', 'click', function () {
                     var pageNumber = $('.J-paginationjs-go-pagenumber', el).val();
 
                     // Before Go button clicked
@@ -732,7 +733,7 @@
                 });
 
                 // go input enter
-                el.delegate('.J-paginationjs-go-pagenumber', 'keyup', function(event) {
+                el.delegate('.J-paginationjs-go-pagenumber', 'keyup', function (event) {
                     if (event.which === 13) {
                         var pageNumber = $(event.currentTarget).val();
 
@@ -750,37 +751,37 @@
                 });
 
                 // Previous page
-                container.on(eventPrefix + 'previous', function(event, done) {
+                container.on(eventPrefix + 'previous', function (event, done) {
                     self.previous(done);
                 });
 
                 // Next page
-                container.on(eventPrefix + 'next', function(event, done) {
+                container.on(eventPrefix + 'next', function (event, done) {
                     self.next(done);
                 });
 
                 // Disable
-                container.on(eventPrefix + 'disable', function() {
+                container.on(eventPrefix + 'disable', function () {
                     self.disable();
                 });
 
                 // Enable
-                container.on(eventPrefix + 'enable', function() {
+                container.on(eventPrefix + 'enable', function () {
                     self.enable();
                 });
 
                 // Show
-                container.on(eventPrefix + 'show', function() {
+                container.on(eventPrefix + 'show', function () {
                     self.show();
                 });
 
                 // Hide
-                container.on(eventPrefix + 'hide', function() {
+                container.on(eventPrefix + 'hide', function () {
                     self.hide();
                 });
 
                 // Destroy
-                container.on(eventPrefix + 'destroy', function() {
+                container.on(eventPrefix + 'destroy', function () {
                     self.destroy();
                 });
 
@@ -817,7 +818,7 @@
                         container.trigger.apply(this, args);
                         break;
 
-                        // Get selected page number
+                    // Get selected page number
                     case 'getSelectedPageNum':
                         if (container.data('pagination').model) {
                             return container.data('pagination').model.pageNumber;
@@ -825,15 +826,15 @@
                             return container.data('pagination').attributes.pageNumber;
                         }
 
-                        // Get total page
+                    // Get total page
                     case 'getTotalPage':
                         return container.data('pagination').model.totalPage;
 
-                        // Get selected page data
+                    // Get selected page data
                     case 'getSelectedPageData':
                         return container.data('pagination').currentPageData;
 
-                        // Whether pagination was be disabled
+                    // Whether pagination was be disabled
                     case 'isDisabled':
                         return container.data('pagination').model.disabled === true;
 
@@ -967,11 +968,12 @@
         showLastOnEllipsisShow: true,
 
         // Pagging callback
-        callback: function() {}
+        callback: function () {
+        }
     };
 
     // Hook register
-    $.fn[pluginHookMethod] = function(hook, callback) {
+    $.fn[pluginHookMethod] = function (hook, callback) {
 
         if (arguments.length < 2) {
             throwError('Missing argument.');
@@ -998,7 +1000,7 @@
     };
 
     // Static method
-    $[pluginName] = function(selector, options) {
+    $[pluginName] = function (selector, options) {
 
         if (arguments.length < 2) {
             throwError('Requires two parameters.');
@@ -1062,8 +1064,9 @@
         var tmp;
         return ((tmp = typeof(object)) == "object" ? object == null && "null" || Object.prototype.toString.call(object).slice(8, -1) : tmp).toLowerCase();
     }
-    $.each(['Object', 'Array'], function(index, name) {
-        Helpers['is' + name] = function(object) {
+
+    $.each(['Object', 'Array'], function (index, name) {
+        Helpers['is' + name] = function (object) {
             return getObjectType(object) === name.toLowerCase();
         };
     });
@@ -1071,20 +1074,20 @@
     // Inline style
 
     /*function addStyle() {
-        var styleElement = $('#paginationjs-style');
+     var styleElement = $('#paginationjs-style');
 
-        if (styleElement.length) return;
+     if (styleElement.length) return;
 
-        var cssText = '.paginationjs{line-height:1.6;font-family:"Marmelad","Lucida Grande","Arial","Hiragino Sans GB",Georgia,sans-serif;font-size:14px;box-sizing:initial}.paginationjs:after{display:table;content:" ";clear:both}.paginationjs .paginationjs-pages{float:left}.paginationjs .paginationjs-pages ul{float:left;margin:0;padding:0}.paginationjs .paginationjs-pages li{float:left;border:1px solid #aaa;border-right:0;list-style:none}.paginationjs .paginationjs-pages li>a{min-width:38px;height:38px;line-height:38px;display:block;background:#fff;font-size:14px;color:#333;text-decoration:none;text-align:center}.paginationjs .paginationjs-pages li>a:hover{background:#eee}.paginationjs .paginationjs-pages li.active{border:0}.paginationjs .paginationjs-pages li.active>a{height:40px;width:40px;line-height:40px;background:#2381c5;color:#fff}.paginationjs .paginationjs-pages li.disabled>a{opacity:.3}.paginationjs .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs .paginationjs-pages li:first-child{border-radius:3px 0 0 3px;}.paginationjs .paginationjs-pages li:first-child>a{border-radius:3px 0 0 3px;font-size:15px;}.paginationjs .paginationjs-pages li:last-child{border-right:1px solid #aaa;border-radius:0 3px 3px 0}.paginationjs .paginationjs-pages li:last-child>a{border-radius:0 3px 3px 0;font-size:15px;}.paginationjs .paginationjs-go-input{float:left;margin-left:10px;font-size:14px}.paginationjs .paginationjs-go-input>input[type="text"]{width:30px;height:38px;background:#fff;border-radius:3px;border:1px solid #aaa;padding:0;font-size:14px;text-align:center;vertical-align:baseline;outline:0;box-shadow:none;box-sizing:initial}.paginationjs .paginationjs-go-button{float:left;margin-left:10px;font-size:14px}.paginationjs .paginationjs-go-button>input[type="button"]{min-width:40px;height:40px;line-height:28px;background:#fff;border-radius:3px;border:1px solid #aaa;text-align:center;padding:0 8px;font-size:14px;vertical-align:baseline;outline:0;box-shadow:none;color:#333;cursor:pointer}.paginationjs .paginationjs-go-button>input[type="button"]:hover{background-color:#f8f8f8}.paginationjs .paginationjs-nav{float:left;height:30px;line-height:30px;margin-left:10px;font-size:14px}.paginationjs.paginationjs-small{font-size:12px}.paginationjs.paginationjs-small .paginationjs-pages li>a{min-width:26px;height:24px;line-height:24px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-pages li.active>a{height:26px;line-height:26px}.paginationjs.paginationjs-small .paginationjs-go-input{font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-input>input[type="text"]{width:26px;height:24px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-button{font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-button>input[type="button"]{min-width:30px;height:26px;line-height:24px;padding:0 6px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-nav{height:26px;line-height:26px;font-size:12px}.paginationjs.paginationjs-big{font-size:16px}.paginationjs.paginationjs-big .paginationjs-pages li>a{min-width:36px;height:34px;line-height:34px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-pages li.active>a{height:36px;line-height:36px}.paginationjs.paginationjs-big .paginationjs-go-input{font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-input>input[type="text"]{width:36px;height:34px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-button{font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-button>input[type="button"]{min-width:50px;height:36px;line-height:34px;padding:0 12px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-nav{height:36px;line-height:36px;font-size:16px}.paginationjs.paginationjs-theme-blue .paginationjs-pages li{border-color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-pages li>a{color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-pages li>a:hover{background:#e9f4fc}.paginationjs.paginationjs-theme-blue .paginationjs-pages li.active>a{background:#289de9;color:#fff}.paginationjs.paginationjs-theme-blue .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-blue .paginationjs-go-input>input[type="text"]{border-color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-go-button>input[type="button"]{background:#289de9;border-color:#289de9;color:#fff}.paginationjs.paginationjs-theme-blue .paginationjs-go-button>input[type="button"]:hover{background-color:#3ca5ea}.paginationjs.paginationjs-theme-green .paginationjs-pages li{border-color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-pages li>a{color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-pages li>a:hover{background:#ebf4eb}.paginationjs.paginationjs-theme-green .paginationjs-pages li.active>a{background:#449d44;color:#fff}.paginationjs.paginationjs-theme-green .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-green .paginationjs-go-input>input[type="text"]{border-color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-go-button>input[type="button"]{background:#449d44;border-color:#449d44;color:#fff}.paginationjs.paginationjs-theme-green .paginationjs-go-button>input[type="button"]:hover{background-color:#55a555}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li{border-color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li>a{color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li>a:hover{background:#fdf5e9}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li.active>a{background:#ec971f;color:#fff}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-yellow .paginationjs-go-input>input[type="text"]{border-color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-go-button>input[type="button"]{background:#ec971f;border-color:#ec971f;color:#fff}.paginationjs.paginationjs-theme-yellow .paginationjs-go-button>input[type="button"]:hover{background-color:#eea135}.paginationjs.paginationjs-theme-red .paginationjs-pages li{border-color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-pages li>a{color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-pages li>a:hover{background:#faeaea}.paginationjs.paginationjs-theme-red .paginationjs-pages li.active>a{background:#c9302c;color:#fff}.paginationjs.paginationjs-theme-red .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-red .paginationjs-go-input>input[type="text"]{border-color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-go-button>input[type="button"]{background:#c9302c;border-color:#c9302c;color:#fff}.paginationjs.paginationjs-theme-red .paginationjs-go-button>input[type="button"]:hover{background-color:#ce4541}.paginationjs .paginationjs-pages li.paginationjs-next{*border-right:1px solid #aaa;border-right:1px solid #aaa\\0}.paginationjs .paginationjs-go-input{*margin-left:5px;margin-left:5px\\0}.paginationjs .paginationjs-go-input>input[type="text"]{*line-height:28px;line-height:28px\\0;*vertical-align:middle;vertical-align:middle\\0}.paginationjs .paginationjs-go-button{*margin-left:5px;margin-left:5px\\\0}.paginationjs .paginationjs-go-button>input[type="button"]{*vertical-align:middle;vertical-align:middle\\0}.paginationjs.paginationjs-big .paginationjs-pages li>a{line-height:36px\\0}.paginationjs.paginationjs-big .paginationjs-go-input>input[type="text"]{*height:35px;height:36px\\0;*line-height:36px;line-height:36px\\0}';
+     var cssText = '.paginationjs{line-height:1.6;font-family:"Marmelad","Lucida Grande","Arial","Hiragino Sans GB",Georgia,sans-serif;font-size:14px;box-sizing:initial}.paginationjs:after{display:table;content:" ";clear:both}.paginationjs .paginationjs-pages{float:left}.paginationjs .paginationjs-pages ul{float:left;margin:0;padding:0}.paginationjs .paginationjs-pages li{float:left;border:1px solid #aaa;border-right:0;list-style:none}.paginationjs .paginationjs-pages li>a{min-width:38px;height:38px;line-height:38px;display:block;background:#fff;font-size:14px;color:#333;text-decoration:none;text-align:center}.paginationjs .paginationjs-pages li>a:hover{background:#eee}.paginationjs .paginationjs-pages li.active{border:0}.paginationjs .paginationjs-pages li.active>a{height:40px;width:40px;line-height:40px;background:#2381c5;color:#fff}.paginationjs .paginationjs-pages li.disabled>a{opacity:.3}.paginationjs .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs .paginationjs-pages li:first-child{border-radius:3px 0 0 3px;}.paginationjs .paginationjs-pages li:first-child>a{border-radius:3px 0 0 3px;font-size:15px;}.paginationjs .paginationjs-pages li:last-child{border-right:1px solid #aaa;border-radius:0 3px 3px 0}.paginationjs .paginationjs-pages li:last-child>a{border-radius:0 3px 3px 0;font-size:15px;}.paginationjs .paginationjs-go-input{float:left;margin-left:10px;font-size:14px}.paginationjs .paginationjs-go-input>input[type="text"]{width:30px;height:38px;background:#fff;border-radius:3px;border:1px solid #aaa;padding:0;font-size:14px;text-align:center;vertical-align:baseline;outline:0;box-shadow:none;box-sizing:initial}.paginationjs .paginationjs-go-button{float:left;margin-left:10px;font-size:14px}.paginationjs .paginationjs-go-button>input[type="button"]{min-width:40px;height:40px;line-height:28px;background:#fff;border-radius:3px;border:1px solid #aaa;text-align:center;padding:0 8px;font-size:14px;vertical-align:baseline;outline:0;box-shadow:none;color:#333;cursor:pointer}.paginationjs .paginationjs-go-button>input[type="button"]:hover{background-color:#f8f8f8}.paginationjs .paginationjs-nav{float:left;height:30px;line-height:30px;margin-left:10px;font-size:14px}.paginationjs.paginationjs-small{font-size:12px}.paginationjs.paginationjs-small .paginationjs-pages li>a{min-width:26px;height:24px;line-height:24px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-pages li.active>a{height:26px;line-height:26px}.paginationjs.paginationjs-small .paginationjs-go-input{font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-input>input[type="text"]{width:26px;height:24px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-button{font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-button>input[type="button"]{min-width:30px;height:26px;line-height:24px;padding:0 6px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-nav{height:26px;line-height:26px;font-size:12px}.paginationjs.paginationjs-big{font-size:16px}.paginationjs.paginationjs-big .paginationjs-pages li>a{min-width:36px;height:34px;line-height:34px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-pages li.active>a{height:36px;line-height:36px}.paginationjs.paginationjs-big .paginationjs-go-input{font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-input>input[type="text"]{width:36px;height:34px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-button{font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-button>input[type="button"]{min-width:50px;height:36px;line-height:34px;padding:0 12px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-nav{height:36px;line-height:36px;font-size:16px}.paginationjs.paginationjs-theme-blue .paginationjs-pages li{border-color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-pages li>a{color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-pages li>a:hover{background:#e9f4fc}.paginationjs.paginationjs-theme-blue .paginationjs-pages li.active>a{background:#289de9;color:#fff}.paginationjs.paginationjs-theme-blue .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-blue .paginationjs-go-input>input[type="text"]{border-color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-go-button>input[type="button"]{background:#289de9;border-color:#289de9;color:#fff}.paginationjs.paginationjs-theme-blue .paginationjs-go-button>input[type="button"]:hover{background-color:#3ca5ea}.paginationjs.paginationjs-theme-green .paginationjs-pages li{border-color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-pages li>a{color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-pages li>a:hover{background:#ebf4eb}.paginationjs.paginationjs-theme-green .paginationjs-pages li.active>a{background:#449d44;color:#fff}.paginationjs.paginationjs-theme-green .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-green .paginationjs-go-input>input[type="text"]{border-color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-go-button>input[type="button"]{background:#449d44;border-color:#449d44;color:#fff}.paginationjs.paginationjs-theme-green .paginationjs-go-button>input[type="button"]:hover{background-color:#55a555}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li{border-color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li>a{color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li>a:hover{background:#fdf5e9}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li.active>a{background:#ec971f;color:#fff}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-yellow .paginationjs-go-input>input[type="text"]{border-color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-go-button>input[type="button"]{background:#ec971f;border-color:#ec971f;color:#fff}.paginationjs.paginationjs-theme-yellow .paginationjs-go-button>input[type="button"]:hover{background-color:#eea135}.paginationjs.paginationjs-theme-red .paginationjs-pages li{border-color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-pages li>a{color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-pages li>a:hover{background:#faeaea}.paginationjs.paginationjs-theme-red .paginationjs-pages li.active>a{background:#c9302c;color:#fff}.paginationjs.paginationjs-theme-red .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-red .paginationjs-go-input>input[type="text"]{border-color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-go-button>input[type="button"]{background:#c9302c;border-color:#c9302c;color:#fff}.paginationjs.paginationjs-theme-red .paginationjs-go-button>input[type="button"]:hover{background-color:#ce4541}.paginationjs .paginationjs-pages li.paginationjs-next{*border-right:1px solid #aaa;border-right:1px solid #aaa\\0}.paginationjs .paginationjs-go-input{*margin-left:5px;margin-left:5px\\0}.paginationjs .paginationjs-go-input>input[type="text"]{*line-height:28px;line-height:28px\\0;*vertical-align:middle;vertical-align:middle\\0}.paginationjs .paginationjs-go-button{*margin-left:5px;margin-left:5px\\\0}.paginationjs .paginationjs-go-button>input[type="button"]{*vertical-align:middle;vertical-align:middle\\0}.paginationjs.paginationjs-big .paginationjs-pages li>a{line-height:36px\\0}.paginationjs.paginationjs-big .paginationjs-go-input>input[type="text"]{*height:35px;height:36px\\0;*line-height:36px;line-height:36px\\0}';
 
-        $('head').append('<style type="text\/css" id="paginationjs-style">' + cssText + '<\/style>');
-    }*/
+     $('head').append('<style type="text\/css" id="paginationjs-style">' + cssText + '<\/style>');
+     }*/
 
     /*
      * export via AMD or CommonJS
      * */
     if (typeof define === 'function' && (define.amd || define.cmd)) {
-        define(function() {
+        define(function () {
             return $;
         });
     }

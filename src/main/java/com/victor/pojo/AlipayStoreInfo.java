@@ -7,11 +7,11 @@ import lombok.EqualsAndHashCode;
  * Created by Administrator on 2015/12/21.
  */
 @Data
-@EqualsAndHashCode(callSuper=false)
+@EqualsAndHashCode(callSuper = false)
 public class AlipayStoreInfo extends Entity {
-   
-	private static final long serialVersionUID = 1L;
-	private String rel_state;
+
+    private static final long serialVersionUID = 1L;
+    private String rel_state;
     private String remark;
     private String partner_key;
     private String partnerid;

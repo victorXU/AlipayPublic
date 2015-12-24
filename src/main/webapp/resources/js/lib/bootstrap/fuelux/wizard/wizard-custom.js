@@ -1,5 +1,5 @@
-﻿(function(b, c) {
-    var a = function(f, e) {
+﻿(function (b, c) {
+    var a = function (f, e) {
         var d;
         this.$element = b(f);
         this.options = b.extend({}, b.fn.wizard.defaults, e);
@@ -8,17 +8,17 @@
         this.$prevBtn = this.options.prevBtn;
         this.$nextBtn = this.options.nextBtn;
         /* d = this.$nextBtn.children().detach();
-        this.nextText = b.trim(this.$nextBtn.text());
-        this.$nextBtn.append(d);
-        this.$prevBtn.on("click", b.proxy(this.previous, this));
-        this.$nextBtn.on("click", b.proxy(this.next, this));*/
+         this.nextText = b.trim(this.$nextBtn.text());
+         this.$nextBtn.append(d);
+         this.$prevBtn.on("click", b.proxy(this.previous, this));
+         this.$nextBtn.on("click", b.proxy(this.next, this));*/
         // this.$element.on("click", "li.complete", b.proxy(this.stepclicked, this));
         this.$stepContainer = this.$element.data("target") || "body";
         this.$stepContainer = b(this.$stepContainer)
     };
     a.prototype = {
         constructor: a,
-        setState: function() {
+        setState: function () {
             var n = (this.currentStep > 1);
             var o = (this.currentStep === 1);
             var d = (this.currentStep === this.numSteps);
@@ -46,7 +46,7 @@
             b(i).addClass("active");
             this.$element.trigger("changed")
         },
-        stepclicked: function(h) {
+        stepclicked: function (h) {
             var d = b(h.currentTarget);
             var g = this.$element.find("li").index(d);
             var f = b.Event("stepclick");
@@ -59,7 +59,7 @@
             this.currentStep = (g + 1);
             this.setState()
         },
-        previous: function() {
+        previous: function () {
             var d = (this.currentStep > 1);
             if (d) {
                 var f = b.Event("change");
@@ -74,7 +74,7 @@
                 this.setState()
             }
         },
-        next: function() {
+        next: function () {
             var g = (this.currentStep + 1 <= this.numSteps);
             var d = (this.currentStep === this.numSteps);
             if (g) {
@@ -94,15 +94,15 @@
                 }
             }
         },
-        selectedItem: function(d) {
+        selectedItem: function (d) {
             return {
                 step: this.currentStep
             }
         }
     };
-    b.fn.wizard = function(e, g) {
+    b.fn.wizard = function (e, g) {
         var f;
-        var d = this.each(function() {
+        var d = this.each(function () {
             var j = b(this);
             var i = j.data("wizard");
             var h = typeof e === "object" && e;
@@ -118,12 +118,12 @@
     b.fn.wizard.defaults = {};
     b.fn.wizard.Constructor = a;
     /*b(function() {
-        b("body").on("mousedown.wizard.data-api", ".wizard", function() {
-            var d = b(this);
-            if (d.data("wizard")) {
-                return
-            }
-            d.wizard(d.data())
-        })
-    })*/
+     b("body").on("mousedown.wizard.data-api", ".wizard", function() {
+     var d = b(this);
+     if (d.data("wizard")) {
+     return
+     }
+     d.wizard(d.data())
+     })
+     })*/
 })(window.jQuery);

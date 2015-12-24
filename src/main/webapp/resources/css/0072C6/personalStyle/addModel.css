@@ -2,401 +2,469 @@
 /*=======================================================================*/
 /*=============title部分=============*/
 .tab_title {
-  margin-bottom: 40px;
+    margin-bottom: 40px;
 }
+
 .tab_title .tab_bread_crumb {
-  list-style: none;
-  display: inline-block;
+    list-style: none;
+    display: inline-block;
 }
+
 .tab_title .tab_bread_crumb > li {
-  display: inline-block;
+    display: inline-block;
 }
+
 .tab_title .tab_bread_crumb > li {
-  cursor: pointer;
+    cursor: pointer;
 }
+
 /*颜色定制*/
 .tab_title .tab_bread_crumb > li:first-child > i,
 .tab_bread_crumb > li:first-child > a {
-  color: #0072c6;
+    color: #0072c6;
 }
+
 .tab_title .tab_bread_crumb > li:last-child {
-  color: #888888;
-  text-decoration: none;
-  cursor: auto;
+    color: #888888;
+    text-decoration: none;
+    cursor: auto;
 }
+
 .tab_title .tab_bread_crumb > li + li:before {
-  padding: 0 5px;
-  color: #ccc;
-  content: "/\00a0";
+    padding: 0 5px;
+    color: #ccc;
+    content: "/\00a0";
 }
+
 .tab_title button {
-  height: 38px;
-  padding: 0 10px;
-  background-color: #0072c6;
-  color: #ffffff;
-  border-radius: 4px;
-  float: right;
+    height: 38px;
+    padding: 0 10px;
+    background-color: #0072c6;
+    color: #ffffff;
+    border-radius: 4px;
+    float: right;
 }
+
 .tab_title button:hover {
-  box-shadow: 0 0px 10px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0px 10px 0 rgba(0, 0, 0, 0.3);
 }
+
 /*=============body部分=============*/
 .tab_body .tab_body_left .left_part {
-  width: 80%;
+    width: 80%;
 }
+
 @media (max-width: 1600px) {
-  .tab_body .tab_body_left .left_part {
-    width: 90%;
-  }
+    .tab_body .tab_body_left .left_part {
+        width: 90%;
+    }
 }
+
 @media (max-width: 1400px) {
-  .tab_body .tab_body_left .left_part {
-    width: 100%;
-  }
+    .tab_body .tab_body_left .left_part {
+        width: 100%;
+    }
 }
+
 /*++++++part1++++++*/
 .tab_body .tab_body_left .left_part.left_part_1 {
-  border: 1px solid #dddddd;
-  box-shadow: 0px 0px 10px 0 rgba(0, 0, 0, 0.3);
+    border: 1px solid #dddddd;
+    box-shadow: 0px 0px 10px 0 rgba(0, 0, 0, 0.3);
 }
+
 /*list item*/
 .tab_body .tab_body_left .left_part .item {
-  width: 100%;
-  position: relative;
+    width: 100%;
+    position: relative;
 }
+
 /*list shadow*/
 .tab_body .tab_body_left .left_part .item .item_shadow {
-  opacity: 0;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
 }
+
 .tab_body .tab_body_left .left_part .item .item_shadow .item_shadow_inner {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  font-size: 30px;
-  top: 50%;
-  margin-top: -21px;
-  color: #dddddd;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    top: 50%;
+    margin-top: -21px;
+    color: #dddddd;
 }
+
 .tab_body .tab_body_left .left_part .item .item_shadow .item_shadow_inner i:last-child {
-  margin-left: 25%;
+    margin-left: 25%;
 }
+
 .tab_body .tab_body_left .left_part .item.main_model .item_shadow .item_shadow_inner i:last-child {
-  margin-left: 0;
+    margin-left: 0;
 }
+
 /*颜色定制*/
 .tab_body .tab_body_left .left_part .item .item_shadow .item_shadow_inner i:hover {
-  cursor: pointer;
-  color: #0072c6;
-  transform: scale(1.3);
-  -webkit-transform: scale(1.3);
-  -moz-transform: scale(1.3);
+    cursor: pointer;
+    color: #0072c6;
+    transform: scale(1.3);
+    -webkit-transform: scale(1.3);
+    -moz-transform: scale(1.3);
 }
+
 .tab_body .tab_body_left .left_part .item:hover .item_shadow {
-  opacity: 1;
+    opacity: 1;
 }
+
 /*list main model*/
 .tab_body .tab_body_left .left_part .item.main_model img {
-  width: 100%;
+    width: 100%;
 }
+
 .tab_body .tab_body_left .left_part .item.main_model span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #ffffff;
-  padding: 0 20px;
-  line-height: 40px;
-  font-size: 16px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    padding: 0 20px;
+    line-height: 40px;
+    font-size: 16px;
 }
+
 @media (max-width: 1600px) {
-  .tab_body .tab_body_left .left_part .item.main_model span {
-    font-size: 14px;
-  }
+    .tab_body .tab_body_left .left_part .item.main_model span {
+        font-size: 14px;
+    }
 }
+
 @media (max-width: 1400px) {
-  .tab_body .tab_body_left .left_part .item.main_model span {
-    font-size: 13px;
-  }
+    .tab_body .tab_body_left .left_part .item.main_model span {
+        font-size: 13px;
+    }
 }
+
 /*list normal model*/
 .tab_body .tab_body_left .left_part .item.normal_model {
-  padding: 20px;
-  border-bottom: 1px solid #dddddd;
+    padding: 20px;
+    border-bottom: 1px solid #dddddd;
 }
+
 .tab_body .tab_body_left .left_part .item.normal_model img {
-  width: 120px;
-  height: 120px;
-  float: right;
+    width: 120px;
+    height: 120px;
+    float: right;
 }
+
 .tab_body .tab_body_left .left_part .item.normal_model span {
-  position: absolute;
-  left: 0;
-  right: 140px;
-  color: #000000;
-  padding: 0 20px;
-  font-size: 16px;
-  margin-top: 30px;
+    position: absolute;
+    left: 0;
+    right: 140px;
+    color: #000000;
+    padding: 0 20px;
+    font-size: 16px;
+    margin-top: 30px;
 }
+
 @media (max-width: 1600px) {
-  .tab_body .tab_body_left .left_part .item.normal_model img {
-    width: 100px;
-    height: 100px;
-    float: right;
-  }
-  .tab_body .tab_body_left .left_part .item.normal_model span {
-    position: absolute;
-    left: 0;
-    right: 120px;
-    color: #000000;
-    padding: 0 20px;
-    font-size: 14px;
-    margin-top: 25px;
-  }
+    .tab_body .tab_body_left .left_part .item.normal_model img {
+        width: 100px;
+        height: 100px;
+        float: right;
+    }
+
+    .tab_body .tab_body_left .left_part .item.normal_model span {
+        position: absolute;
+        left: 0;
+        right: 120px;
+        color: #000000;
+        padding: 0 20px;
+        font-size: 14px;
+        margin-top: 25px;
+    }
 }
+
 @media (max-width: 1400px) {
-  .tab_body .tab_body_left .left_part .item.normal_model img {
-    width: 80px;
-    height: 80px;
-    float: right;
-  }
-  .tab_body .tab_body_left .left_part .item.normal_model span {
-    position: absolute;
-    left: 0;
-    right: 100px;
-    color: #000000;
-    padding: 0 20px;
-    font-size: 13px;
-    margin-top: 20px;
-  }
+    .tab_body .tab_body_left .left_part .item.normal_model img {
+        width: 80px;
+        height: 80px;
+        float: right;
+    }
+
+    .tab_body .tab_body_left .left_part .item.normal_model span {
+        position: absolute;
+        left: 0;
+        right: 100px;
+        color: #000000;
+        padding: 0 20px;
+        font-size: 13px;
+        margin-top: 20px;
+    }
 }
+
 /*add btn area*/
 .tab_body .tab_body_left .left_part .add_model_area {
-  height: 160px;
-  line-height: 160px;
-  text-align: center;
-  padding-top: 27px;
+    height: 160px;
+    line-height: 160px;
+    text-align: center;
+    padding-top: 27px;
 }
+
 .tab_body .tab_body_left .left_part .add_model_area button {
-  height: 100px;
-  width: 129px;
-  border: 1px dashed #B3B3B3;
-  line-height: 100px;
-  background-color: transparent;
-  background-image: url('../../img/plus_small.png');
-  background-repeat: no-repeat;
-  background-position: center 14px;
-  padding: 27px 0;
-  color: #838383;
+    height: 100px;
+    width: 129px;
+    border: 1px dashed #B3B3B3;
+    line-height: 100px;
+    background-color: transparent;
+    background-image: url('../../img/plus_small.png');
+    background-repeat: no-repeat;
+    background-position: center 14px;
+    padding: 27px 0;
+    color: #838383;
 }
+
 .tab_body .tab_body_left .left_part .add_model_area button:last-child {
-  margin-left: 10%;
+    margin-left: 10%;
 }
+
 .tab_body .tab_body_left .left_part .add_model_area button:hover {
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
+
 @media (max-width: 1600px) {
-  .tab_body .tab_body_left .left_part .add_model_area {
-    height: 140px;
-    line-height: 140px;
-    text-align: center;
-    padding-top: 20px;
-  }
-  .tab_body .tab_body_left .left_part .add_model_area button {
-    height: 75px;
-    width: 119px;
-    border: 1px dashed #B3B3B3;
-    line-height: 115px;
-    background-color: transparent;
-    background-image: url('../../img/plus_small.png');
-    background-repeat: no-repeat;
-    background-position: center 10px;
-    background-size: 30%;
-    padding: 0px 0;
-    color: #838383;
-  }
+    .tab_body .tab_body_left .left_part .add_model_area {
+        height: 140px;
+        line-height: 140px;
+        text-align: center;
+        padding-top: 20px;
+    }
+
+    .tab_body .tab_body_left .left_part .add_model_area button {
+        height: 75px;
+        width: 119px;
+        border: 1px dashed #B3B3B3;
+        line-height: 115px;
+        background-color: transparent;
+        background-image: url('../../img/plus_small.png');
+        background-repeat: no-repeat;
+        background-position: center 10px;
+        background-size: 30%;
+        padding: 0px 0;
+        color: #838383;
+    }
 }
+
 @media (max-width: 1400px) {
-  .tab_body .tab_body_left .left_part .add_model_area {
-    height: 120px;
-    line-height: 120px;
-    text-align: center;
-    padding-top: 14px;
-  }
-  .tab_body .tab_body_left .left_part .add_model_area button {
-    height: 60px;
-    width: 109px;
-    border: 1px dashed #B3B3B3;
-    line-height: 85px;
-    background-color: transparent;
-    background-image: url('../../img/plus_small.png');
-    background-repeat: no-repeat;
-    background-position: center 8px;
-    background-size: 25%;
-    padding: 0px 0;
-    color: #838383;
-  }
+    .tab_body .tab_body_left .left_part .add_model_area {
+        height: 120px;
+        line-height: 120px;
+        text-align: center;
+        padding-top: 14px;
+    }
+
+    .tab_body .tab_body_left .left_part .add_model_area button {
+        height: 60px;
+        width: 109px;
+        border: 1px dashed #B3B3B3;
+        line-height: 85px;
+        background-color: transparent;
+        background-image: url('../../img/plus_small.png');
+        background-repeat: no-repeat;
+        background-position: center 8px;
+        background-size: 25%;
+        padding: 0px 0;
+        color: #838383;
+    }
 }
+
 /*++++++part2++++++*/
 .tab_body .tab_body_left .left_part.left_part_2 {
-  position: relative;
-  margin-top: 40px;
+    position: relative;
+    margin-top: 40px;
 }
+
 .tab_body .tab_body_left .left_part.left_part_2 > span {
-  float: left;
-  display: block;
-  width: 20%;
+    float: left;
+    display: block;
+    width: 20%;
 }
+
 .tab_body .tab_body_left .left_part.left_part_2 > .edit_tip_area {
-  float: left;
-  border: 1px solid #D5D5D5;
-  width: 80%;
-  padding: 10px 10px 15px 10px;
-  position: relative;
+    float: left;
+    border: 1px solid #D5D5D5;
+    width: 80%;
+    padding: 10px 10px 15px 10px;
+    position: relative;
 }
+
 .tab_body .tab_body_left .left_part.left_part_2 > .edit_tip_area .tip_list {
-  display: inline-block;
-  padding-left: 5px;
-  line-height: 25px;
+    display: inline-block;
+    padding-left: 5px;
+    line-height: 25px;
 }
+
 .tab_body .tab_body_left .left_part.left_part_2 > .edit_tip_area .add_tip_area {
-  position: relative;
-  margin-top: 10px;
+    position: relative;
+    margin-top: 10px;
 }
+
 .tab_body .tab_body_left .left_part.left_part_2 > .edit_tip_area .add_tip_area input {
-  height: 30px;
-  width: 73%;
-  padding: 0 10px;
+    height: 30px;
+    width: 73%;
+    padding: 0 10px;
 }
+
 .tab_body .tab_body_left .left_part.left_part_2 > .edit_tip_area .add_tip_area button {
-  height: 30px;
-  padding: 0 16px;
-  float: right;
-  background-color: #0072c6;
-  color: #fff;
-  border-radius: 3px;
+    height: 30px;
+    padding: 0 16px;
+    float: right;
+    background-color: #0072c6;
+    color: #fff;
+    border-radius: 3px;
 }
+
 .tab_body .tab_body_left .left_part.left_part_2 > .edit_tip_area .add_tip_area button:hover {
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
+
 /*++++++part3++++++*/
 .tab_body .tab_body_left .left_part.left_part_3 {
-  position: relative;
-  margin-top: 40px;
+    position: relative;
+    margin-top: 40px;
 }
+
 .tab_body .tab_body_left .left_part.left_part_3 > span {
-  float: left;
-  display: block;
-  width: 20%;
+    float: left;
+    display: block;
+    width: 20%;
 }
+
 .tab_body .tab_body_left .left_part.left_part_3 > .history_tip_list {
-  float: left;
-  width: 80%;
-  line-height: 24px;
-  padding-left: 5px;
+    float: left;
+    width: 80%;
+    line-height: 24px;
+    padding-left: 5px;
 }
+
 .tab_body .tab_body_left .left_part.left_part_3 > .history_tip_list .tip {
-  cursor: pointer;
+    cursor: pointer;
 }
+
 /*=============水印部分=============*/
 /*颜色定制*/
 .tab_body_right .tab_head {
-  margin-top: -50px;
-  margin-bottom: 25px;
+    margin-top: -50px;
+    margin-bottom: 25px;
 }
+
 .tab_body_right .tab_head .tab_head_inner {
-  float: right;
+    float: right;
 }
+
 .tab_body_right .tab_head .tab_head_inner a {
-  color: #0072c6;
-  cursor: pointer;
+    color: #0072c6;
+    cursor: pointer;
 }
+
 .tab_body_right .tab_head .tab_head_inner i {
-  color: #0072c6;
+    color: #0072c6;
 }
+
 .tab_body_right .right_inner {
-  position: relative;
-  background-color: #F2F2F2;
-  padding: 20px;
-  border: 1px solid #D5D5D5;
+    position: relative;
+    background-color: #F2F2F2;
+    padding: 20px;
+    border: 1px solid #D5D5D5;
 }
+
 .tab_body_right .right_inner:before {
-  position: absolute;
-  content: '';
-  display: block;
-  border-bottom: 20px solid transparent;
-  border-top: 20px solid transparent;
-  border-right: 17px solid #d5d5d5;
-  left: -17px;
-  top: 65px;
+    position: absolute;
+    content: '';
+    display: block;
+    border-bottom: 20px solid transparent;
+    border-top: 20px solid transparent;
+    border-right: 17px solid #d5d5d5;
+    left: -17px;
+    top: 65px;
 }
+
 .tab_body_right .right_inner:after {
-  position: absolute;
-  content: '';
-  display: block;
-  border-bottom: 19px solid transparent;
-  border-top: 19px solid transparent;
-  border-right: 16px solid #F2F2F2;
-  left: -16px;
-  top: 66px;
+    position: absolute;
+    content: '';
+    display: block;
+    border-bottom: 19px solid transparent;
+    border-top: 19px solid transparent;
+    border-right: 16px solid #F2F2F2;
+    left: -16px;
+    top: 66px;
 }
+
 .tab_body_right .right_inner .right_part {
-  position: relative;
-  margin-bottom: 15px;
+    position: relative;
+    margin-bottom: 15px;
 }
+
 .tab_body_right .right_inner .right_part p {
-  line-height: 30px;
+    line-height: 30px;
 }
+
 .tab_body_right .right_inner .right_part p span {
-  color: #888888;
+    color: #888888;
 }
+
 .tab_body_right .right_inner .right_part .input_part {
-  position: relative;
-  width: 100%;
+    position: relative;
+    width: 100%;
 }
+
 .tab_body_right .right_inner .right_part .input_part input {
-  width: 100%;
-  line-height: 26px;
-  padding-right: 50px;
-  padding-left: 10px;
+    width: 100%;
+    line-height: 26px;
+    padding-right: 50px;
+    padding-left: 10px;
 }
+
 .tab_body_right .right_inner .right_part .input_part span {
-  position: absolute;
-  right: 7px;
-  top: 0;
-  line-height: 30px;
+    position: absolute;
+    right: 7px;
+    top: 0;
+    line-height: 30px;
 }
+
 .tab_body_right .right_inner .right_part_3 .img_btns button {
-  border: 1px solid #D5D5D5;
-  width: 120px;
-  line-height: 32px;
-  background-color: #FBFBFB;
-  border-radius: 4px;
-  margin-right: 10px;
+    border: 1px solid #D5D5D5;
+    width: 120px;
+    line-height: 32px;
+    background-color: #FBFBFB;
+    border-radius: 4px;
+    margin-right: 10px;
 }
+
 .tab_body_right .right_inner .right_part_3 .img_preview {
-  position: relative;
-  height: 100px;
-  margin: 10px 0;
+    position: relative;
+    height: 100px;
+    margin: 10px 0;
 }
+
 .tab_body_right .right_inner .right_part_3 .img_preview img {
-  float: left;
-  height: 100%;
+    float: left;
+    height: 100%;
 }
+
 .tab_body_right .right_inner .right_part_3 .img_preview a {
-  float: left;
-  position: absolute;
-  bottom: 0;
-  margin-left: 10px;
+    float: left;
+    position: absolute;
+    bottom: 0;
+    margin-left: 10px;
 }
+
 .tab_body_right .right_inner .right_part_4 textarea {
-  width: 100%;
-  height: 130px;
-  padding: 5px 10px;
+    width: 100%;
+    height: 130px;
+    padding: 5px 10px;
 }

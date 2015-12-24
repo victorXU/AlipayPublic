@@ -1,12 +1,12 @@
 /**
-  * @description {Class} wdTree
-  * This is the main class of wdTree.
-  */
-(function($) {
-    $.fn.swapClass = function(c1, c2) {
+ * @description {Class} wdTree
+ * This is the main class of wdTree.
+ */
+(function ($) {
+    $.fn.swapClass = function (c1, c2) {
         return this.removeClass(c1).addClass(c2);
     };
-    $.fn.switchClass = function(c1, c2) {
+    $.fn.switchClass = function (c1, c2) {
         if (this.hasClass(c1)) {
             return this.swapClass(c1, c2);
         }
@@ -14,58 +14,58 @@
             return this.swapClass(c2, c1);
         }
     };
-    $.fn.treeview = function(settings) {
-    	// 补充checkedIds配置, 要求展示时, 将节点立即选中;linzp@zzsoft
-    	// 补充lockFilter, 表示是否要过滤掉'冻结'状态的节点, true过滤, false不过滤, 默认false
-    	// 补充invoker, 树调用者, 如果取值 batchCreateOU, 不展示勾选框
+    $.fn.treeview = function (settings) {
+        // 补充checkedIds配置, 要求展示时, 将节点立即选中;linzp@zzsoft
+        // 补充lockFilter, 表示是否要过滤掉'冻结'状态的节点, true过滤, false不过滤, 默认false
+        // 补充invoker, 树调用者, 如果取值 batchCreateOU, 不展示勾选框
         var dfop =
-            {
-                method: "POST",
-                datatype: "json",
-                checkedIds :'',
-                lockFilter : 'false',
-                invoker : '',
-                /**
-                 * @description {Config} url  
-                 * {String} Url for child nodes retrieving. 
-                 */
-                url: false,
-                /**
-                 * @description {Config} cbiconpath  
-                 * {String} Checkbox image path.
-                 */
-                cbiconpath: "../img/icons/",
-                icons: ["checkbox_0.gif", "checkbox_1.gif", "checkbox_2.gif"],
-                /**
-                 * @description {Config} showcheck  
-                 * {Boolean} Whether to show check box or not. 
-                 */
-                showcheck: false,            
-                /**
-	 	             * @description {Event} oncheckboxclick:function(tree, item, status)
-	 	             * Fired when check box is clicked on.
-	 	             * @param {Object} tree This tree object. 
-	 	             * @param {Object} item Node item clicked on.
-	 	             * @param {Number} status 1 for checked, 0 for unchecked.	 	             
-	               */
-                oncheckboxclick: false, 
-                /**
-	 	             * @description {Event} onnodeclick:function(tree, item)
-	 	             * Fired when a node is clicked on.
-	 	             * @param {Object} tree This tree object. 
-	 	             * @param {Object} item Ndde item clicked on.
-	               */
-                onnodeclick: false,
-                /**
-                 * @description {Config} cascadecheck  
-                 * {Boolean} Whether node being seleted leads to parent/sub node being selected.  
-                 */
-                cascadecheck: true,
-                /**
-                 * @description {Config} data  
-                 * {Object} Tree theme. Three themes provided. 'bbit-tree-lines' ,'bbit-tree-no-lines' and 'bbit-tree-arrows'.
-                 * @sample 
-                 * data:[{
+        {
+            method: "POST",
+            datatype: "json",
+            checkedIds: '',
+            lockFilter: 'false',
+            invoker: '',
+            /**
+             * @description {Config} url
+             * {String} Url for child nodes retrieving.
+             */
+            url: false,
+            /**
+             * @description {Config} cbiconpath
+             * {String} Checkbox image path.
+             */
+            cbiconpath: "../img/icons/",
+            icons: ["checkbox_0.gif", "checkbox_1.gif", "checkbox_2.gif"],
+            /**
+             * @description {Config} showcheck
+             * {Boolean} Whether to show check box or not.
+             */
+            showcheck: false,
+            /**
+             * @description {Event} oncheckboxclick:function(tree, item, status)
+             * Fired when check box is clicked on.
+             * @param {Object} tree This tree object.
+             * @param {Object} item Node item clicked on.
+             * @param {Number} status 1 for checked, 0 for unchecked.
+             */
+            oncheckboxclick: false,
+            /**
+             * @description {Event} onnodeclick:function(tree, item)
+             * Fired when a node is clicked on.
+             * @param {Object} tree This tree object.
+             * @param {Object} item Ndde item clicked on.
+             */
+            onnodeclick: false,
+            /**
+             * @description {Config} cascadecheck
+             * {Boolean} Whether node being seleted leads to parent/sub node being selected.
+             */
+            cascadecheck: true,
+            /**
+             * @description {Config} data
+             * {Object} Tree theme. Three themes provided. 'bbit-tree-lines' ,'bbit-tree-no-lines' and 'bbit-tree-arrows'.
+             * @sample
+             * data:[{
                  * id:"node1", //node id
                  * text:"node 1", //node text for display.
                  * value:"1", //node value
@@ -75,20 +75,20 @@
                  * isexpand:false, //Expand or collapse.
                  * complete:false, //See hasChildren.
                  * ChildNodes:[] // child nodes
-                 * }]                  
-                 *  */
-                data: null,
-                /**
-                 * @description {Config} clicktoggle  
-                 * {String} Whether to toggle node when node clicked. 
-                 */
-                clicktoggle: true, 
-                /**
-                 * @description {Config} theme  
-                 * {String} Tree theme. Three themes provided. 'bbit-tree-lines' ,'bbit-tree-no-lines' and 'bbit-tree-arrows'. 
-                 */
-                theme: "bbit-tree-lines" //bbit-tree-lines ,bbit-tree-no-lines,bbit-tree-arrows
-            };
+                 * }]
+             *  */
+            data: null,
+            /**
+             * @description {Config} clicktoggle
+             * {String} Whether to toggle node when node clicked.
+             */
+            clicktoggle: true,
+            /**
+             * @description {Config} theme
+             * {String} Tree theme. Three themes provided. 'bbit-tree-lines' ,'bbit-tree-no-lines' and 'bbit-tree-arrows'.
+             */
+            theme: "bbit-tree-lines" //bbit-tree-lines ,bbit-tree-no-lines,bbit-tree-arrows
+        };
 
         $.extend(dfop, settings);
         var treenodes = dfop.data;
@@ -124,7 +124,7 @@
                 }
             }
             else {
-                asnyloadc(null, false, function(data) {
+                asnyloadc(null, false, function (data) {
                     if (data && data.length > 0) {
                         treenodes = data;
                         dfop.data = data;
@@ -139,24 +139,25 @@
             ht.push("</div>"); // body end;
             ht.push("</div>"); // Wrap end;
         }
+
         //endregion
         function buildnode(nd, ht, deep, path, isend) {
-        	
-        	// 如果入参中指定选中, 则强制将选中状态改为2, linzp@zzsoft
-            if(dfop.checkedIds && dfop.checkedIds.split(",").indexOf(nd.value) != -1) {
-            	nd.checkstate = 1;
+
+            // 如果入参中指定选中, 则强制将选中状态改为2, linzp@zzsoft
+            if (dfop.checkedIds && dfop.checkedIds.split(",").indexOf(nd.value) != -1) {
+                nd.checkstate = 1;
             }
             // 如果调用方来自ou批量创建, batchCreateOU , 并且ouId有值, 则不展示勾选框;品牌节点也不能勾选
-            if(dfop.invoker == 'batchCreateOU' && (nd.ouId || nd.orgType == 0)) {
-            	nd.showcheck = false;
+            if (dfop.invoker == 'batchCreateOU' && (nd.ouId || nd.orgType == 0)) {
+                nd.showcheck = false;
             }
             // 如果设置了只显示某些orgType才显示勾选框
-            if(dfop.selectOnlyOrgType){
-            	if(dfop.selectOnlyOrgType.split(",").indexOf(String(nd.orgType)) == -1) {
-            		nd.showcheck = false;
-            	}
+            if (dfop.selectOnlyOrgType) {
+                if (dfop.selectOnlyOrgType.split(",").indexOf(String(nd.orgType)) == -1) {
+                    nd.showcheck = false;
+                }
             }
-            
+
             var nid = nd.id.replace(/[^\w]/gi, "_");
             ht.push("<li class='bbit-tree-node'>");
             ht.push("<div id='", id, "_", nid, "' tpath='", path, "' unselectable='on' title='", nd.text, "'");
@@ -168,7 +169,9 @@
             else {
                 cs.push("bbit-tree-node-leaf");
             }
-            if (nd.classes) { cs.push(nd.classes); }
+            if (nd.classes) {
+                cs.push(nd.classes);
+            }
 
             ht.push(" class='", cs.join(" "), "'>");
             //span indent
@@ -199,7 +202,7 @@
             ht.push("<img class='bbit-tree-ec-icon ", cs.join(" "), "' src='" + dfop.cbiconpath + "s.gif'/>");
             // 根据组织类型,显示不同的图标
             var orgTypeCls = "";
-            var orgTypeClsMap = {'0':'brand',"1":"sls-area", "2": "dcomp", "5":"agt1","6":"agt2","9":"store"};
+            var orgTypeClsMap = {'0': 'brand', "1": "sls-area", "2": "dcomp", "5": "agt1", "6": "agt2", "9": "store"};
             orgTypeCls = orgTypeClsMap[nd.orgType];
             ht.push("<img class='bbit-tree-node-icon " + orgTypeCls + "' src='" + dfop.cbiconpath + "s.gif'/>");
             //checkbox
@@ -213,7 +216,7 @@
             // 如果ouId存在, 将加上样式名为 ouId的样式, 样式在crop.org.tree.css中定义
             var ifOuIdCls = dfop.invoker == 'batchCreateOU' && nd.ouId ? " ouNode" : "";
             var ifLockNode = nd.status == "1" ? " lockNode" : "";
-            
+
             ht.push("<a hideFocus class='bbit-tree-node-anchor' tabIndex=1 href='javascript:void(0);'>");
             ht.push("<span unselectable='on' class='" + ifOuIdCls + ifLockNode + "'>", nd.text, "</span>");
             ht.push("</a>");
@@ -238,6 +241,7 @@
             ht.push("</li>");
             nd.render = true;
         }
+
         function getItem(path) {
             var ap = path.split(".");
             var t = treenodes;
@@ -251,6 +255,7 @@
             }
             return t;
         }
+
         function check(item, state, type) {
             var pstate = item.checkstate;
             if (type == 1) {
@@ -282,6 +287,7 @@
                 }
             }
         }
+
         //iterate all children nodes
         function cascade(fn, item, args) {
             if (fn(item, args, 1) != false) {
@@ -293,6 +299,7 @@
                 }
             }
         }
+
         //bubble to parent
         function bubble(fn, item, args) {
             var p = item.parent;
@@ -303,6 +310,7 @@
                 p = p.parent;
             }
         }
+
         function nodeclick(e) {
             var path = $(this).attr("tpath");
             var et = e.target || e.srcElement;
@@ -322,7 +330,7 @@
                         }
                         else {
                             $(this).addClass("bbit-tree-node-loading");
-                            asnyloadc(item, true, function(data) {
+                            asnyloadc(item, true, function (data) {
                                 item.complete = true;
                                 item.ChildNodes = data;
                                 asnybuild(data, deep, path, ul, item);
@@ -338,7 +346,7 @@
                     $(this).swapClass("bbit-tree-node-collapsed", "bbit-tree-node-expanded");
                 }
                 //if expended, collapse it
-                else if ($(et).hasClass("bbit-tree-elbow-minus") || $(et).hasClass("bbit-tree-elbow-end-minus")) {                      
+                else if ($(et).hasClass("bbit-tree-elbow-minus") || $(et).hasClass("bbit-tree-elbow-end-minus")) {
                     $(this).next().hide();
                     if ($(et).hasClass("bbit-tree-elbow-minus")) {
                         $(et).swapClass("bbit-tree-elbow-minus", "bbit-tree-elbow-plus");
@@ -376,12 +384,15 @@
                 $(this).addClass("bbit-tree-selected");
                 if (dfop.onnodeclick) {
                     if (!item.expand) {
-                        item.expand = function() { expandnode.call(item); };
+                        item.expand = function () {
+                            expandnode.call(item);
+                        };
                     }
                     dfop.onnodeclick.call(this, item);
                 }
             }
         }
+
         function expandnode() {
             var item = this;
             var nid = item.id.replace(/[^\w]/gi, "_");
@@ -390,6 +401,7 @@
                 img.click();
             }
         }
+
         function asnybuild(nodes, deep, path, ul, pnode) {
             var l = nodes.length;
             if (l > 0) {
@@ -402,19 +414,27 @@
                 ht = null;
                 InitEvent(ul);
             }
-            ul.addClass("bbit-tree-node-ct").css({ "z-index": 0, position: "static", visibility: "visible", top: "auto", left: "auto", display: "" });
+            ul.addClass("bbit-tree-node-ct").css({
+                "z-index": 0,
+                position: "static",
+                visibility: "visible",
+                top: "auto",
+                left: "auto",
+                display: ""
+            });
             ul.prev().removeClass("bbit-tree-node-loading");
         }
+
         function asnyloadc(pnode, isAsync, callback) {
             if (dfop.url) {
-            	var param = {};
+                var param = {};
                 if (pnode && pnode != null) {
-                	param = builparam(pnode);
+                    param = builparam(pnode);
                 } else {
-                	// 初始加载,指定根节点id
-                	if(dfop.rootId) {
-                		param.rootId = dfop.rootId;
-                	}
+                    // 初始加载,指定根节点id
+                    if (dfop.rootId) {
+                        param.rootId = dfop.rootId;
+                    }
                 }
                 $.ajax({
                     type: dfop.method,
@@ -423,39 +443,45 @@
                     async: isAsync,
                     dataType: dfop.datatype,
                     success: callback,
-                    error: function(e) { alert("error occur!"); }
+                    error: function (e) {
+                        alert("error occur!");
+                    }
                 });
             }
         }
+
         // 提交的参数lockFilter,补充是否要过滤掉'冻结'状态的节点
         function builparam(node) {
-            var p = [{ name: "id", value: encodeURIComponent(node.id) }
-                    , { name: "text", value: encodeURIComponent(node.text) }
-                    , { name: "value", value: encodeURIComponent(node.value) }
-                    , { name: "lockFilter", value: dfop.lockFilter }
-                    , { name: "checkstate", value: node.checkstate}];
+            var p = [{name: "id", value: encodeURIComponent(node.id)}
+                , {name: "text", value: encodeURIComponent(node.text)}
+                , {name: "value", value: encodeURIComponent(node.value)}
+                , {name: "lockFilter", value: dfop.lockFilter}
+                , {name: "checkstate", value: node.checkstate}];
             return p;
         }
+
         function bindevent() {
-            $(this).hover(function() {
+            $(this).hover(function () {
                 $(this).addClass("bbit-tree-node-over");
-            }, function() {
+            }, function () {
                 $(this).removeClass("bbit-tree-node-over");
             }).click(nodeclick)
-             .find("img.bbit-tree-ec-icon").each(function(e) {
-                 if (!$(this).hasClass("bbit-tree-elbow")) {
-                     $(this).hover(function() {
-                         $(this).parent().addClass("bbit-tree-ec-over");
-                     }, function() {
-                         $(this).parent().removeClass("bbit-tree-ec-over");
-                     });
-                 }
-             });
+                .find("img.bbit-tree-ec-icon").each(function (e) {
+                    if (!$(this).hasClass("bbit-tree-elbow")) {
+                        $(this).hover(function () {
+                            $(this).parent().addClass("bbit-tree-ec-over");
+                        }, function () {
+                            $(this).parent().removeClass("bbit-tree-ec-over");
+                        });
+                    }
+                });
         }
+
         function InitEvent(parent) {
             var nodes = $("li.bbit-tree-node>div", parent);
             nodes.each(bindevent);
         }
+
         function reflash(itemId) {
             var nid = itemId.replace(/[^\w-]/gi, "_");
             var node = $("#" + id + "_" + nid);
@@ -466,7 +492,7 @@
                 var deep = path.split(".").length;
                 var item = getItem(path);
                 if (item) {
-                    asnyloadc(item, true, function(data) {
+                    asnyloadc(item, true, function (data) {
                         item.complete = true;
                         item.ChildNodes = data;
                         item.isexpand = true;
@@ -492,6 +518,7 @@
                 //node not created yet
             }
         }
+
         function getck(items, c, fn) {
             for (var i = 0, l = items.length; i < l; i++) {
                 (items[i].showcheck == true && items[i].checkstate == 1) && c.push(fn(items[i]));
@@ -500,6 +527,7 @@
                 }
             }
         }
+
         function getCkAndHalfCk(items, c, fn) {
             for (var i = 0, l = items.length; i < l; i++) {
                 (items[i].showcheck == true && (items[i].checkstate == 1 || items[i].checkstate == 2)) && c.push(fn(items[i]));
@@ -508,26 +536,33 @@
                 }
             }
         }
+
         me[0].t = {
-            getSelectedNodes: function(gethalfchecknode) {
+            getSelectedNodes: function (gethalfchecknode) {
                 var s = [];
                 if (gethalfchecknode) {
-                    getCkAndHalfCk(treenodes, s, function(item) { return item; });
+                    getCkAndHalfCk(treenodes, s, function (item) {
+                        return item;
+                    });
                 }
                 else {
-                    getck(treenodes, s, function(item) { return item; });
+                    getck(treenodes, s, function (item) {
+                        return item;
+                    });
                 }
                 return s;
             },
-            getSelectedValues: function() {
+            getSelectedValues: function () {
                 var s = [];
-                getck(treenodes, s, function(item) { return item.value; });
+                getck(treenodes, s, function (item) {
+                    return item.value;
+                });
                 return s;
             },
-            getCurrentItem: function() {
+            getCurrentItem: function () {
                 return dfop.citem;
             },
-            reflash: function(itemOrItemId) {
+            reflash: function (itemOrItemId) {
                 var id;
                 if (typeof (itemOrItemId) == "string") {
                     id = itemOrItemId;
@@ -541,25 +576,25 @@
         return me;
     };
     //get all checked nodes, and put them into array. no hierarchy
-    $.fn.getCheckedNodes = function() {
+    $.fn.getCheckedNodes = function () {
         if (this[0].t) {
             return this[0].t.getSelectedValues();
         }
         return null;
     };
-    $.fn.getTSNs = function(gethalfchecknode) {
+    $.fn.getTSNs = function (gethalfchecknode) {
         if (this[0].t) {
             return this[0].t.getSelectedNodes(gethalfchecknode);
         }
         return null;
     };
-    $.fn.getCurrentNode = function() {
+    $.fn.getCurrentNode = function () {
         if (this[0].t) {
             return this[0].t.getCurrentItem();
         }
         return null;
     };
-    $.fn.reflash = function(ItemOrItemId) {
+    $.fn.reflash = function (ItemOrItemId) {
         if (this[0].t) {
             return this[0].t.reflash(ItemOrItemId);
         }

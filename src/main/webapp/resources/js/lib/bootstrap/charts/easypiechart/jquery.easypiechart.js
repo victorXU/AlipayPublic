@@ -103,8 +103,8 @@
         };
         c = (function () {
             return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function (m) {
-                return window.setTimeout(m, 1000 / 60)
-            }
+                    return window.setTimeout(m, 1000 / 60)
+                }
         })();
         g = function (p, o) {
             var n, m;

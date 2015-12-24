@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatiorg//DTD Mapper 3.0//EN" "http://mybatiorg/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.victor.mapper.AlipayOrderInfoMapper" >
+<mapper namespace="com.victor.mapper.AlipayOrderInfoMapper">
 
-    <select id="queryAlipayOrderInfo" resultType="com.victor.pojo.AlipayOrderEntity" parameterType="com.victor.pojo.AlipayOrderEntity">
-      SELECT
+    <select id="queryAlipayOrderInfo" resultType="com.victor.pojo.AlipayOrderEntity"
+            parameterType="com.victor.pojo.AlipayOrderEntity">
+        SELECT
         partner,
         notify_url,
         out_trade_no,
@@ -59,8 +60,8 @@
         ouid,
         storecode,
         orgcode
-    FROM
-	ESALE_MOBILEPAY_ORDER
+        FROM
+        ESALE_MOBILEPAY_ORDER
         <where>
             1=1
             <if test="id!=null">
@@ -92,7 +93,7 @@
         update ESALE_MOBILEPAY_ORDER
         <set>
             <if test="notify_url!=null">
-                 notify_url = #{notify_url},
+                notify_url = #{notify_url},
             </if>
             <if test="error!=null">
                 error = #{error},
@@ -165,7 +166,8 @@
         partner,notify_url,out_trade_no,subject,product_code,total_fee,seller_id,seller_email,buyer_id,buyer_email,
         operator_code,operator_id,body,show_url,currency,price,quantity,goods_detail,extend_params,it_b_pay,
         royalty_type, royalty_parameters,channel_parameters,dynamicid_type,dynamic_id,remark,error,detail_error_code,
-        detail_error_des,result_code,trade_no,trade_status, refund_code, refund_time,cancel_code,cancel_time,machine_code,
+        detail_error_des,result_code,trade_no,trade_status, refund_code,
+        refund_time,cancel_code,cancel_time,machine_code,
         cashier,refund_fee,disabled,createuserid,createusername, createusercode,createdatetime, createip,id,brandid,
         ouid,storecode, orgcode)
         values(

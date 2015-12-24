@@ -8,7 +8,7 @@
  *
  * Date: 2014-03-16T06:23Z
  */
-(function(factory) {
+(function (factory) {
     /* global define */
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
@@ -17,14 +17,14 @@
         // Browser globals: jQuery, CodeMirror
         factory(window.jQuery, window.CodeMirror);
     }
-}(function($, CodeMirror) {
+}(function ($, CodeMirror) {
     if ('function' !== typeof Array.prototype.reduce) {
         /**
          * Array.prototype.reduce fallback
          *
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
          */
-        Array.prototype.reduce = function(callback, optInitialValue) {
+        Array.prototype.reduce = function (callback, optInitialValue) {
             var idx, value, length = this.length >>> 0,
                 isValueSet = false;
             if (1 < arguments.length) {
@@ -56,38 +56,38 @@
         bMSIE: navigator.userAgent.indexOf('MSIE') > -1,
         bFF: navigator.userAgent.indexOf('Firefox') > -1,
         jqueryVersion: parseFloat($.fn.jquery),
-        bCodeMirror: !! CodeMirror
+        bCodeMirror: !!CodeMirror
     };
 
     /**
      * func utils (for high-order func's arg)
      */
-    var func = (function() {
-        var eq = function(elA) {
-            return function(elB) {
+    var func = (function () {
+        var eq = function (elA) {
+            return function (elB) {
                 return elA === elB;
             };
         };
 
-        var eq2 = function(elA, elB) {
+        var eq2 = function (elA, elB) {
             return elA === elB;
         };
 
-        var ok = function() {
+        var ok = function () {
             return true;
         };
 
-        var fail = function() {
+        var fail = function () {
             return false;
         };
 
-        var not = function(f) {
-            return function() {
+        var not = function (f) {
+            return function () {
                 return !f.apply(f, arguments);
             };
         };
 
-        var self = function(a) {
+        var self = function (a) {
             return a;
         };
 
@@ -104,12 +104,12 @@
     /**
      * list utils
      */
-    var list = (function() {
+    var list = (function () {
         /**
          * returns the first element of an array.
          * @param {Array} array
          */
-        var head = function(array) {
+        var head = function (array) {
             return array[0];
         };
 
@@ -117,7 +117,7 @@
          * returns the last element of an array.
          * @param {Array} array
          */
-        var last = function(array) {
+        var last = function (array) {
             return array[array.length - 1];
         };
 
@@ -125,7 +125,7 @@
          * returns everything but the last entry of the array.
          * @param {Array} array
          */
-        var initial = function(array) {
+        var initial = function (array) {
             return array.slice(0, array.length - 1);
         };
 
@@ -133,7 +133,7 @@
          * returns the rest of the elements in an array.
          * @param {Array} array
          */
-        var tail = function(array) {
+        var tail = function (array) {
             return array.slice(1);
         };
 
@@ -141,7 +141,7 @@
          * returns next item.
          * @param {Array} array
          */
-        var next = function(array, item) {
+        var next = function (array, item) {
             var idx = array.indexOf(item);
             if (idx === -1) {
                 return null;
@@ -154,7 +154,7 @@
          * returns prev item.
          * @param {Array} array
          */
-        var prev = function(array, item) {
+        var prev = function (array, item) {
             var idx = array.indexOf(item);
             if (idx === -1) {
                 return null;
@@ -168,9 +168,9 @@
          * @param {Array} array - array
          * @param {Function} fn - iterator
          */
-        var sum = function(array, fn) {
+        var sum = function (array, fn) {
             fn = fn || func.self;
-            return array.reduce(function(memo, v) {
+            return array.reduce(function (memo, v) {
                 return memo + fn(v);
             }, 0);
         };
@@ -179,7 +179,7 @@
          * returns a copy of the collection with array type.
          * @param {Collection} collection - collection eg) node.childNodes, ...
          */
-        var from = function(collection) {
+        var from = function (collection) {
             var result = [],
                 idx = -1,
                 length = collection.length;
@@ -195,12 +195,12 @@
          * @param {Function} fn - predicate function for cluster rule
          * @param {Array[]}
          */
-        var clusterBy = function(array, fn) {
+        var clusterBy = function (array, fn) {
             if (array.length === 0) {
                 return [];
             }
             var aTail = tail(array);
-            return aTail.reduce(function(memo, v) {
+            return aTail.reduce(function (memo, v) {
                 var aLast = last(memo);
                 if (fn(last(aLast), v)) {
                     aLast[aLast.length] = v;
@@ -218,7 +218,7 @@
          * @param {Array} array - array
          * @param {Function} fn - predicate function for cluster rule
          */
-        var compact = function(array) {
+        var compact = function (array) {
             var aResult = [];
             for (var idx = 0, sz = array.length; idx < sz; idx++) {
                 if (array[idx]) {
@@ -245,18 +245,18 @@
     /**
      * Dom functions
      */
-    var dom = (function() {
+    var dom = (function () {
         /**
          * returns whether node is `note-editable` or not.
          *
          * @param {Element} node
          * @return {Boolean}
          */
-        var isEditable = function(node) {
+        var isEditable = function (node) {
             return node && $(node).hasClass('note-editable');
         };
 
-        var isControlSizing = function(node) {
+        var isControlSizing = function (node) {
             return node && $(node).hasClass('note-control-sizing');
         };
 
@@ -266,14 +266,14 @@
          * @param {jQuery} $editor
          * @return {Object}
          */
-        var buildLayoutInfo = function($editor) {
-            var makeFinder = function(sClassName) {
-                return function() {
+        var buildLayoutInfo = function ($editor) {
+            var makeFinder = function (sClassName) {
+                return function () {
                     return $editor.find(sClassName);
                 };
             };
             return {
-                editor: function() {
+                editor: function () {
                     return $editor;
                 },
                 dropzone: makeFinder('.note-dropzone'),
@@ -291,23 +291,23 @@
          * returns predicate which judge whether nodeName is same
          * @param {String} sNodeName
          */
-        var makePredByNodeName = function(sNodeName) {
+        var makePredByNodeName = function (sNodeName) {
             // nodeName is always uppercase.
-            return function(node) {
+            return function (node) {
                 return node && node.nodeName === sNodeName;
             };
         };
 
-        var isPara = function(node) {
+        var isPara = function (node) {
             // Chrome(v31.0), FF(v25.0.1) use DIV for paragraph
             return node && /^DIV|^P|^LI|^H[1-7]/.test(node.nodeName);
         };
 
-        var isList = function(node) {
+        var isList = function (node) {
             return node && /^UL|^OL/.test(node.nodeName);
         };
 
-        var isCell = function(node) {
+        var isCell = function (node) {
             return node && /^TD|^TH/.test(node.nodeName);
         };
 
@@ -317,7 +317,7 @@
          * @param {Element} node
          * @param {Function} pred - predicate function
          */
-        var ancestor = function(node, pred) {
+        var ancestor = function (node, pred) {
             while (node) {
                 if (pred(node)) {
                     return node;
@@ -337,11 +337,11 @@
          * @param {Element} node
          * @param {Function} [optional] pred - predicate function
          */
-        var listAncestor = function(node, pred) {
+        var listAncestor = function (node, pred) {
             pred = pred || func.fail;
 
             var aAncestor = [];
-            ancestor(node, function(el) {
+            ancestor(node, function (el) {
                 aAncestor.push(el);
                 return pred(el);
             });
@@ -354,7 +354,7 @@
          * @param {Element} nodeA
          * @param {Element} nodeB
          */
-        var commonAncestor = function(nodeA, nodeB) {
+        var commonAncestor = function (nodeA, nodeB) {
             var aAncestor = listAncestor(nodeA);
             for (var n = nodeB; n; n = n.parentNode) {
                 if ($.inArray(n, aAncestor) > -1) {
@@ -371,7 +371,7 @@
          * @param {Element} nodeA
          * @param {Element} nodeB
          */
-        var listBetween = function(nodeA, nodeB) {
+        var listBetween = function (nodeA, nodeB) {
             var aNode = [];
 
             var bStart = false,
@@ -406,7 +406,7 @@
          * @param {Element} node
          * @param {Function} [optional] pred - predicate function
          */
-        var listPrev = function(node, pred) {
+        var listPrev = function (node, pred) {
             pred = pred || func.fail;
 
             var aNext = [];
@@ -426,7 +426,7 @@
          * @param {Element} node
          * @param {Function} [pred] - predicate function
          */
-        var listNext = function(node, pred) {
+        var listNext = function (node, pred) {
             pred = pred || func.fail;
 
             var aNext = [];
@@ -446,7 +446,7 @@
          * @param {Element} node
          * @param {Function} [pred] - predicate function
          */
-        var listDescendant = function(node, pred) {
+        var listDescendant = function (node, pred) {
             var aDescendant = [];
             pred = pred || func.ok;
 
@@ -469,7 +469,7 @@
          * @param {Element} node
          * @param {Element} preceding - predicate function
          */
-        var insertAfter = function(node, preceding) {
+        var insertAfter = function (node, preceding) {
             var next = preceding.nextSibling,
                 parent = preceding.parentNode;
             if (next) {
@@ -486,8 +486,8 @@
          * @param {Element} node
          * @param {Collection} aChild
          */
-        var appends = function(node, aChild) {
-            $.each(aChild, function(idx, child) {
+        var appends = function (node, aChild) {
+            $.each(aChild, function (idx, child) {
                 node.appendChild(child);
             });
             return node;
@@ -500,7 +500,7 @@
          *
          * @param {Element} node
          */
-        var length = function(node) {
+        var length = function (node) {
             if (isText(node)) {
                 return node.nodeValue.length;
             }
@@ -512,7 +512,7 @@
          *
          * @param {Element} node
          */
-        var position = function(node) {
+        var position = function (node) {
             var offset = 0;
             while ((node = node.previousSibling)) {
                 offset += 1;
@@ -526,7 +526,7 @@
          * @param {Element} ancestor - ancestor node
          * @param {Element} node
          */
-        var makeOffsetPath = function(ancestor, node) {
+        var makeOffsetPath = function (ancestor, node) {
             var aAncestor = list.initial(listAncestor(node, func.eq(ancestor)));
             return $.map(aAncestor, position).reverse();
         };
@@ -537,7 +537,7 @@
          * @param {Element} ancestor - ancestor node
          * @param {array} aOffset - offsetPath
          */
-        var fromOffsetPath = function(ancestor, aOffset) {
+        var fromOffsetPath = function (ancestor, aOffset) {
             var current = ancestor;
             for (var i = 0, sz = aOffset.length; i < sz; i++) {
                 current = current.childNodes[aOffset[i]];
@@ -551,7 +551,7 @@
          * @param {Element} node
          * @param {Number} offset
          */
-        var splitData = function(node, offset) {
+        var splitData = function (node, offset) {
             if (offset === 0) {
                 return node;
             }
@@ -577,12 +577,12 @@
          * @param {Element} pivot - this will be boundaryPoint's node
          * @param {Number} offset - this will be boundaryPoint's offset
          */
-        var split = function(root, pivot, offset) {
+        var split = function (root, pivot, offset) {
             var aAncestor = listAncestor(pivot, func.eq(root));
             if (aAncestor.length === 1) {
                 return splitData(pivot, offset);
             }
-            return aAncestor.reduce(function(node, parent) {
+            return aAncestor.reduce(function (node, parent) {
                 var clone = parent.cloneNode(false);
                 insertAfter(clone, parent);
                 if (node === pivot) {
@@ -598,7 +598,7 @@
          * @param {Element} node
          * @param {Boolean} bRemoveChild
          */
-        var remove = function(node, bRemoveChild) {
+        var remove = function (node, bRemoveChild) {
             if (!node || !node.parentNode) {
                 return;
             }
@@ -622,7 +622,7 @@
             elParent.removeChild(node);
         };
 
-        var html = function($node) {
+        var html = function ($node) {
             return dom.isTextarea($node[0]) ? $node.val() : $node.html();
         };
 
@@ -982,21 +982,21 @@
     /**
      * Async functions which returns `Promise`
      */
-    var async = (function() {
+    var async = (function () {
         /**
          * read contents of file as representing URL
          *
          * @param {File} file
          * @return {Promise} - then: sDataUrl
          */
-        var readFileAsDataURL = function(file) {
-            return $.Deferred(function(deferred) {
+        var readFileAsDataURL = function (file) {
+            return $.Deferred(function (deferred) {
                 $.extend(new FileReader(), {
-                    onload: function(e) {
+                    onload: function (e) {
                         var sDataURL = e.target.result;
                         deferred.resolve(sDataURL);
                     },
-                    onerror: function() {
+                    onerror: function () {
                         deferred.reject(this);
                     }
                 }).readAsDataURL(file);
@@ -1009,11 +1009,11 @@
          * @param {String} sUrl
          * @return {Promise} - then: $image
          */
-        var createImage = function(sUrl) {
-            return $.Deferred(function(deferred) {
-                $('<img>').one('load', function() {
+        var createImage = function (sUrl) {
+            return $.Deferred(function (deferred) {
+                $('<img>').one('load', function () {
                     deferred.resolve($(this));
-                }).one('error abort', function() {
+                }).one('error abort', function () {
                     deferred.reject($(this));
                 }).css({
                     display: 'none'
@@ -1031,7 +1031,7 @@
      * Object for keycodes.
      */
     var key = {
-        isEdit: function(keyCode) {
+        isEdit: function (keyCode) {
             return [8, 9, 13, 32].indexOf(keyCode) !== -1;
         },
         nameFromCode: {
@@ -1075,7 +1075,7 @@
      * Style
      * @class
      */
-    var Style = function() {
+    var Style = function () {
         /**
          * passing an array of style properties to .css()
          * will result in an object of property-value pairs.
@@ -1085,10 +1085,10 @@
          * @param  {Array} propertyNames - An array of one or more CSS properties.
          * @returns {Object}
          */
-        var jQueryCSS = function($obj, propertyNames) {
+        var jQueryCSS = function ($obj, propertyNames) {
             if (agent.jqueryVersion < 1.9) {
                 var result = {};
-                $.each(propertyNames, function(idx, propertyName) {
+                $.each(propertyNames, function (idx, propertyName) {
                     result[propertyName] = $obj.css(propertyName);
                 });
                 return result;
@@ -1102,8 +1102,8 @@
          * @param {WrappedRange} rng
          * @param {Object} oStyle
          */
-        this.stylePara = function(rng, oStyle) {
-            $.each(rng.nodes(dom.isPara), function(idx, elPara) {
+        this.stylePara = function (rng, oStyle) {
+            $.each(rng.nodes(dom.isPara), function (idx, elPara) {
                 $(elPara).css(oStyle);
             });
         };
@@ -1115,7 +1115,7 @@
          * @param {Element} elTarget - target element on event
          * @return {Object} - object contains style properties.
          */
-        this.current = function(rng, elTarget) {
+        this.current = function (rng, elTarget) {
             var $cont = $(dom.isText(rng.sc) ? rng.sc.parentNode : rng.sc);
             var properties = ['font-family', 'font-size', 'text-align', 'list-style-type', 'line-height'];
             var oStyle = jQueryCSS($cont, properties) || {};
@@ -1155,8 +1155,8 @@
     /**
      * range module
      */
-    var range = (function() {
-        var bW3CRangeSupport = !! document.createRange;
+    var range = (function () {
+        var bW3CRangeSupport = !!document.createRange;
 
         /**
          * return boundaryPoint from TextRange, inspired by Andy Na's HuskyRange.js
@@ -1164,7 +1164,7 @@
          * @param {Boolean} bStart
          * @return {BoundaryPoint}
          */
-        var textRange2bp = function(textRange, bStart) {
+        var textRange2bp = function (textRange, bStart) {
             var elCont = textRange.parentElement(),
                 nOffset;
 
@@ -1223,8 +1223,8 @@
          * @param {BoundaryPoint} bp
          * @return {TextRange}
          */
-        var bp2textRange = function(bp) {
-            var textRangeInfo = function(elCont, nOffset) {
+        var bp2textRange = function (bp) {
+            var textRangeInfo = function (elCont, nOffset) {
                 var elNode, bCollapseToStart;
 
                 if (dom.isText(elCont)) {
@@ -1267,14 +1267,14 @@
          * @param {Element} ec - end container
          * @param {Number} eo - end offset
          */
-        var WrappedRange = function(sc, so, ec, eo) {
+        var WrappedRange = function (sc, so, ec, eo) {
             this.sc = sc;
             this.so = so;
             this.ec = ec;
             this.eo = eo;
 
             // nativeRange: get nativeRange from sc, so, ec, eo
-            var nativeRange = function() {
+            var nativeRange = function () {
                 if (bW3CRangeSupport) {
                     var w3cRange = document.createRange();
                     w3cRange.setStart(sc, so);
@@ -1296,7 +1296,7 @@
             /**
              * select update visible range
              */
-            this.select = function() {
+            this.select = function () {
                 var nativeRng = nativeRange();
                 if (bW3CRangeSupport) {
                     var selection = document.getSelection();
@@ -1315,9 +1315,9 @@
              * @param {Function} pred - predicate function
              * @return {Element[]}
              */
-            this.nodes = function(pred) {
+            this.nodes = function (pred) {
                 var aNode = dom.listBetween(sc, ec);
-                var aMatched = list.compact($.map(aNode, function(node) {
+                var aMatched = list.compact($.map(aNode, function (node) {
                     return dom.ancestor(node, pred);
                 }));
                 return $.map(list.clusterBy(aMatched, func.eq2), list.head);
@@ -1327,15 +1327,15 @@
              * returns commonAncestor of range
              * @return {Element} - commonAncestor
              */
-            this.commonAncestor = function() {
+            this.commonAncestor = function () {
                 return dom.commonAncestor(sc, ec);
             };
 
             /**
              * makeIsOn: return isOn(pred) function
              */
-            var makeIsOn = function(pred) {
-                return function() {
+            var makeIsOn = function (pred) {
+                return function () {
                     var elAncestor = dom.ancestor(sc, pred);
                     return !!elAncestor && (elAncestor === dom.ancestor(ec, pred));
                 };
@@ -1350,7 +1350,7 @@
             // isOnAnchor: judge whether range is on cell node or not
             this.isOnCell = makeIsOn(dom.isCell);
             // isCollapsed: judge whether range was collapsed
-            this.isCollapsed = function() {
+            this.isCollapsed = function () {
                 return sc === ec && so === eo;
             };
 
@@ -1358,7 +1358,7 @@
              * insert node at current cursor
              * @param {Element} node
              */
-            this.insertNode = function(node) {
+            this.insertNode = function (node) {
                 var nativeRng = nativeRange();
                 if (bW3CRangeSupport) {
                     nativeRng.insertNode(node);
@@ -1367,13 +1367,13 @@
                 }
             };
 
-            this.toString = function() {
+            this.toString = function () {
                 var nativeRng = nativeRange();
                 return bW3CRangeSupport ? nativeRng.toString() : nativeRng.text;
             };
 
             // bookmark: offsetPath bookmark
-            this.bookmark = function(elEditable) {
+            this.bookmark = function (elEditable) {
                 return {
                     s: {
                         path: dom.makeOffsetPath(elEditable, sc),
@@ -1396,7 +1396,7 @@
              * @param {Element} ec - end container
              * @param {Number} eo - end offset
              */
-            create: function(sc, so, ec, eo) {
+            create: function (sc, so, ec, eo) {
                 if (arguments.length === 0) { // from Browser Selection
                     if (bW3CRangeSupport) { // webkit, firefox
                         var selection = document.getSelection();
@@ -1437,7 +1437,7 @@
              * @param {Element} node
              * @return {WrappedRange}
              */
-            createFromNode: function(node) {
+            createFromNode: function (node) {
                 return this.create(node, 0, node, 1);
             },
 
@@ -1448,7 +1448,7 @@
              * @param {Obkect} bookmark
              * @return {WrappedRange}
              */
-            createFromBookmark: function(elEditable, bookmark) {
+            createFromBookmark: function (elEditable, bookmark) {
                 var sc = dom.fromOffsetPath(elEditable, bookmark.s.path);
                 var so = bookmark.s.offset;
                 var ec = dom.fromOffsetPath(elEditable, bookmark.e.path);
@@ -1462,14 +1462,14 @@
      * Table
      * @class
      */
-    var Table = function() {
+    var Table = function () {
         /**
          * handle tab key
          *
          * @param {WrappedRange} rng
          * @param {Boolean} bShift
          */
-        this.tab = function(rng, bShift) {
+        this.tab = function (rng, bShift) {
             var elCell = dom.ancestor(rng.commonAncestor(), dom.isCell);
             var elTable = dom.ancestor(elCell, dom.isTable);
             var aCell = dom.listDescendant(elTable, dom.isCell);
@@ -1486,7 +1486,7 @@
          * @param {Number} nRow
          * @param {Number} nCol
          */
-        this.createTable = function(nCol, nRow) {
+        this.createTable = function (nCol, nRow) {
             var aTD = [],
                 sTD;
             for (var idxCol = 0; idxCol < nCol; idxCol++) {
@@ -1510,7 +1510,7 @@
      * Editor
      * @class
      */
-    var Editor = function() {
+    var Editor = function () {
 
         var style = new Style();
         var table = new Table();
@@ -1520,7 +1520,7 @@
          *
          * @param {jQuery} $editable
          */
-        this.saveRange = function($editable) {
+        this.saveRange = function ($editable) {
             $editable.data('range', range.create());
         };
 
@@ -1529,7 +1529,7 @@
          *
          * @param {jQuery} $editable
          */
-        this.restoreRange = function($editable) {
+        this.restoreRange = function ($editable) {
             var rng = $editable.data('range');
             if (rng) {
                 rng.select();
@@ -1540,7 +1540,7 @@
          * current style
          * @param {Element} elTarget
          */
-        this.currentStyle = function(elTarget) {
+        this.currentStyle = function (elTarget) {
             var rng = range.create();
             return rng && rng.isOnEditable() && style.current(rng, elTarget);
         };
@@ -1549,7 +1549,7 @@
          * undo
          * @param {jQuery} $editable
          */
-        this.undo = function($editable) {
+        this.undo = function ($editable) {
             $editable.data('NoteHistory').undo($editable);
         };
 
@@ -1557,7 +1557,7 @@
          * redo
          * @param {jQuery} $editable
          */
-        this.redo = function($editable) {
+        this.redo = function ($editable) {
             $editable.data('NoteHistory').redo($editable);
         };
 
@@ -1565,7 +1565,7 @@
          * record Undo
          * @param {jQuery} $editable
          */
-        var recordUndo = this.recordUndo = function($editable) {
+        var recordUndo = this.recordUndo = function ($editable) {
             $editable.data('NoteHistory').recordUndo($editable);
         };
 
@@ -1579,8 +1579,8 @@
         ];
 
         for (var idx = 0, len = aCmd.length; idx < len; idx++) {
-            this[aCmd[idx]] = (function(sCmd) {
-                return function($editable, sValue) {
+            this[aCmd[idx]] = (function (sCmd) {
+                return function ($editable, sValue) {
                     recordUndo($editable);
                     document.execCommand(sCmd, false, sValue);
                 };
@@ -1593,7 +1593,7 @@
          * @param {WrappedRange} rng
          * @param {Number} nTabsize
          */
-        var insertTab = function($editable, rng, nTabsize) {
+        var insertTab = function ($editable, rng, nTabsize) {
             recordUndo($editable);
             var sNbsp = new Array(nTabsize + 1).join('&nbsp;');
             rng.insertNode($('<span id="noteTab">' + sNbsp + '</span>')[0]);
@@ -1609,7 +1609,7 @@
          * @param {Number} nTabsize
          * @param {Boolean} bShift
          */
-        this.tab = function($editable, options) {
+        this.tab = function ($editable, options) {
             var rng = range.create();
             if (rng.isCollapsed() && rng.isOnCell()) {
                 table.tab(rng);
@@ -1621,7 +1621,7 @@
         /**
          * handle shift+tab key
          */
-        this.untab = function() {
+        this.untab = function () {
             var rng = range.create();
             if (rng.isCollapsed() && rng.isOnCell()) {
                 table.tab(rng, true);
@@ -1634,15 +1634,15 @@
          * @param {jQuery} $editable
          * @param {String} sUrl
          */
-        this.insertImage = function($editable, sUrl) {
-            async.createImage(sUrl).then(function($image) {
+        this.insertImage = function ($editable, sUrl) {
+            async.createImage(sUrl).then(function ($image) {
                 recordUndo($editable);
                 $image.css({
                     display: '',
                     width: Math.min($editable.width(), $image.width())
                 });
                 range.create().insertNode($image[0]);
-            }).fail(function() {
+            }).fail(function () {
                 var callbacks = $editable.data('callbacks');
                 if (callbacks.onImageUploadError) {
                     callbacks.onImageUploadError();
@@ -1655,7 +1655,7 @@
          * @param {jQuery} $editable
          * @param {String} sUrl
          */
-        this.insertVideo = function($editable, sUrl) {
+        this.insertVideo = function ($editable, sUrl) {
             recordUndo($editable);
 
             // video url patterns(youtube, instagram, vimeo, dailymotion)
@@ -1715,24 +1715,25 @@
          * @param {jQuery} $editable
          * @param {String} sTagName
          */
-        this.formatBlock = function($editable, sTagName) {
+        this.formatBlock = function ($editable, sTagName) {
             recordUndo($editable);
             sTagName = agent.bMSIE ? '<' + sTagName + '>' : sTagName;
             document.execCommand('FormatBlock', false, sTagName);
         };
 
-        this.formatPara = function($editable) {
+        this.formatPara = function ($editable) {
             this.formatBlock($editable, 'P');
         };
 
         /* jshint ignore:start */
         for (var idx = 1; idx <= 6; idx++) {
-            this['formatH' + idx] = function(idx) {
-                return function($editable) {
+            this['formatH' + idx] = function (idx) {
+                return function ($editable) {
                     this.formatBlock($editable, 'H' + idx);
                 };
             }(idx);
-        };
+        }
+        ;
         /* jshint ignore:end */
 
         /**
@@ -1742,7 +1743,7 @@
          * @param {jQuery} $editable
          * @param {String} sValue - px
          */
-        this.fontSize = function($editable, sValue) {
+        this.fontSize = function ($editable, sValue) {
             recordUndo($editable);
             document.execCommand('fontSize', false, 3);
             if (agent.bFF) {
@@ -1750,7 +1751,7 @@
                 $editable.find('font[size=3]').removeAttr('size').css('font-size', sValue + 'px');
             } else {
                 // chrome: <span style="font-size: medium"> to <span style='font-size={sValue}px;'>
-                $editable.find('span').filter(function() {
+                $editable.find('span').filter(function () {
                     return this.style.fontSize === 'medium';
                 }).css('font-size', sValue + 'px');
             }
@@ -1761,7 +1762,7 @@
          * @param {jQuery} $editable
          * @param {String} sValue
          */
-        this.lineHeight = function($editable, sValue) {
+        this.lineHeight = function ($editable, sValue) {
             recordUndo($editable);
             style.stylePara(range.create(), {
                 lineHeight: sValue
@@ -1772,7 +1773,7 @@
          * unlink
          * @param {jQuery} $editable
          */
-        this.unlink = function($editable) {
+        this.unlink = function ($editable) {
             var rng = range.create();
             if (rng.isOnAnchor()) {
                 recordUndo($editable);
@@ -1790,7 +1791,7 @@
          * @param {String} sLinkUrl
          * @param {Boolean} bNewWindow
          */
-        this.createLink = function($editable, sLinkUrl, bNewWindow) {
+        this.createLink = function ($editable, sLinkUrl, bNewWindow) {
             var rng = range.create();
             recordUndo($editable);
 
@@ -1814,7 +1815,7 @@
             }
 
             // target
-            $.each(rng.nodes(dom.isAnchor), function(idx, elAnchor) {
+            $.each(rng.nodes(dom.isAnchor), function (idx, elAnchor) {
                 if (bNewWindow) {
                     $(elAnchor).attr('target', '_blank');
                 } else {
@@ -1828,7 +1829,7 @@
          *
          * @return {Promise}
          */
-        this.getLinkInfo = function() {
+        this.getLinkInfo = function () {
             var rng = range.create();
             var bNewWindow = true;
             var sUrl = '';
@@ -1853,7 +1854,7 @@
          *
          * @return {Object}
          */
-        this.getVideoInfo = function() {
+        this.getVideoInfo = function () {
             var rng = range.create();
 
             if (rng.isOnAnchor()) {
@@ -1866,7 +1867,7 @@
             };
         };
 
-        this.color = function($editable, sObjColor) {
+        this.color = function ($editable, sObjColor) {
             var oColor = JSON.parse(sObjColor);
             var foreColor = oColor.foreColor,
                 backColor = oColor.backColor;
@@ -1880,7 +1881,7 @@
             }
         };
 
-        this.insertTable = function($editable, sDim) {
+        this.insertTable = function ($editable, sDim) {
             recordUndo($editable);
             var aDim = sDim.split('x');
             range.create().insertNode(table.createTable(aDim[0], aDim[1]));
@@ -1891,7 +1892,7 @@
          * @param {String} sValue
          * @param {jQuery} $target
          */
-        this.floatMe = function($editable, sValue, $target) {
+        this.floatMe = function ($editable, sValue, $target) {
             recordUndo($editable);
             $target.css('float', sValue);
         };
@@ -1902,7 +1903,7 @@
          * @param {String} sValue
          * @param {jQuery} $target - target element
          */
-        this.resize = function($editable, sValue, $target) {
+        this.resize = function ($editable, sValue, $target) {
             recordUndo($editable);
 
             $target.css({
@@ -1916,7 +1917,7 @@
          * @param {jQuery} $target - target element
          * @param {Boolean} [bKeepRatio] - keep ratio
          */
-        this.resizeTo = function(pos, $target, bKeepRatio) {
+        this.resizeTo = function (pos, $target, bKeepRatio) {
             var szImage;
             if (bKeepRatio) {
                 var newRatio = pos.y / pos.x;
@@ -1942,7 +1943,7 @@
          * @param {String} sValue - dummy argument (for keep interface)
          * @param {jQuery} $target - target element
          */
-        this.removeMedia = function($editable, sValue, $target) {
+        this.removeMedia = function ($editable, sValue, $target) {
             recordUndo($editable);
             $target.detach();
         };
@@ -1952,11 +1953,11 @@
      * History
      * @class
      */
-    var History = function() {
+    var History = function () {
         var aUndo = [],
             aRedo = [];
 
-        var makeSnap = function($editable) {
+        var makeSnap = function ($editable) {
             var elEditable = $editable[0],
                 rng = range.create();
             return {
@@ -1966,12 +1967,12 @@
             };
         };
 
-        var applySnap = function($editable, oSnap) {
+        var applySnap = function ($editable, oSnap) {
             $editable.html(oSnap.contents).scrollTop(oSnap.scrollTop);
             range.createFromBookmark($editable[0], oSnap.bookmark).select();
         };
 
-        this.undo = function($editable) {
+        this.undo = function ($editable) {
             var oSnap = makeSnap($editable);
             if (aUndo.length === 0) {
                 return;
@@ -1980,7 +1981,7 @@
             aRedo.push(oSnap);
         };
 
-        this.redo = function($editable) {
+        this.redo = function ($editable) {
             var oSnap = makeSnap($editable);
             if (aRedo.length === 0) {
                 return;
@@ -1989,7 +1990,7 @@
             aUndo.push(oSnap);
         };
 
-        this.recordUndo = function($editable) {
+        this.recordUndo = function ($editable) {
             aRedo = [];
             aUndo.push(makeSnap($editable));
         };
@@ -1998,22 +1999,22 @@
     /**
      * Toolbar
      */
-    var Toolbar = function() {
+    var Toolbar = function () {
         /**
          * update button status
          *
          * @param {jQuery} $toolbar
          * @param {Object} oStyle
          */
-        this.update = function($toolbar, oStyle) {
+        this.update = function ($toolbar, oStyle) {
 
             /**
              * handle dropdown's check mark (for fontname, fontsize, lineHeight).
              * @param {jQuery} $btn
              * @param {Number} nValue
              */
-            var checkDropdownMenu = function($btn, nValue) {
-                $btn.find('.dropdown-menu li a').each(function() {
+            var checkDropdownMenu = function ($btn, nValue) {
+                $btn.find('.dropdown-menu li a').each(function () {
                     // always compare string to avoid creating another func.
                     var bChecked = ($(this).data('value') + '') === (nValue + '');
                     this.className = bChecked ? 'checked' : '';
@@ -2026,7 +2027,7 @@
              * @param {String} sSelector
              * @param {Function} pred
              */
-            var btnState = function(sSelector, pred) {
+            var btnState = function (sSelector, pred) {
                 var $btn = $toolbar.find(sSelector);
                 $btn.toggleClass('active', pred());
             };
@@ -2035,7 +2036,7 @@
             var $fontname = $toolbar.find('.note-fontname');
             if ($fontname.length > 0) {
                 var selectedFont = oStyle['font-family'];
-                if ( !! selectedFont) {
+                if (!!selectedFont) {
                     selectedFont = list.head(selectedFont.split(','));
                     selectedFont = selectedFont.replace(/\'/g, '');
                     $fontname.find('.note-current-fontname').text(selectedFont);
@@ -2052,31 +2053,31 @@
             var $lineHeight = $toolbar.find('.note-height');
             checkDropdownMenu($lineHeight, parseFloat(oStyle['line-height']));
 
-            btnState('button[data-event="bold"]', function() {
+            btnState('button[data-event="bold"]', function () {
                 return oStyle['font-bold'] === 'bold';
             });
-            btnState('button[data-event="italic"]', function() {
+            btnState('button[data-event="italic"]', function () {
                 return oStyle['font-italic'] === 'italic';
             });
-            btnState('button[data-event="underline"]', function() {
+            btnState('button[data-event="underline"]', function () {
                 return oStyle['font-underline'] === 'underline';
             });
-            btnState('button[data-event="justifyLeft"]', function() {
+            btnState('button[data-event="justifyLeft"]', function () {
                 return oStyle['text-align'] === 'left' || oStyle['text-align'] === 'start';
             });
-            btnState('button[data-event="justifyCenter"]', function() {
+            btnState('button[data-event="justifyCenter"]', function () {
                 return oStyle['text-align'] === 'center';
             });
-            btnState('button[data-event="justifyRight"]', function() {
+            btnState('button[data-event="justifyRight"]', function () {
                 return oStyle['text-align'] === 'right';
             });
-            btnState('button[data-event="justifyFull"]', function() {
+            btnState('button[data-event="justifyFull"]', function () {
                 return oStyle['text-align'] === 'justify';
             });
-            btnState('button[data-event="insertUnorderedList"]', function() {
+            btnState('button[data-event="insertUnorderedList"]', function () {
                 return oStyle['list-style'] === 'unordered';
             });
-            btnState('button[data-event="insertOrderedList"]', function() {
+            btnState('button[data-event="insertOrderedList"]', function () {
                 return oStyle['list-style'] === 'ordered';
             });
         };
@@ -2088,7 +2089,7 @@
          * @param {String} sEvent
          * @param {sValue} sValue
          */
-        this.updateRecentColor = function(elBtn, sEvent, sValue) {
+        this.updateRecentColor = function (elBtn, sEvent, sValue) {
             var $color = $(elBtn).closest('.note-color');
             var $recentColor = $color.find('.note-recent-color');
             var oColor = JSON.parse($recentColor.attr('data-value'));
@@ -2098,12 +2099,12 @@
             $recentColor.find('i').css(sKey, sValue);
         };
 
-        this.updateFullscreen = function($toolbar, bFullscreen) {
+        this.updateFullscreen = function ($toolbar, bFullscreen) {
             var $btn = $toolbar.find('button[data-event="fullscreen"]');
             $btn.toggleClass('active', bFullscreen);
         };
 
-        this.updateCodeview = function($toolbar, bCodeview) {
+        this.updateCodeview = function ($toolbar, bCodeview) {
             var $btn = $toolbar.find('button[data-event="codeview"]');
             $btn.toggleClass('active', bCodeview);
         };
@@ -2112,7 +2113,7 @@
          * activate buttons exclude codeview
          * @param {jQuery} $toolbar
          */
-        this.activate = function($toolbar) {
+        this.activate = function ($toolbar) {
             $toolbar.find('button').not('button[data-event="codeview"]').removeClass('disabled');
         };
 
@@ -2120,7 +2121,7 @@
          * deactivate buttons exclude codeview
          * @param {jQuery} $toolbar
          */
-        this.deactivate = function($toolbar) {
+        this.deactivate = function ($toolbar) {
             $toolbar.find('button').not('button[data-event="codeview"]').addClass('disabled');
         };
     };
@@ -2128,13 +2129,13 @@
     /**
      * Popover (http://getbootstrap.com/javascript/#popovers)
      */
-    var Popover = function() {
+    var Popover = function () {
         /**
          * show popover
          * @param {jQuery} popover
          * @param {Element} elPlaceholder - placeholder for popover
          */
-        var showPopover = function($popover, elPlaceholder) {
+        var showPopover = function ($popover, elPlaceholder) {
             var $placeholder = $(elPlaceholder);
             var pos = $placeholder.position(),
                 height = $placeholder.height();
@@ -2152,7 +2153,7 @@
          * @param {jQuery} $popover - popover container
          * @param {Object} oStyle - style object
          */
-        this.update = function($popover, oStyle) {
+        this.update = function ($popover, oStyle) {
             var $linkPopover = $popover.find('.note-link-popover');
 
             if (oStyle.anchor) {
@@ -2175,7 +2176,7 @@
          * hide all popovers
          * @param {jQuery} $popover - popover contaienr
          */
-        this.hide = function($popover) {
+        this.hide = function ($popover) {
             $popover.children().hide();
         };
     };
@@ -2183,13 +2184,13 @@
     /**
      * Handle
      */
-    var Handle = function() {
+    var Handle = function () {
         /**
          * update handle
          * @param {jQuery} $handle
          * @param {Object} oStyle
          */
-        this.update = function($handle, oStyle) {
+        this.update = function ($handle, oStyle) {
             var $selection = $handle.find('.note-control-selection');
             if (oStyle.image) {
                 var $image = $(oStyle.image);
@@ -2212,7 +2213,7 @@
             }
         };
 
-        this.hide = function($handle) {
+        this.hide = function ($handle) {
             $handle.children().hide();
         };
     };
@@ -2222,7 +2223,7 @@
      *
      * @class
      */
-    var Dialog = function() {
+    var Dialog = function () {
 
         /**
          * toggle button status
@@ -2230,7 +2231,7 @@
          * @param {jQuery} $btn
          * @param {Boolean} bEnable
          */
-        var toggleBtn = function($btn, bEnable) {
+        var toggleBtn = function ($btn, bEnable) {
             $btn.toggleClass('disabled', !bEnable);
             $btn.attr('disabled', !bEnable);
         };
@@ -2242,36 +2243,36 @@
          * @param {jQuery} $dialog
          * @return {Promise}
          */
-        this.showImageDialog = function($editable, $dialog) {
-            return $.Deferred(function(deferred) {
+        this.showImageDialog = function ($editable, $dialog) {
+            return $.Deferred(function (deferred) {
                 var $imageDialog = $dialog.find('.note-image-dialog');
 
                 var $imageInput = $dialog.find('.note-image-input'),
                     $imageUrl = $dialog.find('.note-image-url'),
                     $imageBtn = $dialog.find('.note-image-btn');
 
-                $imageDialog.one('shown.bs.modal', function(event) {
+                $imageDialog.one('shown.bs.modal', function (event) {
                     event.stopPropagation();
 
                     // Cloning imageInput to clear element.
                     $imageInput.replaceWith($imageInput.clone()
-                        .on('change', function() {
-                            $imageDialog.modal('hide');
-                            deferred.resolve(this.files);
-                        })
+                            .on('change', function () {
+                                $imageDialog.modal('hide');
+                                deferred.resolve(this.files);
+                            })
                     );
 
-                    $imageBtn.click(function(event) {
+                    $imageBtn.click(function (event) {
                         event.preventDefault();
 
                         $imageDialog.modal('hide');
                         deferred.resolve($imageUrl.val());
                     });
 
-                    $imageUrl.keyup(function() {
+                    $imageUrl.keyup(function () {
                         toggleBtn($imageBtn, $imageUrl.val());
                     }).val('').focus();
-                }).one('hidden.bs.modal', function(event) {
+                }).one('hidden.bs.modal', function (event) {
                     event.stopPropagation();
 
                     $editable.focus();
@@ -2289,26 +2290,26 @@
          * @param {Object} videoInfo
          * @return {Promise}
          */
-        this.showVideoDialog = function($editable, $dialog, videoInfo) {
-            return $.Deferred(function(deferred) {
+        this.showVideoDialog = function ($editable, $dialog, videoInfo) {
+            return $.Deferred(function (deferred) {
                 var $videoDialog = $dialog.find('.note-video-dialog');
                 var $videoUrl = $videoDialog.find('.note-video-url'),
                     $videoBtn = $videoDialog.find('.note-video-btn');
 
-                $videoDialog.one('shown.bs.modal', function(event) {
+                $videoDialog.one('shown.bs.modal', function (event) {
                     event.stopPropagation();
 
-                    $videoUrl.val(videoInfo.text).keyup(function() {
+                    $videoUrl.val(videoInfo.text).keyup(function () {
                         toggleBtn($videoBtn, $videoUrl.val());
                     }).trigger('keyup').trigger('focus');
 
-                    $videoBtn.click(function(event) {
+                    $videoBtn.click(function (event) {
                         event.preventDefault();
 
                         $videoDialog.modal('hide');
                         deferred.resolve($videoUrl.val());
                     });
-                }).one('hidden.bs.modal', function(event) {
+                }).one('hidden.bs.modal', function (event) {
                     event.stopPropagation();
 
                     $editable.focus();
@@ -2325,8 +2326,8 @@
          * @param {Object} linkInfo
          * @return {Promise}
          */
-        this.showLinkDialog = function($editable, $dialog, linkInfo) {
-            return $.Deferred(function(deferred) {
+        this.showLinkDialog = function ($editable, $dialog, linkInfo) {
+            return $.Deferred(function (deferred) {
                 var $linkDialog = $dialog.find('.note-link-dialog');
 
                 var $linkText = $linkDialog.find('.note-link-text'),
@@ -2334,12 +2335,12 @@
                     $linkBtn = $linkDialog.find('.note-link-btn'),
                     $openInNewWindow = $linkDialog.find('input[type=checkbox]');
 
-                $linkDialog.one('shown.bs.modal', function(event) {
+                $linkDialog.one('shown.bs.modal', function (event) {
                     event.stopPropagation();
 
                     $linkText.val(linkInfo.text);
 
-                    $linkUrl.keyup(function() {
+                    $linkUrl.keyup(function () {
                         toggleBtn($linkBtn, $linkUrl.val());
                         // display same link on `Text to display` input
                         // when create a new link
@@ -2350,13 +2351,13 @@
 
                     $openInNewWindow.prop('checked', linkInfo.newWindow);
 
-                    $linkBtn.one('click', function(event) {
+                    $linkBtn.one('click', function (event) {
                         event.preventDefault();
 
                         $linkDialog.modal('hide');
                         deferred.resolve($linkUrl.val(), $openInNewWindow.is(':checked'));
                     });
-                }).one('hidden.bs.modal', function(event) {
+                }).one('hidden.bs.modal', function (event) {
                     event.stopPropagation();
 
                     $editable.focus();
@@ -2370,10 +2371,10 @@
          *
          * @param {jQuery} $dialog
          */
-        this.showHelpDialog = function($editable, $dialog) {
+        this.showHelpDialog = function ($editable, $dialog) {
             var $helpDialog = $dialog.find('.note-help-dialog');
 
-            $helpDialog.one('hidden.bs.modal', function(event) {
+            $helpDialog.one('hidden.bs.modal', function (event) {
                 event.stopPropagation();
                 $editable.focus();
             }).modal('show');
@@ -2383,7 +2384,7 @@
     /**
      * EventHandler
      */
-    var EventHandler = function() {
+    var EventHandler = function () {
         var editor = new Editor();
         var toolbar = new Toolbar(),
             popover = new Popover();
@@ -2396,7 +2397,7 @@
          * @param {Element} descendant
          * @returns {Object}
          */
-        var makeLayoutInfo = function(descendant) {
+        var makeLayoutInfo = function (descendant) {
             var $editor = $(descendant).closest('.note-editor');
             return $editor.length > 0 && dom.buildLayoutInfo($editor);
         };
@@ -2407,7 +2408,7 @@
          * @param {jQuery} $editable
          * @param {File[]} files
          */
-        var insertImages = function($editable, files) {
+        var insertImages = function ($editable, files) {
             editor.restoreRange($editable);
             var callbacks = $editable.data('callbacks');
 
@@ -2416,10 +2417,10 @@
                 callbacks.onImageUpload(files, editor, $editable);
                 // else insert Image as dataURL
             } else {
-                $.each(files, function(idx, file) {
-                    async.readFileAsDataURL(file).then(function(sDataURL) {
+                $.each(files, function (idx, file) {
+                    async.readFileAsDataURL(file).then(function (sDataURL) {
                         editor.insertImage($editable, sDataURL);
-                    }).fail(function() {
+                    }).fail(function () {
                         if (callbacks.onImageUploadError) {
                             callbacks.onImageUploadError();
                         }
@@ -2428,14 +2429,14 @@
             }
         };
 
-        var hMousedown = function(event) {
+        var hMousedown = function (event) {
             //preventDefault Selection for FF, IE8+
             if (dom.isImg(event.target)) {
                 event.preventDefault();
             }
         };
 
-        var hToolbarAndPopoverUpdate = function(event) {
+        var hToolbarAndPopoverUpdate = function (event) {
             var oLayoutInfo = makeLayoutInfo(event.currentTarget || event.target);
             var oStyle = editor.currentStyle(event.target);
             if (!oStyle) {
@@ -2446,7 +2447,7 @@
             handle.update(oLayoutInfo.handle(), oStyle);
         };
 
-        var hScroll = function(event) {
+        var hScroll = function (event) {
             var oLayoutInfo = makeLayoutInfo(event.currentTarget || event.target);
             //hide popover and handle when scrolled
             popover.hide(oLayoutInfo.popover());
@@ -2459,7 +2460,7 @@
          *
          * @param {MouseEvent} event
          */
-        var hHandleMousedown = function(event) {
+        var hHandleMousedown = function (event) {
             if (dom.isControlSizing(event.target)) {
                 var oLayoutInfo = makeLayoutInfo(event.target),
                     $handle = oLayoutInfo.handle(),
@@ -2472,7 +2473,7 @@
                 var posStart = $target.offset(),
                     scrollTop = $(document).scrollTop();
 
-                $editor.on('mousemove', function(event) {
+                $editor.on('mousemove', function (event) {
 
                     editor.resizeTo({
                         x: event.clientX - posStart.left,
@@ -2485,7 +2486,7 @@
                     popover.update($popover, {
                         image: elTarget
                     });
-                }).one('mouseup', function() {
+                }).one('mouseup', function () {
                     $editor.off('mousemove');
                 });
 
@@ -2499,7 +2500,7 @@
             }
         };
 
-        var hToolbarAndPopoverMousedown = function(event) {
+        var hToolbarAndPopoverMousedown = function (event) {
             // prevent default event when insertTable (FF, Webkit)
             var $btn = $(event.target).closest('[data-event]');
             if ($btn.length > 0) {
@@ -2507,7 +2508,7 @@
             }
         };
 
-        var hToolbarAndPopoverClick = function(event) {
+        var hToolbarAndPopoverClick = function (event) {
             var $btn = $(event.target).closest('[data-event]');
 
             if ($btn.length > 0) {
@@ -2547,14 +2548,14 @@
                     var linkInfo = editor.getLinkInfo();
 
                     editor.saveRange($editable);
-                    dialog.showLinkDialog($editable, $dialog, linkInfo).then(function(sLinkUrl, bNewWindow) {
+                    dialog.showLinkDialog($editable, $dialog, linkInfo).then(function (sLinkUrl, bNewWindow) {
                         editor.restoreRange($editable);
                         editor.createLink($editable, sLinkUrl, bNewWindow);
                     });
                 } else if (sEvent === 'showImageDialog') {
                     $editable.focus();
 
-                    dialog.showImageDialog($editable, $dialog).then(function(data) {
+                    dialog.showImageDialog($editable, $dialog).then(function (data) {
                         if (typeof data === 'string') {
                             editor.restoreRange($editable);
                             editor.insertImage($editable, data);
@@ -2567,7 +2568,7 @@
                     var videoInfo = editor.getVideoInfo();
 
                     editor.saveRange($editable);
-                    dialog.showVideoDialog($editable, $dialog, videoInfo).then(function(sUrl) {
+                    dialog.showVideoDialog($editable, $dialog, videoInfo).then(function (sUrl) {
                         editor.restoreRange($editable);
                         editor.insertVideo($editable, sUrl);
                     });
@@ -2576,7 +2577,7 @@
                 } else if (sEvent === 'fullscreen') {
                     var $scrollbar = $('html, body');
 
-                    var resize = function(size) {
+                    var resize = function (size) {
                         $editor.css('width', size.w);
                         $editable.css('height', size.h);
                         $codable.css('height', size.h);
@@ -2590,7 +2591,7 @@
                     if (isFullscreen) {
                         $editable.data('orgHeight', $editable.css('height'));
 
-                        $(window).on('resize', function() {
+                        $(window).on('resize', function () {
                             resize({
                                 w: $(window).width(),
                                 h: $(window).height() - $toolbar.outerHeight()
@@ -2627,7 +2628,7 @@
                             if (tern) {
                                 server = new CodeMirror.TernServer(tern);
                                 cmEditor.ternServer = server;
-                                cmEditor.on('cursorActivity', function(cm) {
+                                cmEditor.on('cursorActivity', function (cm) {
                                     server.updateArgHints(cm);
                                 });
                             }
@@ -2674,15 +2675,15 @@
          *
          * @param {MouseEvent} event
          */
-        var hStatusbarMousedown = function(event) {
+        var hStatusbarMousedown = function (event) {
             var $document = $(document);
             var $editable = makeLayoutInfo(event.target).editable();
             var nEditableTop = $editable.offset().top - $document.scrollTop();
 
-            $document.on('mousemove', function(event) {
+            $document.on('mousemove', function (event) {
                 var nHeight = event.clientY - (nEditableTop + EDITABLE_PADDING);
                 $editable.height(nHeight);
-            }).one('mouseup', function() {
+            }).one('mouseup', function () {
                 $document.off('mousemove');
             });
 
@@ -2691,7 +2692,7 @@
         };
 
         var PX_PER_EM = 18;
-        var hDimensionPickerMove = function(event) {
+        var hDimensionPickerMove = function (event) {
             var $picker = $(event.target.parentNode); // target is mousecatcher
             var $dimensionDisplay = $picker.next();
             var $catcher = $picker.find('.note-dimension-picker-mousecatcher');
@@ -2744,13 +2745,13 @@
          *
          * @param {Object} oLayoutInfo - layout Informations
          */
-        var attachDragAndDropEvent = function(oLayoutInfo) {
+        var attachDragAndDropEvent = function (oLayoutInfo) {
             var collection = $(),
                 $dropzone = oLayoutInfo.dropzone,
                 $dropzoneMessage = oLayoutInfo.dropzone.find('.note-dropzone-message');
 
             // show dropzone on dragenter when dragging a object to document.
-            $(document).on('dragenter', function(e) {
+            $(document).on('dragenter', function (e) {
                 var bCodeview = oLayoutInfo.editor.hasClass('codeview');
                 if (!bCodeview && collection.length === 0) {
                     oLayoutInfo.editor.addClass('dragover');
@@ -2759,27 +2760,27 @@
                     $dropzoneMessage.text('Drag Image Here');
                 }
                 collection = collection.add(e.target);
-            }).on('dragleave', function(e) {
+            }).on('dragleave', function (e) {
                 collection = collection.not(e.target);
                 if (collection.length === 0) {
                     oLayoutInfo.editor.removeClass('dragover');
                 }
-            }).on('drop', function() {
+            }).on('drop', function () {
                 collection = $();
                 oLayoutInfo.editor.removeClass('dragover');
             });
 
             // change dropzone's message on hover.
-            $dropzone.on('dragenter', function() {
+            $dropzone.on('dragenter', function () {
                 $dropzone.addClass('hover');
                 $dropzoneMessage.text('Drop Image');
-            }).on('dragleave', function() {
+            }).on('dragleave', function () {
                 $dropzone.removeClass('hover');
                 $dropzoneMessage.text('Drag Image Here');
             });
 
             // attach dropImage
-            $dropzone.on('drop', function(event) {
+            $dropzone.on('drop', function (event) {
                 var dataTransfer = event.originalEvent.dataTransfer;
                 if (dataTransfer && dataTransfer.files) {
                     var oLayoutInfo = makeLayoutInfo(event.currentTarget || event.target);
@@ -2797,11 +2798,11 @@
          * @param {Object} oLayoutInfo
          * @param {Object} keyMap
          */
-        this.bindKeyMap = function(oLayoutInfo, keyMap) {
+        this.bindKeyMap = function (oLayoutInfo, keyMap) {
             var $editor = oLayoutInfo.editor;
             var $editable = oLayoutInfo.editable;
 
-            $editable.on('keydown', function(event) {
+            $editable.on('keydown', function (event) {
                 var aKey = [];
 
                 // modifier
@@ -2839,7 +2840,7 @@
          * @param {Object} options - user options include custom event handlers
          * @param {Function} options.enter - enter key handler
          */
-        this.attach = function(oLayoutInfo, options) {
+        this.attach = function (oLayoutInfo, options) {
             var keyMap = options.keyMap[agent.bMac ? 'mac' : 'pc'];
             this.bindKeyMap(oLayoutInfo, keyMap);
 
@@ -2866,7 +2867,7 @@
             $catcher.on('mousemove', hDimensionPickerMove);
 
             // save selection when focusout
-            oLayoutInfo.editable.on('blur', function() {
+            oLayoutInfo.editable.on('blur', function () {
                 editor.saveRange(oLayoutInfo.editable);
             });
 
@@ -2876,7 +2877,7 @@
             // ret styleWithCSS for backColor / foreColor clearing with 'inherit'.
             if (options.styleWithSpan && !agent.bMSIE) {
                 // protect FF Error: NS_ERROR_FAILURE: Failure
-                setTimeout(function() {
+                setTimeout(function () {
                     document.execCommand('styleWithCSS', 0, true);
                 });
             }
@@ -2887,7 +2888,7 @@
             // basic event callbacks (lowercase)
             // enter, focus, blur, keyup, keydown
             if (options.onenter) {
-                oLayoutInfo.editable.keypress(function(event) {
+                oLayoutInfo.editable.keypress(function (event) {
                     if (event.keyCode === key.ENTER) {
                         options.onenter(event);
                     }
@@ -2925,7 +2926,7 @@
             });
         };
 
-        this.dettach = function(oLayoutInfo) {
+        this.dettach = function (oLayoutInfo) {
             oLayoutInfo.editable.off();
             oLayoutInfo.toolbar.off();
             oLayoutInfo.handle.off();
@@ -2938,24 +2939,24 @@
      *
      * rendering toolbar and editable
      */
-    var Renderer = function() {
+    var Renderer = function () {
         var tplToolbarInfo, tplPopover, tplHandle, tplDialog, tplStatusbar;
 
         /* jshint ignore:start */
         tplToolbarInfo = {
-            picture: function(lang) {
+            picture: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.image.image + '" data-event="showImageDialog" tabindex="-1"><i class="fa fa-picture-o icon-picture"></i></button>';
             },
-            ownpicture: function(lang) {
+            ownpicture: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.image.image + '" data-event="showPersonalImageDialog" tabindex="-1"><i class="fa fa-picture-o icon-picture"></i></button>';
             },
-            link: function(lang) {
+            link: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.link.link + '" data-event="showLinkDialog" tabindex="-1"><i class="fa fa-link icon-link"></i></button>';
             },
-            video: function(lang) {
+            video: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.video.video + '" data-event="showVideoDialog" tabindex="-1"><i class="fa fa-youtube-play icon-play"></i></button>';
             },
-            table: function(lang) {
+            table: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" title="' + lang.table.table + '" data-toggle="dropdown" tabindex="-1"><i class="fa fa-table icon-table"></i> <span class="caret"></span></button>' +
                     '<ul class="dropdown-menu">' +
                     '<div class="note-dimension-picker">' +
@@ -2966,7 +2967,7 @@
                     '<div class="note-dimension-display"> 1 x 1 </div>' +
                     '</ul>';
             },
-            style: function(lang) {
+            style: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" title="' + lang.style.style + '" data-toggle="dropdown" tabindex="-1"><i class="fa fa-magic icon-magic"></i> <span class="caret"></span></button>' +
                     '<ul class="dropdown-menu">' +
                     '<li><a data-event="formatBlock" data-value="p">' + lang.style.normal + '</a></li>' +
@@ -2980,7 +2981,7 @@
                     '<li><a data-event="formatBlock" data-value="h6"><h6>' + lang.style.h6 + '</h6></a></li>' +
                     '</ul>';
             },
-            fontname: function(lang) {
+            fontname: function (lang) {
                 var aFont = [
                     'Serif', 'Sans', 'Arial', 'Arial Black', 'Courier',
                     'Courier New', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande',
@@ -2996,7 +2997,7 @@
 
                 return sMarkup;
             },
-            fontsize: function(lang) {
+            fontsize: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" data-toggle="dropdown" title="' + lang.font.size + '" tabindex="-1"><span class="note-current-fontsize">11</span> <b class="caret"></b></button>' +
                     '<ul class="dropdown-menu">' +
                     '<li><a data-event="fontSize" data-value="8"><i class="fa fa-check icon-ok"></i> 8</a></li>' +
@@ -3010,7 +3011,7 @@
                     '<li><a data-event="fontSize" data-value="36"><i class="fa fa-check icon-ok"></i> 36</a></li>' +
                     '</ul>';
             },
-            color: function(lang) {
+            color: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small note-recent-color" title="' + lang.color.recent + '" data-event="color" data-value=\'{"backColor":"yellow"}\' tabindex="-1"><i class="fa fa-font icon-font" style="color:black;background-color:yellow;"></i></button>' +
                     '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" title="' + lang.color.more + '" data-toggle="dropdown" tabindex="-1">' +
                     '<span class="caret"></span>' +
@@ -3030,25 +3031,25 @@
                     '</li>' +
                     '</ul>';
             },
-            bold: function(lang) {
+            bold: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.font.bold + '" data-shortcut="Ctrl+B" data-mac-shortcut="⌘+B" data-event="bold" tabindex="-1"><i class="fa fa-bold icon-bold"></i></button>';
             },
-            italic: function(lang) {
+            italic: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.font.italic + '" data-shortcut="Ctrl+I" data-mac-shortcut="⌘+I" data-event="italic" tabindex="-1"><i class="fa fa-italic icon-italic"></i></button>';
             },
-            underline: function(lang) {
+            underline: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.font.underline + '" data-shortcut="Ctrl+U" data-mac-shortcut="⌘+U" data-event="underline" tabindex="-1"><i class="fa fa-underline icon-underline"></i></button>';
             },
-            clear: function(lang) {
+            clear: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.font.clear + '" data-shortcut="Ctrl+\\" data-mac-shortcut="⌘+\\" data-event="removeFormat" tabindex="-1"><i class="fa fa-eraser icon-eraser"></i></button>';
             },
-            ul: function(lang) {
+            ul: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.lists.unordered + '" data-shortcut="Ctrl+Shift+8" data-mac-shortcut="⌘+⇧+7" data-event="insertUnorderedList" tabindex="-1"><i class="fa fa-list-ul icon-list-ul"></i></button>';
             },
-            ol: function(lang) {
+            ol: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.lists.ordered + '" data-shortcut="Ctrl+Shift+7" data-mac-shortcut="⌘+⇧+8" data-event="insertOrderedList" tabindex="-1"><i class="fa fa-list-ol icon-list-ol"></i></button>';
             },
-            paragraph: function(lang) {
+            paragraph: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" title="' + lang.paragraph.paragraph + '" data-toggle="dropdown" tabindex="-1"><i class="fa fa-align-left icon-align-left"></i>  <span class="caret"></span></button>' +
                     '<div class="dropdown-menu">' +
                     '<div class="note-align btn-group">' +
@@ -3063,7 +3064,7 @@
                     '</div>' +
                     '</div>';
             },
-            height: function(lang) {
+            height: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" data-toggle="dropdown" title="' + lang.font.height + '" tabindex="-1"><i class="fa fa-text-height icon-text-height"></i>&nbsp; <b class="caret"></b></button>' +
                     '<ul class="dropdown-menu">' +
                     '<li><a data-event="lineHeight" data-value="1.0"><i class="fa fa-check icon-ok"></i> 1.0</a></li>' +
@@ -3076,23 +3077,23 @@
                     '<li><a data-event="lineHeight" data-value="3.0"><i class="fa fa-check icon-ok"></i> 3.0</a></li>' +
                     '</ul>';
             },
-            help: function(lang) {
+            help: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.options.help + '" data-event="showHelpDialog" tabindex="-1"><i class="fa fa-question icon-question"></i></button>';
             },
-            fullscreen: function(lang) {
+            fullscreen: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.options.fullscreen + '" data-event="fullscreen" tabindex="-1"><i class="fa fa-arrows-alt icon-fullscreen"></i></button>';
             },
-            codeview: function(lang) {
+            codeview: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.options.codeview + '" data-event="codeview" tabindex="-1"><i class="fa fa-code icon-code"></i></button>';
             },
-            undo: function(lang) {
+            undo: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.history.undo + '" data-event="undo" tabindex="-1"><i class="fa fa-undo icon-undo"></i></button>';
             },
-            redo: function(lang) {
+            redo: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.history.redo + '" data-event="redo" tabindex="-1"><i class="fa fa-repeat icon-repeat"></i></button>';
             }
         };
-        tplPopover = function(lang) {
+        tplPopover = function (lang) {
             return '<div class="note-popover">' +
                 '<div class="note-link-popover popover bottom in" style="display: none;">' +
                 '<div class="arrow"></div>' +
@@ -3125,7 +3126,7 @@
                 '</div>';
         };
 
-        var tplHandle = function() {
+        var tplHandle = function () {
             return '<div class="note-handle">' +
                 '<div class="note-control-selection">' +
                 '<div class="note-control-selection-bg"></div>' +
@@ -3138,7 +3139,7 @@
                 '</div>';
         };
 
-        var tplShortcutText = function(lang, options) {
+        var tplShortcutText = function (lang, options) {
             return '<table class="note-shortcut">' +
                 '<thead>' +
                 '<tr><th></th><th>' + lang.shortcut.textFormatting + '</th></tr>' +
@@ -3154,7 +3155,7 @@
                 '</table>';
         };
 
-        var tplShortcutAction = function(lang, options) {
+        var tplShortcutAction = function (lang, options) {
             return '<table class="note-shortcut">' +
                 '<thead>' +
                 '<tr><th></th><th>' + lang.shortcut.action + '</th></tr>' +
@@ -3169,7 +3170,7 @@
                 '</table>';
         };
 
-        var tplExtraShortcuts = function(lang, options) {
+        var tplExtraShortcuts = function (lang, options) {
             var template =
                 '<table class="note-shortcut">' +
                 '<thead>' +
@@ -3186,7 +3187,7 @@
             return template;
         };
 
-        var tplShortcutPara = function(lang, options) {
+        var tplShortcutPara = function (lang, options) {
             return '<table class="note-shortcut">' +
                 '<thead>' +
                 '<tr><th></th><th>' + lang.shortcut.paragraphFormatting + '</th></tr>' +
@@ -3202,7 +3203,7 @@
                 '</table>';
         };
 
-        var tplShortcutStyle = function(lang, options) {
+        var tplShortcutStyle = function (lang, options) {
             return '<table class="note-shortcut">' +
                 '<thead>' +
                 '<tr><th></th><th>' + lang.shortcut.documentStyle + '</th></tr>' +
@@ -3219,7 +3220,7 @@
                 '</table>';
         };
 
-        var tplShortcutTable = function(lang, options) {
+        var tplShortcutTable = function (lang, options) {
             var template = '<table class="note-shortcut-layout">' +
                 '<tbody>' +
                 '<tr><td>' + tplShortcutAction(lang, options) + '</td><td>' + tplShortcutText(lang, options) + '</td></tr>' +
@@ -3231,12 +3232,12 @@
             return template;
         };
 
-        var replaceMacKeys = function(sHtml) {
+        var replaceMacKeys = function (sHtml) {
             return sHtml.replace(/⌘/g, 'Ctrl').replace(/⇧/g, 'Shift');
         };
 
-        tplDialog = function(lang, options) {
-            var tplImageDialog = function() {
+        tplDialog = function (lang, options) {
+            var tplImageDialog = function () {
                 return '<div class="note-image-dialog modal" aria-hidden="false">' +
                     '<div class="modal-dialog">' +
                     '<div class="modal-content">' +
@@ -3260,7 +3261,7 @@
                     '</div>';
             };
 
-            var tplLinkDialog = function() {
+            var tplLinkDialog = function () {
                 return '<div class="note-link-dialog modal" aria-hidden="false">' +
                     '<div class="modal-dialog">' +
                     '<div class="modal-content">' +
@@ -3279,12 +3280,12 @@
                     '<input class="note-link-url form-control span12" type="text" />' +
                     '</div>' +
                     (!options.disableLinkTarget ?
-                    '<div class="checkbox">' +
-                    '<label>' + '<input type="checkbox" checked> ' +
-                    lang.link.openInNewWindow +
-                    '</label>' +
-                    '</div>' : ''
-                ) +
+                        '<div class="checkbox">' +
+                        '<label>' + '<input type="checkbox" checked> ' +
+                        lang.link.openInNewWindow +
+                        '</label>' +
+                        '</div>' : ''
+                    ) +
                     '</div>' +
                     '</div>' +
                     '<div class="modal-footer">' +
@@ -3295,7 +3296,7 @@
                     '</div>';
             };
 
-            var tplVideoDialog = function() {
+            var tplVideoDialog = function () {
                 return '<div class="note-video-dialog modal" aria-hidden="false">' +
                     '<div class="modal-dialog">' +
                     '<div class="modal-content">' +
@@ -3306,7 +3307,7 @@
                     '<div class="modal-body">' +
                     '<div class="row-fluid">' +
 
-                '<div class="form-group">' +
+                    '<div class="form-group">' +
                     '<label>' + lang.video.url + '</label>&nbsp;<small class="text-muted">' + lang.video.providers + '</small>' +
                     '<input class="note-video-url form-control span12" type="text" />' +
                     '</div>' +
@@ -3320,7 +3321,7 @@
                     '</div>';
             };
 
-            var tplHelpDialog = function() {
+            var tplHelpDialog = function () {
                 return '<div class="note-help-dialog modal" aria-hidden="false">' +
                     '<div class="modal-dialog">' +
                     '<div class="modal-content">' +
@@ -3343,18 +3344,18 @@
                 '</div>';
         };
 
-        tplStatusbar = function() {
+        tplStatusbar = function () {
             return '<div class="note-resizebar"><div class="note-icon-bar"></div><div class="note-icon-bar"></div><div class="note-icon-bar"></div></div>';
         };
         /* jshint ignore:end */
 
         // createTooltip
-        var createTooltip = function($container, sPlacement) {
-            $container.find('button').each(function(i, elBtn) {
+        var createTooltip = function ($container, sPlacement) {
+            $container.find('button').each(function (i, elBtn) {
                 var $btn = $(elBtn);
                 var tplShortcut = $btn.attr(agent.bMac ? 'data-mac-shortcut' : 'data-shortcut');
                 if (tplShortcut) {
-                    $btn.attr('title', function(i, v) {
+                    $btn.attr('title', function (i, v) {
                         return v + ' (' + tplShortcut + ')';
                     });
                 }
@@ -3363,7 +3364,7 @@
                 container: 'body',
                 trigger: 'hover',
                 placement: sPlacement || 'top'
-            }).on('click', function() {
+            }).on('click', function () {
                 $(this).tooltip('hide');
             });
         };
@@ -3381,8 +3382,8 @@
         ];
 
         // createPalette
-        var createPalette = function($container) {
-            $container.find('.note-color-palette').each(function() {
+        var createPalette = function ($container) {
+            $container.find('.note-color-palette').each(function () {
                 var $palette = $(this),
                     sEvent = $palette.attr('data-target-event');
                 var aPaletteContents = [];
@@ -3410,7 +3411,7 @@
          * @param {jQuery} $holder
          * @param {Object} options
          */
-        this.createLayout = function($holder, options) {
+        this.createLayout = function ($holder, options) {
             //already created
             var next = $holder.next();
             if (next && next.hasClass('note-editor')) {
@@ -3472,7 +3473,7 @@
 
             //07. create Dialog
             var $dialog = $(tplDialog(langInfo, options)).prependTo($editor);
-            $dialog.find('button.close, a.modal-close').click(function() {
+            $dialog.find('button.close, a.modal-close').click(function () {
                 $(this).closest('.modal').modal('hide');
             });
 
@@ -3490,7 +3491,7 @@
          * @param {jQuery} $holder - placeholder
          * @returns {Object}
          */
-        this.layoutInfoFromHolder = function($holder) {
+        this.layoutInfoFromHolder = function ($holder) {
             var $editor = $holder.next();
             if (!$editor.hasClass('note-editor')) {
                 return;
@@ -3511,7 +3512,7 @@
          *
          * @param {jQuery} $holder - placeholder
          */
-        this.removeLayout = function($holder) {
+        this.removeLayout = function ($holder) {
             var info = this.layoutInfoFromHolder($holder);
             if (!info) {
                 return;
@@ -3544,11 +3545,11 @@
          * @returns {this}
          */
 
-        summernote: function(options) {
+        summernote: function (options) {
             // extend default options
             options = $.extend({}, $.summernote.options, options);
 
-            this.each(function(idx, elHolder) {
+            this.each(function (idx, elHolder) {
                 var $holder = $(elHolder);
 
                 // createLayout with options
@@ -3559,7 +3560,7 @@
 
                 // Textarea: auto filling the code before form submit.
                 if (dom.isTextarea($holder[0])) {
-                    $holder.closest('form').submit(function() {
+                    $holder.closest('form').submit(function () {
                         $holder.html($holder.code());
                     });
                 }
@@ -3585,7 +3586,7 @@
          * @param {String} [sHTML] - HTML contents(optional, set)
          * @returns {this|String} - context(set) or HTML contents of note(get).
          */
-        code: function(sHTML) {
+        code: function (sHTML) {
             // get the HTML contents of note
             if (sHTML === undefined) {
                 var $holder = this.first();
@@ -3593,7 +3594,7 @@
                     return;
                 }
                 var info = renderer.layoutInfoFromHolder($holder);
-                if ( !! (info && info.editable)) {
+                if (!!(info && info.editable)) {
                     var bCodeview = info.editor.hasClass('codeview');
                     if (bCodeview && agent.bCodeMirror) {
                         info.codable.data('cmEditor').save();
@@ -3604,7 +3605,7 @@
             }
 
             // set the HTML contents of note
-            this.each(function(i, elHolder) {
+            this.each(function (i, elHolder) {
                 var info = renderer.layoutInfoFromHolder($(elHolder));
                 if (info && info.editable) {
                     info.editable.html(sHTML);
@@ -3614,10 +3615,10 @@
             return this;
         },
 
-        insertImage: function(imgSrc) {
+        insertImage: function (imgSrc) {
             var $img = $('<img>');
             var self = this;
-            $img.one('load', function() {
+            $img.one('load', function () {
                 $('.note-editable').focus();
                 var oldRange = $('.note-editable').data('range');
                 rangeObj = document.createRange();
@@ -3635,8 +3636,8 @@
          * destroy Editor Layout and dettach Key and Mouse Event
          * @returns {this}
          */
-        destroy: function() {
-            this.each(function(idx, elHolder) {
+        destroy: function () {
+            this.each(function (idx, elHolder) {
                 var $holder = $(elHolder);
 
                 var info = renderer.layoutInfoFromHolder($holder);

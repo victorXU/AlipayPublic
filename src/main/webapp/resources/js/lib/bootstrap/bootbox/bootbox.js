@@ -6,7 +6,7 @@
 
 // @see https://github.com/makeusabrew/bootbox/issues/180
 // @see https://github.com/makeusabrew/bootbox/issues/186
-(function(root, factory) {
+(function (root, factory) {
 
     "use strict";
     if (typeof define === "function" && define.amd) {
@@ -105,7 +105,7 @@
 
     function each(collection, iterator) {
         var index = 0;
-        $.each(collection, function(key, value) {
+        $.each(collection, function (key, value) {
             iterator(key, value, index++);
         });
     }
@@ -138,7 +138,7 @@
 
         total = getKeyLength(buttons);
 
-        each(buttons, function(key, button, index) {
+        each(buttons, function (key, button, index) {
 
             if ($.isFunction(button)) {
                 // short form, assume value is our callback. Since button
@@ -270,11 +270,11 @@
 
     function validateButtons(options, buttons) {
         var allowedButtons = {};
-        each(buttons, function(key, value) {
+        each(buttons, function (key, value) {
             allowedButtons[value] = true;
         });
 
-        each(options.buttons, function(key) {
+        each(options.buttons, function (key) {
             if (allowedButtons[key] === undefined) {
                 throw new Error("button key " + key + " is not allowed (options are " + buttons.join("\n") + ")");
             }
@@ -283,7 +283,7 @@
         return options;
     }
 
-    exports.alert = function() {
+    exports.alert = function () {
         var options;
 
         options = mergeDialogOptions("alert", ["ok"], ["message", "callback"], arguments);
@@ -295,7 +295,7 @@
         /**
          * overrides
          */
-        options.buttons.ok.callback = options.onEscape = function() {
+        options.buttons.ok.callback = options.onEscape = function () {
             if ($.isFunction(options.callback)) {
                 return options.callback();
             }
@@ -305,7 +305,7 @@
         return exports.dialog(options);
     };
 
-    exports.confirm = function() {
+    exports.confirm = function () {
         var options;
 
         options = mergeDialogOptions("confirm", ["cancel", "confirm"], ["message", "callback"], arguments);
@@ -313,11 +313,11 @@
         /**
          * overrides; undo anything the user tried to set they shouldn't have
          */
-        options.buttons.cancel.callback = options.onEscape = function() {
+        options.buttons.cancel.callback = options.onEscape = function () {
             return options.callback(false);
         };
 
-        options.buttons.confirm.callback = function() {
+        options.buttons.confirm.callback = function () {
             return options.callback(true);
         };
 
@@ -329,7 +329,7 @@
         return exports.dialog(options);
     };
 
-    exports.prompt = function() {
+    exports.prompt = function () {
         var options;
         var defaults;
         var dialog;
@@ -378,11 +378,11 @@
          */
         options.message = form;
 
-        options.buttons.cancel.callback = options.onEscape = function() {
+        options.buttons.cancel.callback = options.onEscape = function () {
             return options.callback(null);
         };
 
-        options.buttons.confirm.callback = function() {
+        options.buttons.confirm.callback = function () {
             var value;
 
             switch (options.inputType) {
@@ -404,7 +404,7 @@
                     // hence we default to an empty array
                     value = [];
 
-                    each(checkedItems, function(_, item) {
+                    each(checkedItems, function (_, item) {
                         value.push($(item).val());
                     });
                     break;
@@ -450,7 +450,7 @@
                     throw new Error("prompt with select requires options");
                 }
 
-                each(inputOptions, function(_, option) {
+                each(inputOptions, function (_, option) {
 
                     // assume the element to attach to is the input...
                     var elem = input;
@@ -474,7 +474,7 @@
                     elem.append("<option value='" + option.value + "'>" + option.text + "</option>");
                 });
 
-                each(groups, function(_, group) {
+                each(groups, function (_, group) {
                     input.append(group);
                 });
 
@@ -499,14 +499,14 @@
                 // our 'input' element to this container instead
                 input = $("<div/>");
 
-                each(inputOptions, function(_, option) {
+                each(inputOptions, function (_, option) {
                     var checkbox = $(templates.inputs[options.inputType]);
 
                     checkbox.find("input").attr("value", option.value);
                     checkbox.find("label").append(option.text);
 
                     // we've ensured values is an array so we can always iterate over it
-                    each(values, function(_, value) {
+                    each(values, function (_, value) {
                         if (value === option.value) {
                             checkbox.find("input").prop("checked", true);
                         }
@@ -528,7 +528,7 @@
         // now place it in our form
         form.append(input);
 
-        form.on("submit", function(e) {
+        form.on("submit", function (e) {
             e.preventDefault();
             // @TODO can we actually click *the* button object instead?
             // e.g. buttons.confirm.click() or similar
@@ -541,7 +541,7 @@
         dialog.off("shown.bs.modal");
 
         // ...and replace it with one focusing our input, if possible
-        dialog.on("shown.bs.modal", function() {
+        dialog.on("shown.bs.modal", function () {
             input.focus();
         });
 
@@ -552,7 +552,7 @@
         return dialog;
     };
 
-    exports.dialog = function(options) {
+    exports.dialog = function (options) {
         options = sanitize(options);
 
         var dialog = $(templates.dialog);
@@ -567,7 +567,7 @@
             onEscape: options.onEscape
         };
 
-        each(buttons, function(key, button) {
+        each(buttons, function (key, button) {
 
             // @TODO I don't like this string appending to itself; bit dirty. Needs reworking
             // can we just build up button elements instead? slower but neater. Then button
@@ -662,7 +662,7 @@
          * modal has performed certain actions
          */
 
-        dialog.on("hidden.bs.modal", function(e) {
+        dialog.on("hidden.bs.modal", function (e) {
             // ensure we don't accidentally intercept hidden events triggered
             // by children of the current dialog. We shouldn't anymore now BS
             // namespaces its events; but still worth doing
@@ -682,7 +682,7 @@
         // });
 
 
-        dialog.on("shown.bs.modal", function() {
+        dialog.on("shown.bs.modal", function () {
             dialog.find(".btn-primary:first").focus();
         });
 
@@ -692,7 +692,7 @@
          * respective triggers
          */
 
-        dialog.on("escape.close.bb", function(e) {
+        dialog.on("escape.close.bb", function (e) {
             if (callbacks.onEscape) {
                 processCallback(e, dialog, callbacks.onEscape);
             }
@@ -703,21 +703,21 @@
          * interaction with our dialog
          */
 
-        dialog.on("click", ".modal-footer button", function(e) {
+        dialog.on("click", ".modal-footer button", function (e) {
             var callbackKey = $(this).data("bb-handler");
 
             processCallback(e, dialog, callbacks[callbackKey]);
 
         });
 
-        dialog.on("click", ".bootbox-close-button", function(e) {
+        dialog.on("click", ".bootbox-close-button", function (e) {
             // onEscape might be falsy but that's fine; the fact is
             // if the user has managed to click the close button we
             // have to close the dialog, callback or not
             processCallback(e, dialog, callbacks.onEscape);
         });
 
-        dialog.on("keyup", function(e) {
+        dialog.on("keyup", function (e) {
             if (e.which === 27) {
                 dialog.trigger("escape.close.bb");
             }
@@ -764,7 +764,7 @@
 
     };
 
-    exports.setDefaults = function() {
+    exports.setDefaults = function () {
         var values = {};
 
         if (arguments.length === 2) {
@@ -778,7 +778,7 @@
         $.extend(defaults, values);
     };
 
-    exports.hideAll = function() {
+    exports.hideAll = function () {
         $(".bootbox").modal("hide");
     };
 
@@ -885,7 +885,7 @@
         }
     };
 
-    exports.init = function(_$) {
+    exports.init = function (_$) {
         return init(_$ || $);
     };
 

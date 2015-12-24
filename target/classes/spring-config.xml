@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
-	   xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
-	   xsi:schemaLocation="
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="
 			http://www.springframework.org/schema/beans 
 			http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 			http://www.springframework.org/schema/tx 
@@ -11,28 +11,42 @@
 			http://www.springframework.org/schema/context/spring-context-4.0.xsd
 	   		">
 
-	<context:annotation-config />
-	<context:component-scan base-package="com.victor" />
-	<context:property-placeholder location="classpath:jdbc.properties" />
-	<!-- Declare a datasource that has pooling capabilities -->
-	<!--数据库连接-->
-	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
-		<property name="url" value="${jdbc_url}" />
-		<property name="username" value="${jdbc_username}"/>
-		<property name="password" value="${jdbc_password}"/>
-		<!-- 配置初始化大小、最小、最大 -->
-		<property name="initialSize"><value>1</value></property>
-		<property name="maxActive"><value>5</value></property>
-		<property name="minIdle"><value>1</value></property>
-		<!-- 配置获取连接等待超时的时间 -->
-		<property name="maxWait"><value>60000</value></property>
-		<!-- 配置监控统计拦截的filters -->
-		<property name="filters"><value>stat</value></property>
-		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
-		<property name="timeBetweenEvictionRunsMillis"><value>60000</value></property>
-		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
-		<property name="minEvictableIdleTimeMillis"><value>300000</value></property>
-		<!--
+    <context:annotation-config/>
+    <context:component-scan base-package="com.victor"/>
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    <!-- Declare a datasource that has pooling capabilities -->
+    <!--数据库连接-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="url" value="${jdbc_url}"/>
+        <property name="username" value="${jdbc_username}"/>
+        <property name="password" value="${jdbc_password}"/>
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize">
+            <value>1</value>
+        </property>
+        <property name="maxActive">
+            <value>5</value>
+        </property>
+        <property name="minIdle">
+            <value>1</value>
+        </property>
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait">
+            <value>60000</value>
+        </property>
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters">
+            <value>stat</value>
+        </property>
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis">
+            <value>60000</value>
+        </property>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis">
+            <value>300000</value>
+        </property>
+        <!--
         <property name="validationQuery"><value>SELECT 'x'</value></property>
         <property name="testWhileIdle"><value>true</value></property>
         <property name="testOnBorrow"><value>false</value></property>
@@ -40,27 +54,27 @@
         <property name="poolPreparedStatements"><value>true</value></property>
         <property name="maxOpenPreparedStatements"><value>20</value></property>
          -->
-	</bean>
+    </bean>
 
-	<!-- Declare a transaction manager -->
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-		  p:dataSource-ref="dataSource" />
+    <!-- Declare a transaction manager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+          p:dataSource-ref="dataSource"/>
 
-	<!-- Enable annotation style of managing transactions -->
-	<tx:annotation-driven transaction-manager="transactionManager" />
-	<!-- define the SqlSessionFactory, notice that configLocation is not needed when you use MapperFactoryBean -->
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<property name="configLocation" value="classpath:sqlMapConfig.xml" />
-		<property name="mapperLocations" value="classpath:mapper/*Mapper.xml"></property>
-	</bean>
+    <!-- Enable annotation style of managing transactions -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <!-- define the SqlSessionFactory, notice that configLocation is not needed when you use MapperFactoryBean -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:sqlMapConfig.xml"/>
+        <property name="mapperLocations" value="classpath:mapper/*Mapper.xml"></property>
+    </bean>
 
-	<!-- scan for mappers and let them be autowired -->
-	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.victor.mapper" />
-	</bean>
-	<!-- 配置SQLSession模板 -->
-	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
-		<constructor-arg index="0" ref="sqlSessionFactory" />
-	</bean>
+    <!-- scan for mappers and let them be autowired -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.victor.mapper"/>
+    </bean>
+    <!-- 配置SQLSession模板 -->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory"/>
+    </bean>
 </beans>

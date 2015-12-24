@@ -1,3 +1,3 @@
-$(document).ready(function() {
-	$('#registrationForm').bootstrapValidator();
+$(document).ready(function () {
+    $('#registrationForm').bootstrapValidator();
 });

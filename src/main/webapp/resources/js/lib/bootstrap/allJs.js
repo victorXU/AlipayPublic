@@ -5,11 +5,11 @@
 //! license : MIT
 //! momentjs.com
 
-(function(undefined) {
+(function (undefined) {
 
     /************************************
-        Constants
-    ************************************/
+     Constants
+     ************************************/
 
     var moment,
         VERSION = "2.5.1",
@@ -25,10 +25,10 @@
         SECOND = 5,
         MILLISECOND = 6,
 
-        // internal storage for language config files
+    // internal storage for language config files
         languages = {},
 
-        // moment internal properties
+    // moment internal properties
         momentProperties = {
             _isAMomentObject: null,
             _i: null,
@@ -41,22 +41,22 @@
             _lang: null // optional
         },
 
-        // check for nodeJS
+    // check for nodeJS
         hasModule = (typeof module !== 'undefined' && module.exports && typeof require !== 'undefined'),
 
-        // ASP.NET json date format regex
+    // ASP.NET json date format regex
         aspNetJsonRegex = /^\/?Date\((\-?\d+)/i,
         aspNetTimeSpanJsonRegex = /(\-)?(?:(\d*)\.)?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?)?/,
 
-        // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
-        // somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
+    // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
+    // somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
         isoDurationRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/,
 
-        // format tokens
+    // format tokens
         formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|X|zz?|ZZ?|.)/g,
         localFormattingTokens = /(\[[^\[]*\])|(\\)?(LT|LL?L?L?|l{1,4})/g,
 
-        // parsing token regexes
+    // parsing token regexes
         parseTokenOneOrTwoDigits = /\d\d?/, // 0 - 99
         parseTokenOneToThreeDigits = /\d{1,3}/, // 0 - 999
         parseTokenOneToFourDigits = /\d{1,4}/, // 0 - 9999
@@ -67,7 +67,7 @@
         parseTokenT = /T/i, // T (ISO separator)
         parseTokenTimestampMs = /[\+\-]?\d+(\.\d{1,3})?/, // 123456789 123456789.123
 
-        //strict parsing regexes
+    //strict parsing regexes
         parseTokenOneDigit = /\d/, // 0 - 9
         parseTokenTwoDigits = /\d\d/, // 00 - 99
         parseTokenThreeDigits = /\d{3}/, // 000 - 999
@@ -75,8 +75,8 @@
         parseTokenSixDigits = /[+-]?\d{6}/, // -999,999 - 999,999
         parseTokenSignedNumber = /[+-]?\d+/, // -inf - inf
 
-        // iso 8601 regex
-        // 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
+    // iso 8601 regex
+    // 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
         isoRegex = /^\s*(?:[+-]\d{6}|\d{4})-(?:(\d\d-\d\d)|(W\d\d$)|(W\d\d-\d)|(\d\d\d))((T| )(\d\d(:\d\d(:\d\d(\.\d+)?)?)?)?([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/,
 
         isoFormat = 'YYYY-MM-DDTHH:mm:ssZ',
@@ -89,7 +89,7 @@
             ['YYYY-DDD', /\d{4}-\d{3}/]
         ],
 
-        // iso time formats and regexes
+    // iso time formats and regexes
         isoTimes = [
             ['HH:mm:ss.SSSS', /(T| )\d\d:\d\d:\d\d\.\d{1,3}/],
             ['HH:mm:ss', /(T| )\d\d:\d\d:\d\d/],
@@ -97,10 +97,10 @@
             ['HH', /(T| )\d\d/]
         ],
 
-        // timezone chunker "+10:00" > ["10", "00"] or "-1530" > ["-15", "30"]
+    // timezone chunker "+10:00" > ["10", "00"] or "-1530" > ["-15", "30"]
         parseTimezoneChunker = /([\+\-]|\d\d)/gi,
 
-        // getter and setter names
+    // getter and setter names
         proxyGettersAndSetters = 'Date|Hours|Minutes|Seconds|Milliseconds'.split('|'),
         unitMillisecondFactors = {
             'Milliseconds': 1,
@@ -138,116 +138,116 @@
             isoweekyear: 'isoWeekYear'
         },
 
-        // format function strings
+    // format function strings
         formatFunctions = {},
 
-        // tokens to ordinalize and pad
+    // tokens to ordinalize and pad
         ordinalizeTokens = 'DDD w W M D d'.split(' '),
         paddedTokens = 'M D H h m s w W'.split(' '),
 
         formatTokenFunctions = {
-            M: function() {
+            M: function () {
                 return this.month() + 1;
             },
-            MMM: function(format) {
+            MMM: function (format) {
                 return this.lang().monthsShort(this, format);
             },
-            MMMM: function(format) {
+            MMMM: function (format) {
                 return this.lang().months(this, format);
             },
-            D: function() {
+            D: function () {
                 return this.date();
             },
-            DDD: function() {
+            DDD: function () {
                 return this.dayOfYear();
             },
-            d: function() {
+            d: function () {
                 return this.day();
             },
-            dd: function(format) {
+            dd: function (format) {
                 return this.lang().weekdaysMin(this, format);
             },
-            ddd: function(format) {
+            ddd: function (format) {
                 return this.lang().weekdaysShort(this, format);
             },
-            dddd: function(format) {
+            dddd: function (format) {
                 return this.lang().weekdays(this, format);
             },
-            w: function() {
+            w: function () {
                 return this.week();
             },
-            W: function() {
+            W: function () {
                 return this.isoWeek();
             },
-            YY: function() {
+            YY: function () {
                 return leftZeroFill(this.year() % 100, 2);
             },
-            YYYY: function() {
+            YYYY: function () {
                 return leftZeroFill(this.year(), 4);
             },
-            YYYYY: function() {
+            YYYYY: function () {
                 return leftZeroFill(this.year(), 5);
             },
-            YYYYYY: function() {
+            YYYYYY: function () {
                 var y = this.year(),
                     sign = y >= 0 ? '+' : '-';
                 return sign + leftZeroFill(Math.abs(y), 6);
             },
-            gg: function() {
+            gg: function () {
                 return leftZeroFill(this.weekYear() % 100, 2);
             },
-            gggg: function() {
+            gggg: function () {
                 return leftZeroFill(this.weekYear(), 4);
             },
-            ggggg: function() {
+            ggggg: function () {
                 return leftZeroFill(this.weekYear(), 5);
             },
-            GG: function() {
+            GG: function () {
                 return leftZeroFill(this.isoWeekYear() % 100, 2);
             },
-            GGGG: function() {
+            GGGG: function () {
                 return leftZeroFill(this.isoWeekYear(), 4);
             },
-            GGGGG: function() {
+            GGGGG: function () {
                 return leftZeroFill(this.isoWeekYear(), 5);
             },
-            e: function() {
+            e: function () {
                 return this.weekday();
             },
-            E: function() {
+            E: function () {
                 return this.isoWeekday();
             },
-            a: function() {
+            a: function () {
                 return this.lang().meridiem(this.hours(), this.minutes(), true);
             },
-            A: function() {
+            A: function () {
                 return this.lang().meridiem(this.hours(), this.minutes(), false);
             },
-            H: function() {
+            H: function () {
                 return this.hours();
             },
-            h: function() {
+            h: function () {
                 return this.hours() % 12 || 12;
             },
-            m: function() {
+            m: function () {
                 return this.minutes();
             },
-            s: function() {
+            s: function () {
                 return this.seconds();
             },
-            S: function() {
+            S: function () {
                 return toInt(this.milliseconds() / 100);
             },
-            SS: function() {
+            SS: function () {
                 return leftZeroFill(toInt(this.milliseconds() / 10), 2);
             },
-            SSS: function() {
+            SSS: function () {
                 return leftZeroFill(this.milliseconds(), 3);
             },
-            SSSS: function() {
+            SSSS: function () {
                 return leftZeroFill(this.milliseconds(), 3);
             },
-            Z: function() {
+            Z: function () {
                 var a = -this.zone(),
                     b = "+";
                 if (a < 0) {
@@ -256,7 +256,7 @@
                 }
                 return b + leftZeroFill(toInt(a / 60), 2) + ":" + leftZeroFill(toInt(a) % 60, 2);
             },
-            ZZ: function() {
+            ZZ: function () {
                 var a = -this.zone(),
                     b = "+";
                 if (a < 0) {
@@ -265,16 +265,16 @@
                 }
                 return b + leftZeroFill(toInt(a / 60), 2) + leftZeroFill(toInt(a) % 60, 2);
             },
-            z: function() {
+            z: function () {
                 return this.zoneAbbr();
             },
-            zz: function() {
+            zz: function () {
                 return this.zoneName();
             },
-            X: function() {
+            X: function () {
                 return this.unix();
             },
-            Q: function() {
+            Q: function () {
                 return this.quarter();
             }
         },
@@ -299,13 +299,13 @@
     }
 
     function padToken(func, count) {
-        return function(a) {
+        return function (a) {
             return leftZeroFill(func.call(this, a), count);
         };
     }
 
     function ordinalizeToken(func, period) {
-        return function(a) {
+        return function (a) {
             return this.lang().ordinal(func.call(this, a), period);
         };
     }
@@ -322,8 +322,8 @@
 
 
     /************************************
-        Constructors
-    ************************************/
+     Constructors
+     ************************************/
 
     function Language() {
 
@@ -352,8 +352,8 @@
         // representation for dateAddRemove
         this._milliseconds = +milliseconds +
             seconds * 1e3 + // 1000
-        minutes * 6e4 + // 1000 * 60
-        hours * 36e5; // 1000 * 60 * 60
+            minutes * 6e4 + // 1000 * 60
+            hours * 36e5; // 1000 * 60 * 60
         // Because of dateAddRemove treats 24 hours as different from a
         // day when working around DST, we need to store them separately
         this._days = +days +
@@ -370,8 +370,8 @@
     }
 
     /************************************
-        Helpers
-    ************************************/
+     Helpers
+     ************************************/
 
 
     function extend(a, b) {
@@ -522,7 +522,7 @@
             return;
         }
 
-        moment[field] = function(format, index) {
+        moment[field] = function (format, index) {
             var i, getter,
                 method = moment.fn._lang[field],
                 results = [];
@@ -532,7 +532,7 @@
                 format = undefined;
             }
 
-            getter = function(i) {
+            getter = function (i) {
                 var m = moment().utc().set(setter, i);
                 return method.call(moment.fn._lang, m, format || '');
             };
@@ -580,11 +580,11 @@
         if (m._a && m._pf.overflow === -2) {
             overflow =
                 m._a[MONTH] < 0 || m._a[MONTH] > 11 ? MONTH :
-                m._a[DATE] < 1 || m._a[DATE] > daysInMonth(m._a[YEAR], m._a[MONTH]) ? DATE :
-                m._a[HOUR] < 0 || m._a[HOUR] > 23 ? HOUR :
-                m._a[MINUTE] < 0 || m._a[MINUTE] > 59 ? MINUTE :
-                m._a[SECOND] < 0 || m._a[SECOND] > 59 ? SECOND :
-                m._a[MILLISECOND] < 0 || m._a[MILLISECOND] > 999 ? MILLISECOND : -1;
+                    m._a[DATE] < 1 || m._a[DATE] > daysInMonth(m._a[YEAR], m._a[MONTH]) ? DATE :
+                        m._a[HOUR] < 0 || m._a[HOUR] > 23 ? HOUR :
+                            m._a[MINUTE] < 0 || m._a[MINUTE] > 59 ? MINUTE :
+                                m._a[SECOND] < 0 || m._a[SECOND] > 59 ? SECOND :
+                                    m._a[MILLISECOND] < 0 || m._a[MILLISECOND] > 999 ? MILLISECOND : -1;
 
             if (m._pf._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
                 overflow = DATE;
@@ -620,13 +620,13 @@
     }
 
     /************************************
-        Languages
-    ************************************/
+     Languages
+     ************************************/
 
 
     extend(Language.prototype, {
 
-        set: function(config) {
+        set: function (config) {
             var prop, i;
             for (i in config) {
                 prop = config[i];
@@ -639,16 +639,16 @@
         },
 
         _months: "一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月".split("_"),
-        months: function(m) {
+        months: function (m) {
             return this._months[m.month()];
         },
 
         _monthsShort: "一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月".split("_"),
-        monthsShort: function(m) {
+        monthsShort: function (m) {
             return this._monthsShort[m.month()];
         },
 
-        monthsParse: function(monthName) {
+        monthsParse: function (monthName) {
             var i, mom, regex;
 
             if (!this._monthsParse) {
@@ -670,21 +670,21 @@
         },
 
         _weekdays: "日_一_二_三_四_五_六".split("_"),
-        weekdays: function(m) {
+        weekdays: function (m) {
             return this._weekdays[m.day()];
         },
 
         _weekdaysShort: "日_一_二_三_四_五_六".split("_"),
-        weekdaysShort: function(m) {
+        weekdaysShort: function (m) {
             return this._weekdaysShort[m.day()];
         },
 
         _weekdaysMin: "日_一_二_三_四_五_六".split("_"),
-        weekdaysMin: function(m) {
+        weekdaysMin: function (m) {
             return this._weekdaysMin[m.day()];
         },
 
-        weekdaysParse: function(weekdayName) {
+        weekdaysParse: function (weekdayName) {
             var i, mom, regex;
 
             if (!this._weekdaysParse) {
@@ -712,10 +712,10 @@
             LLL: "MMMM D YYYY LT",
             LLLL: "dddd, MMMM D YYYY LT"
         },
-        longDateFormat: function(key) {
+        longDateFormat: function (key) {
             var output = this._longDateFormat[key];
             if (!output && this._longDateFormat[key.toUpperCase()]) {
-                output = this._longDateFormat[key.toUpperCase()].replace(/MMMM|MM|DD|dddd/g, function(val) {
+                output = this._longDateFormat[key.toUpperCase()].replace(/MMMM|MM|DD|dddd/g, function (val) {
                     return val.slice(1);
                 });
                 this._longDateFormat[key] = output;
@@ -723,14 +723,14 @@
             return output;
         },
 
-        isPM: function(input) {
+        isPM: function (input) {
             // IE8 Quirks Mode & IE7 Standards Mode do not allow accessing strings like arrays
             // Using charAt should be more compatible.
             return ((input + '').toLowerCase().charAt(0) === 'p');
         },
 
         _meridiemParse: /[ap]\.?m?\.?/i,
-        meridiem: function(hours, minutes, isLower) {
+        meridiem: function (hours, minutes, isLower) {
             if (hours > 11) {
                 return isLower ? 'pm' : 'PM';
             } else {
@@ -746,7 +746,7 @@
             lastWeek: '[Last] dddd [at] LT',
             sameElse: 'L'
         },
-        calendar: function(key, mom) {
+        calendar: function (key, mom) {
             var output = this._calendar[key];
             return typeof output === 'function' ? output.apply(mom) : output;
         },
@@ -766,31 +766,31 @@
             y: "a year",
             yy: "%d years"
         },
-        relativeTime: function(number, withoutSuffix, string, isFuture) {
+        relativeTime: function (number, withoutSuffix, string, isFuture) {
             var output = this._relativeTime[string];
             return (typeof output === 'function') ?
                 output(number, withoutSuffix, string, isFuture) :
                 output.replace(/%d/i, number);
         },
-        pastFuture: function(diff, output) {
+        pastFuture: function (diff, output) {
             var format = this._relativeTime[diff > 0 ? 'future' : 'past'];
             return typeof format === 'function' ? format(output) : format.replace(/%s/i, output);
         },
 
-        ordinal: function(number) {
+        ordinal: function (number) {
             return this._ordinal.replace("%d", number);
         },
         _ordinal: "%d",
 
-        preparse: function(string) {
+        preparse: function (string) {
             return string;
         },
 
-        postformat: function(string) {
+        postformat: function (string) {
             return string;
         },
 
-        week: function(mom) {
+        week: function (mom) {
             return weekOfYear(mom, this._week.dow, this._week.doy).week;
         },
 
@@ -800,7 +800,7 @@
         },
 
         _invalidDate: 'Invalid date',
-        invalidDate: function() {
+        invalidDate: function () {
             return this._invalidDate;
         }
     });
@@ -835,11 +835,12 @@
     function getLangDefinition(key) {
         var i = 0,
             j, lang, next, split,
-            get = function(k) {
+            get = function (k) {
                 if (!languages[k] && hasModule) {
                     try {
                         require('./lang/' + k);
-                    } catch (e) {}
+                    } catch (e) {
+                    }
                 }
                 return languages[k];
             };
@@ -882,8 +883,8 @@
     }
 
     /************************************
-        Formatting
-    ************************************/
+     Formatting
+     ************************************/
 
 
     function removeFormattingTokens(input) {
@@ -905,7 +906,7 @@
             }
         }
 
-        return function(mom) {
+        return function (mom) {
             var output = "";
             for (i = 0; i < length; i++) {
                 output += array[i] instanceof Function ? array[i].call(mom, format) : array[i];
@@ -950,8 +951,8 @@
 
 
     /************************************
-        Parsing
-    ************************************/
+     Parsing
+     ************************************/
 
 
     // get the regex to find the next token
@@ -978,17 +979,17 @@
                 if (strict) {
                     return parseTokenOneDigit;
                 }
-                /* falls through */
+            /* falls through */
             case 'SS':
                 if (strict) {
                     return parseTokenTwoDigits;
                 }
-                /* falls through */
+            /* falls through */
             case 'SSS':
                 if (strict) {
                     return parseTokenThreeDigits;
                 }
-                /* falls through */
+            /* falls through */
             case 'DDD':
                 return parseTokenOneToThreeDigits;
             case 'MMM':
@@ -1072,14 +1073,14 @@
                     config._pf.invalidMonth = input;
                 }
                 break;
-                // DAY OF MONTH
+            // DAY OF MONTH
             case 'D': // fall through to DD
             case 'DD':
                 if (input != null) {
                     datePartArray[DATE] = toInt(input);
                 }
                 break;
-                // DAY OF YEAR
+            // DAY OF YEAR
             case 'DDD': // fall through to DDDD
             case 'DDDD':
                 if (input != null) {
@@ -1087,7 +1088,7 @@
                 }
 
                 break;
-                // YEAR
+            // YEAR
             case 'YY':
                 datePartArray[YEAR] = toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
                 break;
@@ -1096,40 +1097,40 @@
             case 'YYYYYY':
                 datePartArray[YEAR] = toInt(input);
                 break;
-                // AM / PM
+            // AM / PM
             case 'a': // fall through to A
             case 'A':
                 config._isPm = getLangDefinition(config._l).isPM(input);
                 break;
-                // 24 HOUR
+            // 24 HOUR
             case 'H': // fall through to hh
             case 'HH': // fall through to hh
             case 'h': // fall through to hh
             case 'hh':
                 datePartArray[HOUR] = toInt(input);
                 break;
-                // MINUTE
+            // MINUTE
             case 'm': // fall through to mm
             case 'mm':
                 datePartArray[MINUTE] = toInt(input);
                 break;
-                // SECOND
+            // SECOND
             case 's': // fall through to ss
             case 'ss':
                 datePartArray[SECOND] = toInt(input);
                 break;
-                // MILLISECOND
+            // MILLISECOND
             case 'S':
             case 'SS':
             case 'SSS':
             case 'SSSS':
                 datePartArray[MILLISECOND] = toInt(('0.' + input) * 1000);
                 break;
-                // UNIX TIMESTAMP WITH MS
+            // UNIX TIMESTAMP WITH MS
             case 'X':
                 config._d = new Date(parseFloat(input) * 1000);
                 break;
-                // TIMEZONE
+            // TIMEZONE
             case 'Z': // fall through to ZZ
             case 'ZZ':
                 config._useUTC = true;
@@ -1146,7 +1147,7 @@
             case 'e':
             case 'E':
                 token = token.substr(0, 1);
-                /* falls through */
+            /* falls through */
             case 'gg':
             case 'gggg':
             case 'GG':
@@ -1179,7 +1180,7 @@
 
         //compute day of the year from weeks and weekdays
         if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
-            fixYear = function(val) {
+            fixYear = function (val) {
                 var int_val = parseInt(val, 10);
                 return val ?
                     (val.length < 3 ? (int_val > 68 ? 1900 + int_val : 2000 + int_val) : int_val) :
@@ -1336,7 +1337,7 @@
     }
 
     function unescapeFormat(s) {
-        return s.replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function(matched, p1, p2, p3, p4) {
+        return s.replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (matched, p1, p2, p3, p4) {
             return p1 || p2 || p3 || p4;
         });
     }
@@ -1479,14 +1480,14 @@
     }
 
     /************************************
-        Relative Time
-    ************************************/
+     Relative Time
+     ************************************/
 
 
     // helper function for moment.fn.from, moment.fn.fromNow, and moment.duration.fn.humanize
 
     function substituteTimeAgo(string, number, withoutSuffix, isFuture, lang) {
-        return lang.relativeTime(number || 1, !! withoutSuffix, string, isFuture);
+        return lang.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
     }
 
     function relativeTime(milliseconds, withoutSuffix, lang) {
@@ -1513,8 +1514,8 @@
 
 
     /************************************
-        Week of Year
-    ************************************/
+     Week of Year
+     ************************************/
 
 
     // firstDayOfWeek       0 = sun, 6 = sat
@@ -1563,8 +1564,8 @@
     }
 
     /************************************
-        Top Level Functions
-    ************************************/
+     Top Level Functions
+     ************************************/
 
     function makeMoment(config) {
         var input = config._i,
@@ -1597,7 +1598,7 @@
         return new Moment(config);
     }
 
-    moment = function(input, format, lang, strict) {
+    moment = function (input, format, lang, strict) {
         var c;
 
         if (typeof(lang) === "boolean") {
@@ -1619,7 +1620,7 @@
     };
 
     // creating with utc
-    moment.utc = function(input, format, lang, strict) {
+    moment.utc = function (input, format, lang, strict) {
         var c;
 
         if (typeof(lang) === "boolean") {
@@ -1642,14 +1643,14 @@
     };
 
     // creating with unix timestamp (in seconds)
-    moment.unix = function(input) {
+    moment.unix = function (input) {
         return moment(input * 1000);
     };
 
     // duration
-    moment.duration = function(input, key) {
+    moment.duration = function (input, key) {
         var duration = input,
-            // matching against regexp is expensive, do it on demand
+        // matching against regexp is expensive, do it on demand
             match = null,
             sign,
             ret,
@@ -1668,7 +1669,7 @@
             } else {
                 duration.milliseconds = input;
             }
-        } else if ( !! (match = aspNetTimeSpanJsonRegex.exec(input))) {
+        } else if (!!(match = aspNetTimeSpanJsonRegex.exec(input))) {
             sign = (match[1] === "-") ? -1 : 1;
             duration = {
                 y: 0,
@@ -1678,9 +1679,9 @@
                 s: toInt(match[SECOND]) * sign,
                 ms: toInt(match[MILLISECOND]) * sign
             };
-        } else if ( !! (match = isoDurationRegex.exec(input))) {
+        } else if (!!(match = isoDurationRegex.exec(input))) {
             sign = (match[1] === "-") ? -1 : 1;
-            parseIso = function(inp) {
+            parseIso = function (inp) {
                 // We'd normally use ~~inp for this, but unfortunately it also
                 // converts floats to ints.
                 // inp may be undefined, so careful calling replace on it.
@@ -1716,12 +1717,13 @@
 
     // This function will be called whenever a moment is mutated.
     // It is intended to keep the offset in sync with the timezone.
-    moment.updateOffset = function() {};
+    moment.updateOffset = function () {
+    };
 
     // This function will load languages and then set the global language.  If
     // no arguments are passed in, it will simply return the current global
     // language key.
-    moment.lang = function(key, values) {
+    moment.lang = function (key, values) {
         var r;
         if (!key) {
             return moment.fn._lang._abbr;
@@ -1739,7 +1741,7 @@
     };
 
     // returns language data
-    moment.langData = function(key) {
+    moment.langData = function (key) {
         if (key && key._lang && key._lang._abbr) {
             key = key._lang._abbr;
         }
@@ -1747,13 +1749,13 @@
     };
 
     // compare moment object
-    moment.isMoment = function(obj) {
+    moment.isMoment = function (obj) {
         return obj instanceof Moment ||
             (obj != null && obj.hasOwnProperty('_isAMomentObject'));
     };
 
     // for typechecking Duration objects
-    moment.isDuration = function(obj) {
+    moment.isDuration = function (obj) {
         return obj instanceof Duration;
     };
 
@@ -1761,11 +1763,11 @@
         makeList(lists[i]);
     }
 
-    moment.normalizeUnits = function(units) {
+    moment.normalizeUnits = function (units) {
         return normalizeUnits(units);
     };
 
-    moment.invalid = function(flags) {
+    moment.invalid = function (flags) {
         var m = moment.utc(NaN);
         if (flags != null) {
             extend(m._pf, flags);
@@ -1776,38 +1778,38 @@
         return m;
     };
 
-    moment.parseZone = function(input) {
+    moment.parseZone = function (input) {
         return moment(input).parseZone();
     };
 
     /************************************
-        Moment Prototype
-    ************************************/
+     Moment Prototype
+     ************************************/
 
 
     extend(moment.fn = Moment.prototype, {
 
-        clone: function() {
+        clone: function () {
             return moment(this);
         },
 
-        valueOf: function() {
+        valueOf: function () {
             return +this._d + ((this._offset || 0) * 60000);
         },
 
-        unix: function() {
+        unix: function () {
             return Math.floor(+this / 1000);
         },
 
-        toString: function() {
+        toString: function () {
             return this.clone().lang('en').format("ddd MMM DD YYYY HH:mm:ss [GMT]ZZ");
         },
 
-        toDate: function() {
+        toDate: function () {
             return this._offset ? new Date(+this) : this._d;
         },
 
-        toISOString: function() {
+        toISOString: function () {
             var m = moment(this).utc();
             if (0 < m.year() && m.year() <= 9999) {
                 return formatMoment(m, 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]');
@@ -1816,7 +1818,7 @@
             }
         },
 
-        toArray: function() {
+        toArray: function () {
             var m = this;
             return [
                 m.year(),
@@ -1829,11 +1831,11 @@
             ];
         },
 
-        isValid: function() {
+        isValid: function () {
             return isValid(this);
         },
 
-        isDSTShifted: function() {
+        isDSTShifted: function () {
 
             if (this._a) {
                 return this.isValid() && compareArrays(this._a, (this._isUTC ? moment.utc(this._a) : moment(this._a)).toArray()) > 0;
@@ -1842,30 +1844,30 @@
             return false;
         },
 
-        parsingFlags: function() {
+        parsingFlags: function () {
             return extend({}, this._pf);
         },
 
-        invalidAt: function() {
+        invalidAt: function () {
             return this._pf.overflow;
         },
 
-        utc: function() {
+        utc: function () {
             return this.zone(0);
         },
 
-        local: function() {
+        local: function () {
             this.zone(0);
             this._isUTC = false;
             return this;
         },
 
-        format: function(inputString) {
+        format: function (inputString) {
             var output = formatMoment(this, inputString || moment.defaultFormat);
             return this.lang().postformat(output);
         },
 
-        add: function(input, val) {
+        add: function (input, val) {
             var dur;
             // switch args to support add('s', 1) and add(1, 's')
             if (typeof input === 'string') {
@@ -1877,7 +1879,7 @@
             return this;
         },
 
-        subtract: function(input, val) {
+        subtract: function (input, val) {
             var dur;
             // switch args to support subtract('s', 1) and subtract(1, 's')
             if (typeof input === 'string') {
@@ -1889,7 +1891,7 @@
             return this;
         },
 
-        diff: function(input, units, asFloat) {
+        diff: function (input, units, asFloat) {
             var that = makeAs(input, this),
                 zoneDiff = (this.zone() - that.zone()) * 6e4,
                 diff, output;
@@ -1914,47 +1916,47 @@
             } else {
                 diff = (this - that);
                 output = units === 'second' ? diff / 1e3 : // 1000
-                units === 'minute' ? diff / 6e4 : // 1000 * 60
-                units === 'hour' ? diff / 36e5 : // 1000 * 60 * 60
-                units === 'day' ? (diff - zoneDiff) / 864e5 : // 1000 * 60 * 60 * 24, negate dst
-                units === 'week' ? (diff - zoneDiff) / 6048e5 : // 1000 * 60 * 60 * 24 * 7, negate dst
-                diff;
+                    units === 'minute' ? diff / 6e4 : // 1000 * 60
+                        units === 'hour' ? diff / 36e5 : // 1000 * 60 * 60
+                            units === 'day' ? (diff - zoneDiff) / 864e5 : // 1000 * 60 * 60 * 24, negate dst
+                                units === 'week' ? (diff - zoneDiff) / 6048e5 : // 1000 * 60 * 60 * 24 * 7, negate dst
+                                    diff;
             }
             return asFloat ? output : absRound(output);
         },
 
-        from: function(time, withoutSuffix) {
+        from: function (time, withoutSuffix) {
             return moment.duration(this.diff(time)).lang(this.lang()._abbr).humanize(!withoutSuffix);
         },
 
-        fromNow: function(withoutSuffix) {
+        fromNow: function (withoutSuffix) {
             return this.from(moment(), withoutSuffix);
         },
 
-        calendar: function() {
+        calendar: function () {
             // We want to compare the start of today, vs this.
             // Getting start-of-today depends on whether we're zone'd or not.
             var sod = makeAs(moment(), this).startOf('day'),
                 diff = this.diff(sod, 'days', true),
                 format = diff < -6 ? 'sameElse' :
                     diff < -1 ? 'lastWeek' :
-                    diff < 0 ? 'lastDay' :
-                    diff < 1 ? 'sameDay' :
-                    diff < 2 ? 'nextDay' :
-                    diff < 7 ? 'nextWeek' : 'sameElse';
+                        diff < 0 ? 'lastDay' :
+                            diff < 1 ? 'sameDay' :
+                                diff < 2 ? 'nextDay' :
+                                    diff < 7 ? 'nextWeek' : 'sameElse';
             return this.format(this.lang().calendar(format, this));
         },
 
-        isLeapYear: function() {
+        isLeapYear: function () {
             return isLeapYear(this.year());
         },
 
-        isDST: function() {
+        isDST: function () {
             return (this.zone() < this.clone().month(0).zone() ||
-                this.zone() < this.clone().month(5).zone());
+            this.zone() < this.clone().month(5).zone());
         },
 
-        day: function(input) {
+        day: function (input) {
             var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
             if (input != null) {
                 input = parseWeekday(input, this.lang());
@@ -1966,7 +1968,7 @@
             }
         },
 
-        month: function(input) {
+        month: function (input) {
             var utc = this._isUTC ? 'UTC' : '',
                 dayOfMonth;
 
@@ -1990,31 +1992,31 @@
             }
         },
 
-        startOf: function(units) {
+        startOf: function (units) {
             units = normalizeUnits(units);
             // the following switch intentionally omits break keywords
             // to utilize falling through the cases.
             switch (units) {
                 case 'year':
                     this.month(0);
-                    /* falls through */
+                /* falls through */
                 case 'month':
                     this.date(1);
-                    /* falls through */
+                /* falls through */
                 case 'week':
                 case 'isoWeek':
                 case 'day':
                     this.hours(0);
-                    /* falls through */
+                /* falls through */
                 case 'hour':
                     this.minutes(0);
-                    /* falls through */
+                /* falls through */
                 case 'minute':
                     this.seconds(0);
-                    /* falls through */
+                /* falls through */
                 case 'second':
                     this.milliseconds(0);
-                    /* falls through */
+                /* falls through */
             }
 
             // weeks are a special case
@@ -2027,37 +2029,37 @@
             return this;
         },
 
-        endOf: function(units) {
+        endOf: function (units) {
             units = normalizeUnits(units);
             return this.startOf(units).add((units === 'isoWeek' ? 'week' : units), 1).subtract('ms', 1);
         },
 
-        isAfter: function(input, units) {
+        isAfter: function (input, units) {
             units = typeof units !== 'undefined' ? units : 'millisecond';
             return +this.clone().startOf(units) > +moment(input).startOf(units);
         },
 
-        isBefore: function(input, units) {
+        isBefore: function (input, units) {
             units = typeof units !== 'undefined' ? units : 'millisecond';
             return +this.clone().startOf(units) < +moment(input).startOf(units);
         },
 
-        isSame: function(input, units) {
+        isSame: function (input, units) {
             units = units || 'ms';
             return +this.clone().startOf(units) === +makeAs(input, this).startOf(units);
         },
 
-        min: function(other) {
+        min: function (other) {
             other = moment.apply(null, arguments);
             return other < this ? this : other;
         },
 
-        max: function(other) {
+        max: function (other) {
             other = moment.apply(null, arguments);
             return other > this ? this : other;
         },
 
-        zone: function(input) {
+        zone: function (input) {
             var offset = this._offset || 0;
             if (input != null) {
                 if (typeof input === "string") {
@@ -2077,15 +2079,15 @@
             return this;
         },
 
-        zoneAbbr: function() {
+        zoneAbbr: function () {
             return this._isUTC ? "UTC" : "";
         },
 
-        zoneName: function() {
+        zoneName: function () {
             return this._isUTC ? "Coordinated Universal Time" : "";
         },
 
-        parseZone: function() {
+        parseZone: function () {
             if (this._tzm) {
                 this.zone(this._tzm);
             } else if (typeof this._i === 'string') {
@@ -2094,7 +2096,7 @@
             return this;
         },
 
-        hasAlignedHourOffset: function(input) {
+        hasAlignedHourOffset: function (input) {
             if (!input) {
                 input = 0;
             } else {
@@ -2104,57 +2106,57 @@
             return (this.zone() - input) % 60 === 0;
         },
 
-        daysInMonth: function() {
+        daysInMonth: function () {
             return daysInMonth(this.year(), this.month());
         },
 
-        dayOfYear: function(input) {
+        dayOfYear: function (input) {
             var dayOfYear = round((moment(this).startOf('day') - moment(this).startOf('year')) / 864e5) + 1;
             return input == null ? dayOfYear : this.add("d", (input - dayOfYear));
         },
 
-        quarter: function() {
+        quarter: function () {
             return Math.ceil((this.month() + 1.0) / 3.0);
         },
 
-        weekYear: function(input) {
+        weekYear: function (input) {
             var year = weekOfYear(this, this.lang()._week.dow, this.lang()._week.doy).year;
             return input == null ? year : this.add("y", (input - year));
         },
 
-        isoWeekYear: function(input) {
+        isoWeekYear: function (input) {
             var year = weekOfYear(this, 1, 4).year;
             return input == null ? year : this.add("y", (input - year));
         },
 
-        week: function(input) {
+        week: function (input) {
             var week = this.lang().week(this);
             return input == null ? week : this.add("d", (input - week) * 7);
         },
 
-        isoWeek: function(input) {
+        isoWeek: function (input) {
             var week = weekOfYear(this, 1, 4).week;
             return input == null ? week : this.add("d", (input - week) * 7);
         },
 
-        weekday: function(input) {
+        weekday: function (input) {
             var weekday = (this.day() + 7 - this.lang()._week.dow) % 7;
             return input == null ? weekday : this.add("d", input - weekday);
         },
 
-        isoWeekday: function(input) {
+        isoWeekday: function (input) {
             // behaves the same as moment#day except
             // as a getter, returns 7 instead of 0 (1-7 range instead of 0-6)
             // as a setter, sunday should belong to the previous week.
             return input == null ? this.day() || 7 : this.day(this.day() % 7 ? input : input - 7);
         },
 
-        get: function(units) {
+        get: function (units) {
             units = normalizeUnits(units);
             return this[units]();
         },
 
-        set: function(units, value) {
+        set: function (units, value) {
             units = normalizeUnits(units);
             if (typeof this[units] === 'function') {
                 this[units](value);
@@ -2165,7 +2167,7 @@
         // If passed a language key, it will set the language for this
         // instance.  Otherwise, it will return the language configuration
         // variables for this instance.
-        lang: function(key) {
+        lang: function (key) {
             if (key === undefined) {
                 return this._lang;
             } else {
@@ -2178,7 +2180,7 @@
     // helper for adding shortcuts
 
     function makeGetterAndSetter(name, key) {
-        moment.fn[name] = moment.fn[name + 's'] = function(input) {
+        moment.fn[name] = moment.fn[name + 's'] = function (input) {
             var utc = this._isUTC ? 'UTC' : '';
             if (input != null) {
                 this._d['set' + utc + key](input);
@@ -2208,13 +2210,13 @@
     moment.fn.toJSON = moment.fn.toISOString;
 
     /************************************
-        Duration Prototype
-    ************************************/
+     Duration Prototype
+     ************************************/
 
 
     extend(moment.duration.fn = Duration.prototype, {
 
-        _bubble: function() {
+        _bubble: function () {
             var milliseconds = this._milliseconds,
                 days = this._days,
                 months = this._months,
@@ -2244,18 +2246,18 @@
             data.years = years;
         },
 
-        weeks: function() {
+        weeks: function () {
             return absRound(this.days() / 7);
         },
 
-        valueOf: function() {
+        valueOf: function () {
             return this._milliseconds +
                 this._days * 864e5 +
                 (this._months % 12) * 2592e6 +
                 toInt(this._months / 12) * 31536e6;
         },
 
-        humanize: function(withSuffix) {
+        humanize: function (withSuffix) {
             var difference = +this,
                 output = relativeTime(difference, !withSuffix, this.lang());
 
@@ -2266,7 +2268,7 @@
             return this.lang().postformat(output);
         },
 
-        add: function(input, val) {
+        add: function (input, val) {
             // supports only 2.0-style add(1, 's') or add(moment)
             var dur = moment.duration(input, val);
 
@@ -2279,7 +2281,7 @@
             return this;
         },
 
-        subtract: function(input, val) {
+        subtract: function (input, val) {
             var dur = moment.duration(input, val);
 
             this._milliseconds -= dur._milliseconds;
@@ -2291,19 +2293,19 @@
             return this;
         },
 
-        get: function(units) {
+        get: function (units) {
             units = normalizeUnits(units);
             return this[units.toLowerCase() + 's']();
         },
 
-        as: function(units) {
+        as: function (units) {
             units = normalizeUnits(units);
             return this['as' + units.charAt(0).toUpperCase() + units.slice(1) + 's']();
         },
 
         lang: moment.fn.lang,
 
-        toIsoString: function() {
+        toIsoString: function () {
             // inspired by https://github.com/dordille/moment-isoduration/blob/master/moment.isoduration.js
             var years = Math.abs(this.years()),
                 months = Math.abs(this.months()),
@@ -2331,13 +2333,13 @@
     });
 
     function makeDurationGetter(name) {
-        moment.duration.fn[name] = function() {
+        moment.duration.fn[name] = function () {
             return this._data[name];
         };
     }
 
     function makeDurationAsGetter(name, factor) {
-        moment.duration.fn['as' + name] = function() {
+        moment.duration.fn['as' + name] = function () {
             return +this / factor;
         };
     }
@@ -2350,24 +2352,24 @@
     }
 
     makeDurationAsGetter('Weeks', 6048e5);
-    moment.duration.fn.asMonths = function() {
+    moment.duration.fn.asMonths = function () {
         return (+this - this.years() * 31536e6) / 2592e6 + this.years() * 12;
     };
 
 
     /************************************
-        Default Lang
-    ************************************/
+     Default Lang
+     ************************************/
 
 
-    // Set default language, other languages will inherit from English.
+        // Set default language, other languages will inherit from English.
     moment.lang('en', {
-        ordinal: function(number) {
+        ordinal: function (number) {
             var b = number % 10,
                 output = (toInt(number % 100 / 10) === 1) ? 'th' :
                     (b === 1) ? 'st' :
-                    (b === 2) ? 'nd' :
-                    (b === 3) ? 'rd' : 'th';
+                        (b === 2) ? 'nd' :
+                            (b === 3) ? 'rd' : 'th';
             return number + output;
         }
     });
@@ -2375,8 +2377,8 @@
     /* EMBED_LANGUAGES */
 
     /************************************
-        Exposing Moment
-    ************************************/
+     Exposing Moment
+     ************************************/
 
     function makeGlobal(deprecate) {
         var warned = false,
@@ -2389,7 +2391,7 @@
         // add `moment` as a global object via a string identifier,
         // for Closure Compiler "advanced" mode
         if (deprecate) {
-            global.moment = function() {
+            global.moment = function () {
                 if (!warned && console && console.warn) {
                     warned = true;
                     console.warn(
@@ -2410,7 +2412,7 @@
         module.exports = moment;
         makeGlobal(true);
     } else if (typeof define === "function" && define.amd) {
-        define("moment", function(require, exports, module) {
+        define("moment", function (require, exports, module) {
             if (module.config && module.config() && module.config().noGlobal !== true) {
                 // If user provided noGlobal, he is aware of global
                 makeGlobal(module.config().noGlobal === undefined);
@@ -2431,9 +2433,9 @@
  * @license: Licensed under Apache License v2.0. See http://www.apache.org/licenses/LICENSE-2.0
  * @website: http://www.improvely.com/
  */
-! function($, moment) {
+!function ($, moment) {
 
-    var DateRangePicker = function(element, options, cb) {
+    var DateRangePicker = function (element, options, cb) {
 
         // by default, the daterangepicker element is placed at the bottom of HTML body
         this.parentEl = 'body';
@@ -2471,7 +2473,7 @@
 
         //apply CSS classes and labels to buttons
         var c = this.container;
-        $.each(this.buttonClasses, function(idx, val) {
+        $.each(this.buttonClasses, function (idx, val) {
             c.find('button').addClass(val);
         });
         this.container.find('.daterangepicker_start_input label').html(this.locale.fromLabel);
@@ -2520,7 +2522,7 @@
 
         constructor: DateRangePicker,
 
-        setOptions: function(options, callback) {
+        setOptions: function (options, callback) {
 
             this.startDate = moment().startOf('day');
             this.endDate = moment().startOf('day');
@@ -2559,7 +2561,8 @@
                 firstDay: 0
             };
 
-            this.cb = function() {};
+            this.cb = function () {
+            };
 
             if (typeof options.format === 'string')
                 this.format = options.format;
@@ -2793,7 +2796,7 @@
 
         },
 
-        setStartDate: function(startDate) {
+        setStartDate: function (startDate) {
             if (typeof startDate === 'string')
                 this.startDate = moment(startDate, this.format);
 
@@ -2809,7 +2812,7 @@
             this.updateCalendars();
         },
 
-        setEndDate: function(endDate) {
+        setEndDate: function (endDate) {
             if (typeof endDate === 'string')
                 this.endDate = moment(endDate, this.format);
 
@@ -2825,17 +2828,17 @@
             this.updateCalendars();
         },
 
-        mousedown: function(e) {
+        mousedown: function (e) {
             e.stopPropagation();
         },
 
-        updateView: function() {
+        updateView: function () {
             this.leftCalendar.month.month(this.startDate.month()).year(this.startDate.year());
             this.rightCalendar.month.month(this.endDate.month()).year(this.endDate.year());
             this.updateFormInputs();
         },
 
-        updateFormInputs: function() {
+        updateFormInputs: function () {
             this.container.find('input[name=daterangepicker_start]').val(this.startDate.format(this.format));
             this.container.find('input[name=daterangepicker_end]').val(this.endDate.format(this.format));
 
@@ -2846,7 +2849,7 @@
             }
         },
 
-        updateFromControl: function() {
+        updateFromControl: function () {
             if (!this.element.is('input')) return;
             if (!this.element.val().length) return;
 
@@ -2873,12 +2876,12 @@
             this.updateCalendars();
         },
 
-        notify: function() {
+        notify: function () {
             this.updateView();
             this.cb(this.startDate, this.endDate, this.chosenLabel);
         },
 
-        move: function() {
+        move: function () {
             var parentOffset = {
                 top: 0,
                 left: 0
@@ -2917,7 +2920,7 @@
             }
         },
 
-        show: function(e) {
+        show: function (e) {
             this.element.addClass('active');
             this.container.show();
             this.move();
@@ -2931,7 +2934,7 @@
             this.element.trigger('show.daterangepicker', this);
         },
 
-        hide: function(e) {
+        hide: function (e) {
             this.element.removeClass('active');
             this.container.hide();
 
@@ -2945,7 +2948,7 @@
             this.element.trigger('hide.daterangepicker', this);
         },
 
-        enterRange: function(e) {
+        enterRange: function (e) {
             // mouse pointer has entered a range label
             var label = e.target.innerHTML;
             if (label == this.locale.customRangeLabel) {
@@ -2957,12 +2960,12 @@
             }
         },
 
-        showCalendars: function() {
+        showCalendars: function () {
             this.container.find('.calendar').show();
             this.move();
         },
 
-        updateInputText: function() {
+        updateInputText: function () {
             if (this.element.is('input') && !this.singleDatePicker) {
                 this.element.val(this.startDate.format(this.format) + this.separator + this.endDate.format(this.format));
             } else if (this.element.is('input')) {
@@ -2971,7 +2974,7 @@
 
         },
 
-        clickRange: function(e) {
+        clickRange: function (e) {
             var label = e.target.innerHTML;
             this.chosenLabel = label;
             if (label == this.locale.customRangeLabel) {
@@ -2999,7 +3002,7 @@
             }
         },
 
-        clickPrev: function(e) {
+        clickPrev: function (e) {
             var cal = $(e.target).parents('.calendar');
             if (cal.hasClass('left')) {
                 this.leftCalendar.month.subtract('month', 1);
@@ -3009,7 +3012,7 @@
             this.updateCalendars();
         },
 
-        clickNext: function(e) {
+        clickNext: function (e) {
             var cal = $(e.target).parents('.calendar');
             if (cal.hasClass('left')) {
                 this.leftCalendar.month.add('month', 1);
@@ -3019,7 +3022,7 @@
             this.updateCalendars();
         },
 
-        enterDate: function(e) {
+        enterDate: function (e) {
 
             var title = $(e.target).attr('data-title');
             var row = title.substr(1, 1);
@@ -3034,7 +3037,7 @@
 
         },
 
-        clickDate: function(e) {
+        clickDate: function (e) {
             var title = $(e.target).attr('data-title');
             var row = title.substr(1, 1);
             var col = title.substr(3, 1);
@@ -3088,13 +3091,13 @@
                 this.clickApply();
         },
 
-        clickApply: function(e) {
+        clickApply: function (e) {
             this.updateInputText();
             this.hide();
             this.element.trigger('apply.daterangepicker', this).trigger('input');
         },
 
-        clickCancel: function(e) {
+        clickCancel: function (e) {
             this.startDate = this.oldStartDate;
             this.endDate = this.oldEndDate;
             this.chosenLabel = this.oldChosenLabel;
@@ -3104,7 +3107,7 @@
             this.element.trigger('cancel.daterangepicker', this);
         },
 
-        updateMonthYear: function(e) {
+        updateMonthYear: function (e) {
 
             var isLeft = $(e.target).closest('.calendar').hasClass('left');
             var cal = this.container.find('.calendar.left');
@@ -3125,7 +3128,7 @@
 
         },
 
-        updateTime: function(e) {
+        updateTime: function (e) {
 
             var isLeft = $(e.target).closest('.calendar').hasClass('left');
             var cal = this.container.find('.calendar.left');
@@ -3161,7 +3164,7 @@
 
         },
 
-        updateCalendars: function() {
+        updateCalendars: function () {
             this.leftCalendar.calendar = this.buildCalendar(this.leftCalendar.month.month(), this.leftCalendar.month.year(), this.leftCalendar.month.hour(), this.leftCalendar.month.minute(), 'left');
             this.rightCalendar.calendar = this.buildCalendar(this.rightCalendar.month.month(), this.rightCalendar.month.year(), this.rightCalendar.month.hour(), this.rightCalendar.month.minute(), 'right');
             this.container.find('.calendar.left').html(this.renderCalendar(this.leftCalendar.calendar, this.startDate, this.minDate, this.maxDate));
@@ -3189,7 +3192,7 @@
                 this.container.find('.ranges li:last').addClass('active');
         },
 
-        buildCalendar: function(month, year, hour, minute, side) {
+        buildCalendar: function (month, year, hour, minute, side) {
 
             var firstDay = moment([year, month, 1]);
             var lastMonth = moment(firstDay).subtract('month', 1).month();
@@ -3230,7 +3233,7 @@
 
         },
 
-        renderDropdowns: function(selected, minDate, maxDate) {
+        renderDropdowns: function (selected, minDate, maxDate) {
             var currentMonth = selected.month();
             var monthHtml = '<select class="monthselect">';
             var inMinYear = false;
@@ -3261,7 +3264,7 @@
             return monthHtml + yearHtml;
         },
 
-        renderCalendar: function(calendar, selected, minDate, maxDate) {
+        renderCalendar: function (calendar, selected, minDate, maxDate) {
 
             var html = '<div class="calendar-date">';
             html += '<table class="table-condensed">';
@@ -3298,7 +3301,7 @@
             if (this.showWeekNumbers)
                 html += '<th class="week">' + this.locale.weekLabel + '</th>';
 
-            $.each(this.locale.daysOfWeek, function(index, dayOfWeek) {
+            $.each(this.locale.daysOfWeek, function (index, dayOfWeek) {
                 html += '<th>' + dayOfWeek + '</th>';
             });
 
@@ -3407,7 +3410,7 @@
 
         },
 
-        remove: function() {
+        remove: function () {
 
             this.container.remove();
             this.element.off('.daterangepicker');
@@ -3417,8 +3420,8 @@
 
     };
 
-    $.fn.daterangepicker = function(options, cb) {
-        this.each(function() {
+    $.fn.daterangepicker = function (options, cb) {
+        this.each(function () {
             var el = $(this);
             if (el.data('daterangepicker'))
                 el.data('daterangepicker').remove();
@@ -3448,490 +3451,491 @@
  * limitations under the License.
  * ========================================================= */
 
-! function($) {
+!function ($) {
 
-	// Picker object
+    // Picker object
 
-	var Datepicker = function(element, options) {
-		this.element = $(element);
-		this.format = DPGlobal.parseFormat(options.format || this.element.data('date-format') || 'mm/dd/yyyy');
-		this.picker = $(DPGlobal.template).appendTo('body').on({
-			click: $.proxy(this.click, this) //,
-			//mousedown: $.proxy(this.mousedown, this)
-		});
-		this.isInput = this.element.is('input');
-		this.component = this.element.is('.date') ? this.element.find('.add-on') : false;
+    var Datepicker = function (element, options) {
+        this.element = $(element);
+        this.format = DPGlobal.parseFormat(options.format || this.element.data('date-format') || 'mm/dd/yyyy');
+        this.picker = $(DPGlobal.template).appendTo('body').on({
+            click: $.proxy(this.click, this) //,
+            //mousedown: $.proxy(this.mousedown, this)
+        });
+        this.isInput = this.element.is('input');
+        this.component = this.element.is('.date') ? this.element.find('.add-on') : false;
 
-		if (this.isInput) {
-			this.element.on({
-				focus: $.proxy(this.show, this),
-				//blur: $.proxy(this.hide, this),
-				keyup: $.proxy(this.update, this)
-			});
-		} else {
-			if (this.component) {
-				this.component.on('click', $.proxy(this.show, this));
-			} else {
-				this.element.on('click', $.proxy(this.show, this));
-			}
-		}
+        if (this.isInput) {
+            this.element.on({
+                focus: $.proxy(this.show, this),
+                //blur: $.proxy(this.hide, this),
+                keyup: $.proxy(this.update, this)
+            });
+        } else {
+            if (this.component) {
+                this.component.on('click', $.proxy(this.show, this));
+            } else {
+                this.element.on('click', $.proxy(this.show, this));
+            }
+        }
 
-		this.minViewMode = options.minViewMode || this.element.data('date-minviewmode') || 0;
-		if (typeof this.minViewMode === 'string') {
-			switch (this.minViewMode) {
-				case 'months':
-					this.minViewMode = 1;
-					break;
-				case 'years':
-					this.minViewMode = 2;
-					break;
-				default:
-					this.minViewMode = 0;
-					break;
-			}
-		}
-		this.viewMode = options.viewMode || this.element.data('date-viewmode') || 0;
-		if (typeof this.viewMode === 'string') {
-			switch (this.viewMode) {
-				case 'months':
-					this.viewMode = 1;
-					break;
-				case 'years':
-					this.viewMode = 2;
-					break;
-				default:
-					this.viewMode = 0;
-					break;
-			}
-		}
-		this.startViewMode = this.viewMode;
-		this.weekStart = options.weekStart || this.element.data('date-weekstart') || 0;
-		this.weekEnd = this.weekStart === 0 ? 6 : this.weekStart - 1;
-		this.onRender = options.onRender;
-		this.fillDow();
-		this.fillMonths();
-		this.update();
-		this.showMode();
-	};
+        this.minViewMode = options.minViewMode || this.element.data('date-minviewmode') || 0;
+        if (typeof this.minViewMode === 'string') {
+            switch (this.minViewMode) {
+                case 'months':
+                    this.minViewMode = 1;
+                    break;
+                case 'years':
+                    this.minViewMode = 2;
+                    break;
+                default:
+                    this.minViewMode = 0;
+                    break;
+            }
+        }
+        this.viewMode = options.viewMode || this.element.data('date-viewmode') || 0;
+        if (typeof this.viewMode === 'string') {
+            switch (this.viewMode) {
+                case 'months':
+                    this.viewMode = 1;
+                    break;
+                case 'years':
+                    this.viewMode = 2;
+                    break;
+                default:
+                    this.viewMode = 0;
+                    break;
+            }
+        }
+        this.startViewMode = this.viewMode;
+        this.weekStart = options.weekStart || this.element.data('date-weekstart') || 0;
+        this.weekEnd = this.weekStart === 0 ? 6 : this.weekStart - 1;
+        this.onRender = options.onRender;
+        this.fillDow();
+        this.fillMonths();
+        this.update();
+        this.showMode();
+    };
 
-	Datepicker.prototype = {
-		constructor: Datepicker,
+    Datepicker.prototype = {
+        constructor: Datepicker,
 
-		show: function(e) {
-			this.picker.show();
-			this.height = this.component ? this.component.outerHeight() : this.element.outerHeight();
-			this.place();
-			$(window).on('resize', $.proxy(this.place, this));
-			if (e) {
-				e.stopPropagation();
-				e.preventDefault();
-			}
-			if (!this.isInput) {}
-			var that = this;
-			$(document).on('mousedown', function(ev) {
-				if ($(ev.target).closest('.datepicker').length == 0) {
-					that.hide();
-				}
-			});
-			this.element.trigger({
-				type: 'show',
-				date: this.date
-			});
-		},
+        show: function (e) {
+            this.picker.show();
+            this.height = this.component ? this.component.outerHeight() : this.element.outerHeight();
+            this.place();
+            $(window).on('resize', $.proxy(this.place, this));
+            if (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            if (!this.isInput) {
+            }
+            var that = this;
+            $(document).on('mousedown', function (ev) {
+                if ($(ev.target).closest('.datepicker').length == 0) {
+                    that.hide();
+                }
+            });
+            this.element.trigger({
+                type: 'show',
+                date: this.date
+            });
+        },
 
-		hide: function() {
-			this.picker.hide();
-			$(window).off('resize', this.place);
-			this.viewMode = this.startViewMode;
-			this.showMode();
-			if (!this.isInput) {
-				$(document).off('mousedown', this.hide);
-			}
-			//this.set();
-			this.element.trigger({
-				type: 'hide',
-				date: this.date
-			});
-		},
+        hide: function () {
+            this.picker.hide();
+            $(window).off('resize', this.place);
+            this.viewMode = this.startViewMode;
+            this.showMode();
+            if (!this.isInput) {
+                $(document).off('mousedown', this.hide);
+            }
+            //this.set();
+            this.element.trigger({
+                type: 'hide',
+                date: this.date
+            });
+        },
 
-		set: function() {
-			var formated = DPGlobal.formatDate(this.date, this.format);
-			if (!this.isInput) {
-				if (this.component) {
-					this.element.find('input').prop('value', formated);
-				}
-				this.element.data('date', formated);
-			} else {
-				this.element.prop('value', formated);
-			}
-		},
+        set: function () {
+            var formated = DPGlobal.formatDate(this.date, this.format);
+            if (!this.isInput) {
+                if (this.component) {
+                    this.element.find('input').prop('value', formated);
+                }
+                this.element.data('date', formated);
+            } else {
+                this.element.prop('value', formated);
+            }
+        },
 
-		setValue: function(newDate) {
-			if (typeof newDate === 'string') {
-				this.date = DPGlobal.parseDate(newDate, this.format);
-			} else {
-				this.date = new Date(newDate);
-			}
-			this.set();
-			this.viewDate = new Date(this.date.getFullYear(), this.date.getMonth(), 1, 0, 0, 0, 0);
-			this.fill();
-		},
+        setValue: function (newDate) {
+            if (typeof newDate === 'string') {
+                this.date = DPGlobal.parseDate(newDate, this.format);
+            } else {
+                this.date = new Date(newDate);
+            }
+            this.set();
+            this.viewDate = new Date(this.date.getFullYear(), this.date.getMonth(), 1, 0, 0, 0, 0);
+            this.fill();
+        },
 
-		place: function() {
-			var offset = this.component ? this.component.offset() : this.element.offset();
-			this.picker.css({
-				top: offset.top + this.height,
-				left: offset.left
-			});
-		},
+        place: function () {
+            var offset = this.component ? this.component.offset() : this.element.offset();
+            this.picker.css({
+                top: offset.top + this.height,
+                left: offset.left
+            });
+        },
 
-		update: function(newDate) {
-			this.date = DPGlobal.parseDate(
-				typeof newDate === 'string' ? newDate : (this.isInput ? this.element.prop('value') : this.element.data('date')),
-				this.format
-			);
-			this.viewDate = new Date(this.date.getFullYear(), this.date.getMonth(), 1, 0, 0, 0, 0);
-			this.fill();
-		},
+        update: function (newDate) {
+            this.date = DPGlobal.parseDate(
+                typeof newDate === 'string' ? newDate : (this.isInput ? this.element.prop('value') : this.element.data('date')),
+                this.format
+            );
+            this.viewDate = new Date(this.date.getFullYear(), this.date.getMonth(), 1, 0, 0, 0, 0);
+            this.fill();
+        },
 
-		fillDow: function() {
-			var dowCnt = this.weekStart;
-			var html = '<tr>';
-			while (dowCnt < this.weekStart + 7) {
-				html += '<th class="dow">' + DPGlobal.dates.daysMin[(dowCnt++) % 7] + '</th>';
-			}
-			html += '</tr>';
-			this.picker.find('.datepicker-days thead').append(html);
-		},
+        fillDow: function () {
+            var dowCnt = this.weekStart;
+            var html = '<tr>';
+            while (dowCnt < this.weekStart + 7) {
+                html += '<th class="dow">' + DPGlobal.dates.daysMin[(dowCnt++) % 7] + '</th>';
+            }
+            html += '</tr>';
+            this.picker.find('.datepicker-days thead').append(html);
+        },
 
-		fillMonths: function() {
-			var html = '';
-			var i = 0
-			while (i < 12) {
-				html += '<span class="month">' + DPGlobal.dates.monthsShort[i++] + '</span>';
-			}
-			this.picker.find('.datepicker-months td').append(html);
-		},
+        fillMonths: function () {
+            var html = '';
+            var i = 0
+            while (i < 12) {
+                html += '<span class="month">' + DPGlobal.dates.monthsShort[i++] + '</span>';
+            }
+            this.picker.find('.datepicker-months td').append(html);
+        },
 
-		fill: function() {
-			var d = new Date(this.viewDate),
-				year = d.getFullYear(),
-				month = d.getMonth(),
-				currentDate = this.date.valueOf();
-			this.picker.find('.datepicker-days th:eq(1)')
-				.text(DPGlobal.dates.months[month] + ' ' + year);
-			var prevMonth = new Date(year, month - 1, 28, 0, 0, 0, 0),
-				day = DPGlobal.getDaysInMonth(prevMonth.getFullYear(), prevMonth.getMonth());
-			prevMonth.setDate(day);
-			prevMonth.setDate(day - (prevMonth.getDay() - this.weekStart + 7) % 7);
-			var nextMonth = new Date(prevMonth);
-			nextMonth.setDate(nextMonth.getDate() + 42);
-			nextMonth = nextMonth.valueOf();
-			var html = [];
-			var clsName,
-				prevY,
-				prevM;
-			while (prevMonth.valueOf() < nextMonth) {
-				if (prevMonth.getDay() === this.weekStart) {
-					html.push('<tr>');
-				}
-				clsName = this.onRender(prevMonth);
-				prevY = prevMonth.getFullYear();
-				prevM = prevMonth.getMonth();
-				if ((prevM < month && prevY === year) || prevY < year) {
-					clsName += ' old';
-				} else if ((prevM > month && prevY === year) || prevY > year) {
-					clsName += ' new';
-				}
-				if (prevMonth.valueOf() === currentDate) {
-					clsName += ' active';
-				}
-				html.push('<td class="day ' + clsName + '">' + prevMonth.getDate() + '</td>');
-				if (prevMonth.getDay() === this.weekEnd) {
-					html.push('</tr>');
-				}
-				prevMonth.setDate(prevMonth.getDate() + 1);
-			}
-			this.picker.find('.datepicker-days tbody').empty().append(html.join(''));
-			var currentYear = this.date.getFullYear();
+        fill: function () {
+            var d = new Date(this.viewDate),
+                year = d.getFullYear(),
+                month = d.getMonth(),
+                currentDate = this.date.valueOf();
+            this.picker.find('.datepicker-days th:eq(1)')
+                .text(DPGlobal.dates.months[month] + ' ' + year);
+            var prevMonth = new Date(year, month - 1, 28, 0, 0, 0, 0),
+                day = DPGlobal.getDaysInMonth(prevMonth.getFullYear(), prevMonth.getMonth());
+            prevMonth.setDate(day);
+            prevMonth.setDate(day - (prevMonth.getDay() - this.weekStart + 7) % 7);
+            var nextMonth = new Date(prevMonth);
+            nextMonth.setDate(nextMonth.getDate() + 42);
+            nextMonth = nextMonth.valueOf();
+            var html = [];
+            var clsName,
+                prevY,
+                prevM;
+            while (prevMonth.valueOf() < nextMonth) {
+                if (prevMonth.getDay() === this.weekStart) {
+                    html.push('<tr>');
+                }
+                clsName = this.onRender(prevMonth);
+                prevY = prevMonth.getFullYear();
+                prevM = prevMonth.getMonth();
+                if ((prevM < month && prevY === year) || prevY < year) {
+                    clsName += ' old';
+                } else if ((prevM > month && prevY === year) || prevY > year) {
+                    clsName += ' new';
+                }
+                if (prevMonth.valueOf() === currentDate) {
+                    clsName += ' active';
+                }
+                html.push('<td class="day ' + clsName + '">' + prevMonth.getDate() + '</td>');
+                if (prevMonth.getDay() === this.weekEnd) {
+                    html.push('</tr>');
+                }
+                prevMonth.setDate(prevMonth.getDate() + 1);
+            }
+            this.picker.find('.datepicker-days tbody').empty().append(html.join(''));
+            var currentYear = this.date.getFullYear();
 
-			var months = this.picker.find('.datepicker-months')
-				.find('th:eq(1)')
-				.text(year)
-				.end()
-				.find('span').removeClass('active');
-			if (currentYear === year) {
-				months.eq(this.date.getMonth()).addClass('active');
-			}
+            var months = this.picker.find('.datepicker-months')
+                .find('th:eq(1)')
+                .text(year)
+                .end()
+                .find('span').removeClass('active');
+            if (currentYear === year) {
+                months.eq(this.date.getMonth()).addClass('active');
+            }
 
-			html = '';
-			year = parseInt(year / 10, 10) * 10;
-			var yearCont = this.picker.find('.datepicker-years')
-				.find('th:eq(1)')
-				.text(year + '-' + (year + 9))
-				.end()
-				.find('td');
-			year -= 1;
-			for (var i = -1; i < 11; i++) {
-				html += '<span class="year' + (i === -1 || i === 10 ? ' old' : '') + (currentYear === year ? ' active' : '') + '">' + year + '</span>';
-				year += 1;
-			}
-			yearCont.html(html);
-		},
+            html = '';
+            year = parseInt(year / 10, 10) * 10;
+            var yearCont = this.picker.find('.datepicker-years')
+                .find('th:eq(1)')
+                .text(year + '-' + (year + 9))
+                .end()
+                .find('td');
+            year -= 1;
+            for (var i = -1; i < 11; i++) {
+                html += '<span class="year' + (i === -1 || i === 10 ? ' old' : '') + (currentYear === year ? ' active' : '') + '">' + year + '</span>';
+                year += 1;
+            }
+            yearCont.html(html);
+        },
 
-		click: function(e) {
-			e.stopPropagation();
-			e.preventDefault();
-			var target = $(e.target).closest('span, td, th');
-			if (target.length === 1) {
-				switch (target[0].nodeName.toLowerCase()) {
-					case 'th':
-						switch (target[0].className) {
-							case 'switch':
-								this.showMode(1);
-								break;
-							case 'prev':
-							case 'next':
-								this.viewDate['set' + DPGlobal.modes[this.viewMode].navFnc].call(
-									this.viewDate,
-									this.viewDate['get' + DPGlobal.modes[this.viewMode].navFnc].call(this.viewDate) +
-									DPGlobal.modes[this.viewMode].navStep * (target[0].className === 'prev' ? -1 : 1)
-								);
-								this.fill();
-								this.set();
-								break;
-						}
-						break;
-					case 'span':
-						if (target.is('.month')) {
-							var month = target.parent().find('span').index(target);
-							this.viewDate.setMonth(month);
-						} else {
-							var year = parseInt(target.text(), 10) || 0;
-							this.viewDate.setFullYear(year);
-						}
-						if (this.viewMode !== 0) {
-							this.date = new Date(this.viewDate);
-							this.element.trigger({
-								type: 'changeDate',
-								date: this.date,
-								viewMode: DPGlobal.modes[this.viewMode].clsName
-							});
-						}
-						this.showMode(-1);
-						this.fill();
-						this.set();
-						break;
-					case 'td':
-						if (target.is('.day') && !target.is('.disabled')) {
-							var day = parseInt(target.text(), 10) || 1;
-							var month = this.viewDate.getMonth();
-							if (target.is('.old')) {
-								month -= 1;
-							} else if (target.is('.new')) {
-								month += 1;
-							}
-							var year = this.viewDate.getFullYear();
-							this.date = new Date(year, month, day, 0, 0, 0, 0);
-							this.viewDate = new Date(year, month, Math.min(28, day), 0, 0, 0, 0);
-							this.fill();
-							this.set();
-							this.element.trigger({
-								type: 'changeDate',
-								date: this.date,
-								viewMode: DPGlobal.modes[this.viewMode].clsName
-							});
-						}
-						break;
-				}
-			}
-			this.element.trigger('input');
-		},
+        click: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var target = $(e.target).closest('span, td, th');
+            if (target.length === 1) {
+                switch (target[0].nodeName.toLowerCase()) {
+                    case 'th':
+                        switch (target[0].className) {
+                            case 'switch':
+                                this.showMode(1);
+                                break;
+                            case 'prev':
+                            case 'next':
+                                this.viewDate['set' + DPGlobal.modes[this.viewMode].navFnc].call(
+                                    this.viewDate,
+                                    this.viewDate['get' + DPGlobal.modes[this.viewMode].navFnc].call(this.viewDate) +
+                                    DPGlobal.modes[this.viewMode].navStep * (target[0].className === 'prev' ? -1 : 1)
+                                );
+                                this.fill();
+                                this.set();
+                                break;
+                        }
+                        break;
+                    case 'span':
+                        if (target.is('.month')) {
+                            var month = target.parent().find('span').index(target);
+                            this.viewDate.setMonth(month);
+                        } else {
+                            var year = parseInt(target.text(), 10) || 0;
+                            this.viewDate.setFullYear(year);
+                        }
+                        if (this.viewMode !== 0) {
+                            this.date = new Date(this.viewDate);
+                            this.element.trigger({
+                                type: 'changeDate',
+                                date: this.date,
+                                viewMode: DPGlobal.modes[this.viewMode].clsName
+                            });
+                        }
+                        this.showMode(-1);
+                        this.fill();
+                        this.set();
+                        break;
+                    case 'td':
+                        if (target.is('.day') && !target.is('.disabled')) {
+                            var day = parseInt(target.text(), 10) || 1;
+                            var month = this.viewDate.getMonth();
+                            if (target.is('.old')) {
+                                month -= 1;
+                            } else if (target.is('.new')) {
+                                month += 1;
+                            }
+                            var year = this.viewDate.getFullYear();
+                            this.date = new Date(year, month, day, 0, 0, 0, 0);
+                            this.viewDate = new Date(year, month, Math.min(28, day), 0, 0, 0, 0);
+                            this.fill();
+                            this.set();
+                            this.element.trigger({
+                                type: 'changeDate',
+                                date: this.date,
+                                viewMode: DPGlobal.modes[this.viewMode].clsName
+                            });
+                        }
+                        break;
+                }
+            }
+            this.element.trigger('input');
+        },
 
-		mousedown: function(e) {
-			e.stopPropagation();
-			e.preventDefault();
-		},
+        mousedown: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        },
 
-		showMode: function(dir) {
-			if (dir) {
-				this.viewMode = Math.max(this.minViewMode, Math.min(2, this.viewMode + dir));
-			}
-			this.picker.find('>div').hide().filter('.datepicker-' + DPGlobal.modes[this.viewMode].clsName).show();
-		}
-	};
+        showMode: function (dir) {
+            if (dir) {
+                this.viewMode = Math.max(this.minViewMode, Math.min(2, this.viewMode + dir));
+            }
+            this.picker.find('>div').hide().filter('.datepicker-' + DPGlobal.modes[this.viewMode].clsName).show();
+        }
+    };
 
-	$.fn.datepicker = function(option, val) {
-		return this.each(function() {
-			var $this = $(this),
-				data = $this.data('datepicker'),
-				options = typeof option === 'object' && option;
-			if (!data) {
-				$this.data('datepicker', (data = new Datepicker(this, $.extend({}, $.fn.datepicker.defaults, options))));
-			}
-			if (typeof option === 'string') data[option](val);
-		});
-	};
+    $.fn.datepicker = function (option, val) {
+        return this.each(function () {
+            var $this = $(this),
+                data = $this.data('datepicker'),
+                options = typeof option === 'object' && option;
+            if (!data) {
+                $this.data('datepicker', (data = new Datepicker(this, $.extend({}, $.fn.datepicker.defaults, options))));
+            }
+            if (typeof option === 'string') data[option](val);
+        });
+    };
 
-	$.fn.datepicker.defaults = {
-		onRender: function(date) {
-			return '';
-		}
-	};
-	$.fn.datepicker.Constructor = Datepicker;
+    $.fn.datepicker.defaults = {
+        onRender: function (date) {
+            return '';
+        }
+    };
+    $.fn.datepicker.Constructor = Datepicker;
 
-	var DPGlobal = {
-		modes: [{
-			clsName: 'days',
-			navFnc: 'Month',
-			navStep: 1
-		}, {
-			clsName: 'months',
-			navFnc: 'FullYear',
-			navStep: 1
-		}, {
-			clsName: 'years',
-			navFnc: 'FullYear',
-			navStep: 10
-		}],
-		dates: {
-			days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-			daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-			daysMin: ["日", "一", "二", "三", "四", "五", "六", "日"],
-			months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
-			monthsShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
-		},
-		isLeapYear: function(year) {
-			return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0))
-		},
-		getDaysInMonth: function(year, month) {
-			return [31, (DPGlobal.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
-		},
-		parseFormat: function(format) {
-			var separator = format.match(/[.\/\-\s].*?/),
-				parts = format.split(/\W+/);
-			if (!separator || !parts || parts.length === 0) {
-				throw new Error("Invalid date format.");
-			}
-			return {
-				separator: separator,
-				parts: parts
-			};
-		},
-		parseDate: function(date, format) {
-			var parts = date.split(format.separator),
-				date = new Date(),
-				val;
-			date.setHours(0);
-			date.setMinutes(0);
-			date.setSeconds(0);
-			date.setMilliseconds(0);
-			if (parts.length === format.parts.length) {
-				var year = date.getFullYear(),
-					day = date.getDate(),
-					month = date.getMonth();
-				for (var i = 0, cnt = format.parts.length; i < cnt; i++) {
-					val = parseInt(parts[i], 10) || 1;
-					switch (format.parts[i]) {
-						case 'dd':
-						case 'd':
-							day = val;
-							date.setDate(val);
-							break;
-						case 'mm':
-						case 'm':
-							month = val - 1;
-							date.setMonth(val - 1);
-							break;
-						case 'yy':
-							year = 2000 + val;
-							date.setFullYear(2000 + val);
-							break;
-						case 'yyyy':
-							year = val;
-							date.setFullYear(val);
-							break;
-					}
-				}
-				date = new Date(year, month, day, 0, 0, 0);
-			}
-			return date;
-		},
-		formatDate: function(date, format) {
-			var val = {
-				d: date.getDate(),
-				m: date.getMonth() + 1,
-				yy: date.getFullYear().toString().substring(2),
-				yyyy: date.getFullYear()
-			};
-			val.dd = (val.d < 10 ? '0' : '') + val.d;
-			val.mm = (val.m < 10 ? '0' : '') + val.m;
-			var date = [];
-			for (var i = 0, cnt = format.parts.length; i < cnt; i++) {
-				date.push(val[format.parts[i]]);
-			}
-			return date.join(format.separator);
-		},
-		headTemplate: '<thead>' + '<tr>' + '<th class="prev"><i class="fa fa-chevron-left"></i></th>' + '<th colspan="5" class="switch"></th>' + '<th class="next"><i class="fa fa-chevron-right"></i></th>' + '</tr>' + '</thead>',
-		contTemplate: '<tbody><tr><td colspan="7"></td></tr></tbody>'
-	};
-	DPGlobal.template = '<div class="datepicker dropdown-menu">' +
-		'<div class="datepicker-days">' +
-		'<table class=" table-condensed">' +
-		DPGlobal.headTemplate +
-		'<tbody></tbody>' +
-		'</table>' +
-		'</div>' +
-		'<div class="datepicker-months">' +
-		'<table class="table-condensed">' +
-		DPGlobal.headTemplate +
-		DPGlobal.contTemplate +
-		'</table>' +
-		'</div>' +
-		'<div class="datepicker-years">' +
-		'<table class="table-condensed">' +
-		DPGlobal.headTemplate +
-		DPGlobal.contTemplate +
-		'</table>' +
-		'</div>' +
-		'</div>';
+    var DPGlobal = {
+        modes: [{
+            clsName: 'days',
+            navFnc: 'Month',
+            navStep: 1
+        }, {
+            clsName: 'months',
+            navFnc: 'FullYear',
+            navStep: 1
+        }, {
+            clsName: 'years',
+            navFnc: 'FullYear',
+            navStep: 10
+        }],
+        dates: {
+            days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            daysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            daysMin: ["日", "一", "二", "三", "四", "五", "六", "日"],
+            months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+            monthsShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
+        },
+        isLeapYear: function (year) {
+            return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0))
+        },
+        getDaysInMonth: function (year, month) {
+            return [31, (DPGlobal.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
+        },
+        parseFormat: function (format) {
+            var separator = format.match(/[.\/\-\s].*?/),
+                parts = format.split(/\W+/);
+            if (!separator || !parts || parts.length === 0) {
+                throw new Error("Invalid date format.");
+            }
+            return {
+                separator: separator,
+                parts: parts
+            };
+        },
+        parseDate: function (date, format) {
+            var parts = date.split(format.separator),
+                date = new Date(),
+                val;
+            date.setHours(0);
+            date.setMinutes(0);
+            date.setSeconds(0);
+            date.setMilliseconds(0);
+            if (parts.length === format.parts.length) {
+                var year = date.getFullYear(),
+                    day = date.getDate(),
+                    month = date.getMonth();
+                for (var i = 0, cnt = format.parts.length; i < cnt; i++) {
+                    val = parseInt(parts[i], 10) || 1;
+                    switch (format.parts[i]) {
+                        case 'dd':
+                        case 'd':
+                            day = val;
+                            date.setDate(val);
+                            break;
+                        case 'mm':
+                        case 'm':
+                            month = val - 1;
+                            date.setMonth(val - 1);
+                            break;
+                        case 'yy':
+                            year = 2000 + val;
+                            date.setFullYear(2000 + val);
+                            break;
+                        case 'yyyy':
+                            year = val;
+                            date.setFullYear(val);
+                            break;
+                    }
+                }
+                date = new Date(year, month, day, 0, 0, 0);
+            }
+            return date;
+        },
+        formatDate: function (date, format) {
+            var val = {
+                d: date.getDate(),
+                m: date.getMonth() + 1,
+                yy: date.getFullYear().toString().substring(2),
+                yyyy: date.getFullYear()
+            };
+            val.dd = (val.d < 10 ? '0' : '') + val.d;
+            val.mm = (val.m < 10 ? '0' : '') + val.m;
+            var date = [];
+            for (var i = 0, cnt = format.parts.length; i < cnt; i++) {
+                date.push(val[format.parts[i]]);
+            }
+            return date.join(format.separator);
+        },
+        headTemplate: '<thead>' + '<tr>' + '<th class="prev"><i class="fa fa-chevron-left"></i></th>' + '<th colspan="5" class="switch"></th>' + '<th class="next"><i class="fa fa-chevron-right"></i></th>' + '</tr>' + '</thead>',
+        contTemplate: '<tbody><tr><td colspan="7"></td></tr></tbody>'
+    };
+    DPGlobal.template = '<div class="datepicker dropdown-menu">' +
+        '<div class="datepicker-days">' +
+        '<table class=" table-condensed">' +
+        DPGlobal.headTemplate +
+        '<tbody></tbody>' +
+        '</table>' +
+        '</div>' +
+        '<div class="datepicker-months">' +
+        '<table class="table-condensed">' +
+        DPGlobal.headTemplate +
+        DPGlobal.contTemplate +
+        '</table>' +
+        '</div>' +
+        '<div class="datepicker-years">' +
+        '<table class="table-condensed">' +
+        DPGlobal.headTemplate +
+        DPGlobal.contTemplate +
+        '</table>' +
+        '</div>' +
+        '</div>';
 
 }(window.jQuery);
 ///<jscompress sourcefile="select2.js" />
 /*
-Copyright 2012 Igor Vaynberg
+ Copyright 2012 Igor Vaynberg
 
-Version: 3.5.4 Timestamp: Sun Aug 30 13:30:32 EDT 2015
+ Version: 3.5.4 Timestamp: Sun Aug 30 13:30:32 EDT 2015
 
-This software is licensed under the Apache License, Version 2.0 (the "Apache License") or the GNU
-General Public License version 2 (the "GPL License"). You may choose either license to govern your
-use of this software only upon the condition that you accept all of the terms of either the Apache
-License or the GPL License.
+ This software is licensed under the Apache License, Version 2.0 (the "Apache License") or the GNU
+ General Public License version 2 (the "GPL License"). You may choose either license to govern your
+ use of this software only upon the condition that you accept all of the terms of either the Apache
+ License or the GPL License.
 
-You may obtain a copy of the Apache License and the GPL License at:
+ You may obtain a copy of the Apache License and the GPL License at:
 
-    http://www.apache.org/licenses/LICENSE-2.0
-    http://www.gnu.org/licenses/gpl-2.0.html
+ http://www.apache.org/licenses/LICENSE-2.0
+ http://www.gnu.org/licenses/gpl-2.0.html
 
-Unless required by applicable law or agreed to in writing, software distributed under the
-Apache License or the GPL License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-CONDITIONS OF ANY KIND, either express or implied. See the Apache License and the GPL License for
-the specific language governing permissions and limitations under the Apache License and the GPL License.
-*/
+ Unless required by applicable law or agreed to in writing, software distributed under the
+ Apache License or the GPL License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ CONDITIONS OF ANY KIND, either express or implied. See the Apache License and the GPL License for
+ the specific language governing permissions and limitations under the Apache License and the GPL License.
+ */
 (function ($) {
-    if(typeof $.fn.each2 == "undefined") {
+    if (typeof $.fn.each2 == "undefined") {
         $.extend($.fn, {
             /*
-            * 4-10 times faster .each replacement
-            * use it carefully, as it overrides jQuery context of element on each iteration
-            */
-            each2 : function (c) {
+             * 4-10 times faster .each replacement
+             * use it carefully, as it overrides jQuery context of element on each iteration
+             */
+            each2: function (c) {
                 var j = $([0]), i = -1, l = this.length;
                 while (
-                    ++i < l
-                    && (j.context = j[0] = this[i])
-                    && c.call(j[0], i, j) !== false //"this"=DOM, i=index, j=jQuery object
-                );
+                ++i < l
+                && (j.context = j[0] = this[i])
+                && c.call(j[0], i, j) !== false //"this"=DOM, i=index, j=jQuery object
+                    );
                 return this;
             }
         });
@@ -3947,62 +3951,907 @@ the specific language governing permissions and limitations under the Apache Lic
     }
 
     var AbstractSelect2, SingleSelect2, MultiSelect2, nextUid, sizer,
-        lastMousePosition={x:0,y:0}, $document, scrollBarDimensions,
+        lastMousePosition = {x: 0, y: 0}, $document, scrollBarDimensions,
 
-    KEY = {
-        TAB: 9,
-        ENTER: 13,
-        ESC: 27,
-        SPACE: 32,
-        LEFT: 37,
-        UP: 38,
-        RIGHT: 39,
-        DOWN: 40,
-        SHIFT: 16,
-        CTRL: 17,
-        ALT: 18,
-        PAGE_UP: 33,
-        PAGE_DOWN: 34,
-        HOME: 36,
-        END: 35,
-        BACKSPACE: 8,
-        DELETE: 46,
-        isArrow: function (k) {
-            k = k.which ? k.which : k;
-            switch (k) {
-            case KEY.LEFT:
-            case KEY.RIGHT:
-            case KEY.UP:
-            case KEY.DOWN:
-                return true;
+        KEY = {
+            TAB: 9,
+            ENTER: 13,
+            ESC: 27,
+            SPACE: 32,
+            LEFT: 37,
+            UP: 38,
+            RIGHT: 39,
+            DOWN: 40,
+            SHIFT: 16,
+            CTRL: 17,
+            ALT: 18,
+            PAGE_UP: 33,
+            PAGE_DOWN: 34,
+            HOME: 36,
+            END: 35,
+            BACKSPACE: 8,
+            DELETE: 46,
+            isArrow: function (k) {
+                k = k.which ? k.which : k;
+                switch (k) {
+                    case KEY.LEFT:
+                    case KEY.RIGHT:
+                    case KEY.UP:
+                    case KEY.DOWN:
+                        return true;
+                }
+                return false;
+            },
+            isControl: function (e) {
+                var k = e.which;
+                switch (k) {
+                    case KEY.SHIFT:
+                    case KEY.CTRL:
+                    case KEY.ALT:
+                        return true;
+                }
+
+                if (e.metaKey) return true;
+
+                return false;
+            },
+            isFunctionKey: function (k) {
+                k = k.which ? k.which : k;
+                return k >= 112 && k <= 123;
             }
-            return false;
         },
-        isControl: function (e) {
-            var k = e.which;
-            switch (k) {
-            case KEY.SHIFT:
-            case KEY.CTRL:
-            case KEY.ALT:
-                return true;
-            }
+        MEASURE_SCROLLBAR_TEMPLATE = "<div class='select2-measure-scrollbar'></div>",
 
-            if (e.metaKey) return true;
-
-            return false;
-        },
-        isFunctionKey: function (k) {
-            k = k.which ? k.which : k;
-            return k >= 112 && k <= 123;
-        }
-    },
-    MEASURE_SCROLLBAR_TEMPLATE = "<div class='select2-measure-scrollbar'></div>",
-
-    DIACRITICS = {"\u24B6":"A","\uFF21":"A","\u00C0":"A","\u00C1":"A","\u00C2":"A","\u1EA6":"A","\u1EA4":"A","\u1EAA":"A","\u1EA8":"A","\u00C3":"A","\u0100":"A","\u0102":"A","\u1EB0":"A","\u1EAE":"A","\u1EB4":"A","\u1EB2":"A","\u0226":"A","\u01E0":"A","\u00C4":"A","\u01DE":"A","\u1EA2":"A","\u00C5":"A","\u01FA":"A","\u01CD":"A","\u0200":"A","\u0202":"A","\u1EA0":"A","\u1EAC":"A","\u1EB6":"A","\u1E00":"A","\u0104":"A","\u023A":"A","\u2C6F":"A","\uA732":"AA","\u00C6":"AE","\u01FC":"AE","\u01E2":"AE","\uA734":"AO","\uA736":"AU","\uA738":"AV","\uA73A":"AV","\uA73C":"AY","\u24B7":"B","\uFF22":"B","\u1E02":"B","\u1E04":"B","\u1E06":"B","\u0243":"B","\u0182":"B","\u0181":"B","\u24B8":"C","\uFF23":"C","\u0106":"C","\u0108":"C","\u010A":"C","\u010C":"C","\u00C7":"C","\u1E08":"C","\u0187":"C","\u023B":"C","\uA73E":"C","\u24B9":"D","\uFF24":"D","\u1E0A":"D","\u010E":"D","\u1E0C":"D","\u1E10":"D","\u1E12":"D","\u1E0E":"D","\u0110":"D","\u018B":"D","\u018A":"D","\u0189":"D","\uA779":"D","\u01F1":"DZ","\u01C4":"DZ","\u01F2":"Dz","\u01C5":"Dz","\u24BA":"E","\uFF25":"E","\u00C8":"E","\u00C9":"E","\u00CA":"E","\u1EC0":"E","\u1EBE":"E","\u1EC4":"E","\u1EC2":"E","\u1EBC":"E","\u0112":"E","\u1E14":"E","\u1E16":"E","\u0114":"E","\u0116":"E","\u00CB":"E","\u1EBA":"E","\u011A":"E","\u0204":"E","\u0206":"E","\u1EB8":"E","\u1EC6":"E","\u0228":"E","\u1E1C":"E","\u0118":"E","\u1E18":"E","\u1E1A":"E","\u0190":"E","\u018E":"E","\u24BB":"F","\uFF26":"F","\u1E1E":"F","\u0191":"F","\uA77B":"F","\u24BC":"G","\uFF27":"G","\u01F4":"G","\u011C":"G","\u1E20":"G","\u011E":"G","\u0120":"G","\u01E6":"G","\u0122":"G","\u01E4":"G","\u0193":"G","\uA7A0":"G","\uA77D":"G","\uA77E":"G","\u24BD":"H","\uFF28":"H","\u0124":"H","\u1E22":"H","\u1E26":"H","\u021E":"H","\u1E24":"H","\u1E28":"H","\u1E2A":"H","\u0126":"H","\u2C67":"H","\u2C75":"H","\uA78D":"H","\u24BE":"I","\uFF29":"I","\u00CC":"I","\u00CD":"I","\u00CE":"I","\u0128":"I","\u012A":"I","\u012C":"I","\u0130":"I","\u00CF":"I","\u1E2E":"I","\u1EC8":"I","\u01CF":"I","\u0208":"I","\u020A":"I","\u1ECA":"I","\u012E":"I","\u1E2C":"I","\u0197":"I","\u24BF":"J","\uFF2A":"J","\u0134":"J","\u0248":"J","\u24C0":"K","\uFF2B":"K","\u1E30":"K","\u01E8":"K","\u1E32":"K","\u0136":"K","\u1E34":"K","\u0198":"K","\u2C69":"K","\uA740":"K","\uA742":"K","\uA744":"K","\uA7A2":"K","\u24C1":"L","\uFF2C":"L","\u013F":"L","\u0139":"L","\u013D":"L","\u1E36":"L","\u1E38":"L","\u013B":"L","\u1E3C":"L","\u1E3A":"L","\u0141":"L","\u023D":"L","\u2C62":"L","\u2C60":"L","\uA748":"L","\uA746":"L","\uA780":"L","\u01C7":"LJ","\u01C8":"Lj","\u24C2":"M","\uFF2D":"M","\u1E3E":"M","\u1E40":"M","\u1E42":"M","\u2C6E":"M","\u019C":"M","\u24C3":"N","\uFF2E":"N","\u01F8":"N","\u0143":"N","\u00D1":"N","\u1E44":"N","\u0147":"N","\u1E46":"N","\u0145":"N","\u1E4A":"N","\u1E48":"N","\u0220":"N","\u019D":"N","\uA790":"N","\uA7A4":"N","\u01CA":"NJ","\u01CB":"Nj","\u24C4":"O","\uFF2F":"O","\u00D2":"O","\u00D3":"O","\u00D4":"O","\u1ED2":"O","\u1ED0":"O","\u1ED6":"O","\u1ED4":"O","\u00D5":"O","\u1E4C":"O","\u022C":"O","\u1E4E":"O","\u014C":"O","\u1E50":"O","\u1E52":"O","\u014E":"O","\u022E":"O","\u0230":"O","\u00D6":"O","\u022A":"O","\u1ECE":"O","\u0150":"O","\u01D1":"O","\u020C":"O","\u020E":"O","\u01A0":"O","\u1EDC":"O","\u1EDA":"O","\u1EE0":"O","\u1EDE":"O","\u1EE2":"O","\u1ECC":"O","\u1ED8":"O","\u01EA":"O","\u01EC":"O","\u00D8":"O","\u01FE":"O","\u0186":"O","\u019F":"O","\uA74A":"O","\uA74C":"O","\u01A2":"OI","\uA74E":"OO","\u0222":"OU","\u24C5":"P","\uFF30":"P","\u1E54":"P","\u1E56":"P","\u01A4":"P","\u2C63":"P","\uA750":"P","\uA752":"P","\uA754":"P","\u24C6":"Q","\uFF31":"Q","\uA756":"Q","\uA758":"Q","\u024A":"Q","\u24C7":"R","\uFF32":"R","\u0154":"R","\u1E58":"R","\u0158":"R","\u0210":"R","\u0212":"R","\u1E5A":"R","\u1E5C":"R","\u0156":"R","\u1E5E":"R","\u024C":"R","\u2C64":"R","\uA75A":"R","\uA7A6":"R","\uA782":"R","\u24C8":"S","\uFF33":"S","\u1E9E":"S","\u015A":"S","\u1E64":"S","\u015C":"S","\u1E60":"S","\u0160":"S","\u1E66":"S","\u1E62":"S","\u1E68":"S","\u0218":"S","\u015E":"S","\u2C7E":"S","\uA7A8":"S","\uA784":"S","\u24C9":"T","\uFF34":"T","\u1E6A":"T","\u0164":"T","\u1E6C":"T","\u021A":"T","\u0162":"T","\u1E70":"T","\u1E6E":"T","\u0166":"T","\u01AC":"T","\u01AE":"T","\u023E":"T","\uA786":"T","\uA728":"TZ","\u24CA":"U","\uFF35":"U","\u00D9":"U","\u00DA":"U","\u00DB":"U","\u0168":"U","\u1E78":"U","\u016A":"U","\u1E7A":"U","\u016C":"U","\u00DC":"U","\u01DB":"U","\u01D7":"U","\u01D5":"U","\u01D9":"U","\u1EE6":"U","\u016E":"U","\u0170":"U","\u01D3":"U","\u0214":"U","\u0216":"U","\u01AF":"U","\u1EEA":"U","\u1EE8":"U","\u1EEE":"U","\u1EEC":"U","\u1EF0":"U","\u1EE4":"U","\u1E72":"U","\u0172":"U","\u1E76":"U","\u1E74":"U","\u0244":"U","\u24CB":"V","\uFF36":"V","\u1E7C":"V","\u1E7E":"V","\u01B2":"V","\uA75E":"V","\u0245":"V","\uA760":"VY","\u24CC":"W","\uFF37":"W","\u1E80":"W","\u1E82":"W","\u0174":"W","\u1E86":"W","\u1E84":"W","\u1E88":"W","\u2C72":"W","\u24CD":"X","\uFF38":"X","\u1E8A":"X","\u1E8C":"X","\u24CE":"Y","\uFF39":"Y","\u1EF2":"Y","\u00DD":"Y","\u0176":"Y","\u1EF8":"Y","\u0232":"Y","\u1E8E":"Y","\u0178":"Y","\u1EF6":"Y","\u1EF4":"Y","\u01B3":"Y","\u024E":"Y","\u1EFE":"Y","\u24CF":"Z","\uFF3A":"Z","\u0179":"Z","\u1E90":"Z","\u017B":"Z","\u017D":"Z","\u1E92":"Z","\u1E94":"Z","\u01B5":"Z","\u0224":"Z","\u2C7F":"Z","\u2C6B":"Z","\uA762":"Z","\u24D0":"a","\uFF41":"a","\u1E9A":"a","\u00E0":"a","\u00E1":"a","\u00E2":"a","\u1EA7":"a","\u1EA5":"a","\u1EAB":"a","\u1EA9":"a","\u00E3":"a","\u0101":"a","\u0103":"a","\u1EB1":"a","\u1EAF":"a","\u1EB5":"a","\u1EB3":"a","\u0227":"a","\u01E1":"a","\u00E4":"a","\u01DF":"a","\u1EA3":"a","\u00E5":"a","\u01FB":"a","\u01CE":"a","\u0201":"a","\u0203":"a","\u1EA1":"a","\u1EAD":"a","\u1EB7":"a","\u1E01":"a","\u0105":"a","\u2C65":"a","\u0250":"a","\uA733":"aa","\u00E6":"ae","\u01FD":"ae","\u01E3":"ae","\uA735":"ao","\uA737":"au","\uA739":"av","\uA73B":"av","\uA73D":"ay","\u24D1":"b","\uFF42":"b","\u1E03":"b","\u1E05":"b","\u1E07":"b","\u0180":"b","\u0183":"b","\u0253":"b","\u24D2":"c","\uFF43":"c","\u0107":"c","\u0109":"c","\u010B":"c","\u010D":"c","\u00E7":"c","\u1E09":"c","\u0188":"c","\u023C":"c","\uA73F":"c","\u2184":"c","\u24D3":"d","\uFF44":"d","\u1E0B":"d","\u010F":"d","\u1E0D":"d","\u1E11":"d","\u1E13":"d","\u1E0F":"d","\u0111":"d","\u018C":"d","\u0256":"d","\u0257":"d","\uA77A":"d","\u01F3":"dz","\u01C6":"dz","\u24D4":"e","\uFF45":"e","\u00E8":"e","\u00E9":"e","\u00EA":"e","\u1EC1":"e","\u1EBF":"e","\u1EC5":"e","\u1EC3":"e","\u1EBD":"e","\u0113":"e","\u1E15":"e","\u1E17":"e","\u0115":"e","\u0117":"e","\u00EB":"e","\u1EBB":"e","\u011B":"e","\u0205":"e","\u0207":"e","\u1EB9":"e","\u1EC7":"e","\u0229":"e","\u1E1D":"e","\u0119":"e","\u1E19":"e","\u1E1B":"e","\u0247":"e","\u025B":"e","\u01DD":"e","\u24D5":"f","\uFF46":"f","\u1E1F":"f","\u0192":"f","\uA77C":"f","\u24D6":"g","\uFF47":"g","\u01F5":"g","\u011D":"g","\u1E21":"g","\u011F":"g","\u0121":"g","\u01E7":"g","\u0123":"g","\u01E5":"g","\u0260":"g","\uA7A1":"g","\u1D79":"g","\uA77F":"g","\u24D7":"h","\uFF48":"h","\u0125":"h","\u1E23":"h","\u1E27":"h","\u021F":"h","\u1E25":"h","\u1E29":"h","\u1E2B":"h","\u1E96":"h","\u0127":"h","\u2C68":"h","\u2C76":"h","\u0265":"h","\u0195":"hv","\u24D8":"i","\uFF49":"i","\u00EC":"i","\u00ED":"i","\u00EE":"i","\u0129":"i","\u012B":"i","\u012D":"i","\u00EF":"i","\u1E2F":"i","\u1EC9":"i","\u01D0":"i","\u0209":"i","\u020B":"i","\u1ECB":"i","\u012F":"i","\u1E2D":"i","\u0268":"i","\u0131":"i","\u24D9":"j","\uFF4A":"j","\u0135":"j","\u01F0":"j","\u0249":"j","\u24DA":"k","\uFF4B":"k","\u1E31":"k","\u01E9":"k","\u1E33":"k","\u0137":"k","\u1E35":"k","\u0199":"k","\u2C6A":"k","\uA741":"k","\uA743":"k","\uA745":"k","\uA7A3":"k","\u24DB":"l","\uFF4C":"l","\u0140":"l","\u013A":"l","\u013E":"l","\u1E37":"l","\u1E39":"l","\u013C":"l","\u1E3D":"l","\u1E3B":"l","\u017F":"l","\u0142":"l","\u019A":"l","\u026B":"l","\u2C61":"l","\uA749":"l","\uA781":"l","\uA747":"l","\u01C9":"lj","\u24DC":"m","\uFF4D":"m","\u1E3F":"m","\u1E41":"m","\u1E43":"m","\u0271":"m","\u026F":"m","\u24DD":"n","\uFF4E":"n","\u01F9":"n","\u0144":"n","\u00F1":"n","\u1E45":"n","\u0148":"n","\u1E47":"n","\u0146":"n","\u1E4B":"n","\u1E49":"n","\u019E":"n","\u0272":"n","\u0149":"n","\uA791":"n","\uA7A5":"n","\u01CC":"nj","\u24DE":"o","\uFF4F":"o","\u00F2":"o","\u00F3":"o","\u00F4":"o","\u1ED3":"o","\u1ED1":"o","\u1ED7":"o","\u1ED5":"o","\u00F5":"o","\u1E4D":"o","\u022D":"o","\u1E4F":"o","\u014D":"o","\u1E51":"o","\u1E53":"o","\u014F":"o","\u022F":"o","\u0231":"o","\u00F6":"o","\u022B":"o","\u1ECF":"o","\u0151":"o","\u01D2":"o","\u020D":"o","\u020F":"o","\u01A1":"o","\u1EDD":"o","\u1EDB":"o","\u1EE1":"o","\u1EDF":"o","\u1EE3":"o","\u1ECD":"o","\u1ED9":"o","\u01EB":"o","\u01ED":"o","\u00F8":"o","\u01FF":"o","\u0254":"o","\uA74B":"o","\uA74D":"o","\u0275":"o","\u01A3":"oi","\u0223":"ou","\uA74F":"oo","\u24DF":"p","\uFF50":"p","\u1E55":"p","\u1E57":"p","\u01A5":"p","\u1D7D":"p","\uA751":"p","\uA753":"p","\uA755":"p","\u24E0":"q","\uFF51":"q","\u024B":"q","\uA757":"q","\uA759":"q","\u24E1":"r","\uFF52":"r","\u0155":"r","\u1E59":"r","\u0159":"r","\u0211":"r","\u0213":"r","\u1E5B":"r","\u1E5D":"r","\u0157":"r","\u1E5F":"r","\u024D":"r","\u027D":"r","\uA75B":"r","\uA7A7":"r","\uA783":"r","\u24E2":"s","\uFF53":"s","\u00DF":"s","\u015B":"s","\u1E65":"s","\u015D":"s","\u1E61":"s","\u0161":"s","\u1E67":"s","\u1E63":"s","\u1E69":"s","\u0219":"s","\u015F":"s","\u023F":"s","\uA7A9":"s","\uA785":"s","\u1E9B":"s","\u24E3":"t","\uFF54":"t","\u1E6B":"t","\u1E97":"t","\u0165":"t","\u1E6D":"t","\u021B":"t","\u0163":"t","\u1E71":"t","\u1E6F":"t","\u0167":"t","\u01AD":"t","\u0288":"t","\u2C66":"t","\uA787":"t","\uA729":"tz","\u24E4":"u","\uFF55":"u","\u00F9":"u","\u00FA":"u","\u00FB":"u","\u0169":"u","\u1E79":"u","\u016B":"u","\u1E7B":"u","\u016D":"u","\u00FC":"u","\u01DC":"u","\u01D8":"u","\u01D6":"u","\u01DA":"u","\u1EE7":"u","\u016F":"u","\u0171":"u","\u01D4":"u","\u0215":"u","\u0217":"u","\u01B0":"u","\u1EEB":"u","\u1EE9":"u","\u1EEF":"u","\u1EED":"u","\u1EF1":"u","\u1EE5":"u","\u1E73":"u","\u0173":"u","\u1E77":"u","\u1E75":"u","\u0289":"u","\u24E5":"v","\uFF56":"v","\u1E7D":"v","\u1E7F":"v","\u028B":"v","\uA75F":"v","\u028C":"v","\uA761":"vy","\u24E6":"w","\uFF57":"w","\u1E81":"w","\u1E83":"w","\u0175":"w","\u1E87":"w","\u1E85":"w","\u1E98":"w","\u1E89":"w","\u2C73":"w","\u24E7":"x","\uFF58":"x","\u1E8B":"x","\u1E8D":"x","\u24E8":"y","\uFF59":"y","\u1EF3":"y","\u00FD":"y","\u0177":"y","\u1EF9":"y","\u0233":"y","\u1E8F":"y","\u00FF":"y","\u1EF7":"y","\u1E99":"y","\u1EF5":"y","\u01B4":"y","\u024F":"y","\u1EFF":"y","\u24E9":"z","\uFF5A":"z","\u017A":"z","\u1E91":"z","\u017C":"z","\u017E":"z","\u1E93":"z","\u1E95":"z","\u01B6":"z","\u0225":"z","\u0240":"z","\u2C6C":"z","\uA763":"z","\u0386":"\u0391","\u0388":"\u0395","\u0389":"\u0397","\u038A":"\u0399","\u03AA":"\u0399","\u038C":"\u039F","\u038E":"\u03A5","\u03AB":"\u03A5","\u038F":"\u03A9","\u03AC":"\u03B1","\u03AD":"\u03B5","\u03AE":"\u03B7","\u03AF":"\u03B9","\u03CA":"\u03B9","\u0390":"\u03B9","\u03CC":"\u03BF","\u03CD":"\u03C5","\u03CB":"\u03C5","\u03B0":"\u03C5","\u03C9":"\u03C9","\u03C2":"\u03C3"};
+        DIACRITICS = {
+            "\u24B6": "A",
+            "\uFF21": "A",
+            "\u00C0": "A",
+            "\u00C1": "A",
+            "\u00C2": "A",
+            "\u1EA6": "A",
+            "\u1EA4": "A",
+            "\u1EAA": "A",
+            "\u1EA8": "A",
+            "\u00C3": "A",
+            "\u0100": "A",
+            "\u0102": "A",
+            "\u1EB0": "A",
+            "\u1EAE": "A",
+            "\u1EB4": "A",
+            "\u1EB2": "A",
+            "\u0226": "A",
+            "\u01E0": "A",
+            "\u00C4": "A",
+            "\u01DE": "A",
+            "\u1EA2": "A",
+            "\u00C5": "A",
+            "\u01FA": "A",
+            "\u01CD": "A",
+            "\u0200": "A",
+            "\u0202": "A",
+            "\u1EA0": "A",
+            "\u1EAC": "A",
+            "\u1EB6": "A",
+            "\u1E00": "A",
+            "\u0104": "A",
+            "\u023A": "A",
+            "\u2C6F": "A",
+            "\uA732": "AA",
+            "\u00C6": "AE",
+            "\u01FC": "AE",
+            "\u01E2": "AE",
+            "\uA734": "AO",
+            "\uA736": "AU",
+            "\uA738": "AV",
+            "\uA73A": "AV",
+            "\uA73C": "AY",
+            "\u24B7": "B",
+            "\uFF22": "B",
+            "\u1E02": "B",
+            "\u1E04": "B",
+            "\u1E06": "B",
+            "\u0243": "B",
+            "\u0182": "B",
+            "\u0181": "B",
+            "\u24B8": "C",
+            "\uFF23": "C",
+            "\u0106": "C",
+            "\u0108": "C",
+            "\u010A": "C",
+            "\u010C": "C",
+            "\u00C7": "C",
+            "\u1E08": "C",
+            "\u0187": "C",
+            "\u023B": "C",
+            "\uA73E": "C",
+            "\u24B9": "D",
+            "\uFF24": "D",
+            "\u1E0A": "D",
+            "\u010E": "D",
+            "\u1E0C": "D",
+            "\u1E10": "D",
+            "\u1E12": "D",
+            "\u1E0E": "D",
+            "\u0110": "D",
+            "\u018B": "D",
+            "\u018A": "D",
+            "\u0189": "D",
+            "\uA779": "D",
+            "\u01F1": "DZ",
+            "\u01C4": "DZ",
+            "\u01F2": "Dz",
+            "\u01C5": "Dz",
+            "\u24BA": "E",
+            "\uFF25": "E",
+            "\u00C8": "E",
+            "\u00C9": "E",
+            "\u00CA": "E",
+            "\u1EC0": "E",
+            "\u1EBE": "E",
+            "\u1EC4": "E",
+            "\u1EC2": "E",
+            "\u1EBC": "E",
+            "\u0112": "E",
+            "\u1E14": "E",
+            "\u1E16": "E",
+            "\u0114": "E",
+            "\u0116": "E",
+            "\u00CB": "E",
+            "\u1EBA": "E",
+            "\u011A": "E",
+            "\u0204": "E",
+            "\u0206": "E",
+            "\u1EB8": "E",
+            "\u1EC6": "E",
+            "\u0228": "E",
+            "\u1E1C": "E",
+            "\u0118": "E",
+            "\u1E18": "E",
+            "\u1E1A": "E",
+            "\u0190": "E",
+            "\u018E": "E",
+            "\u24BB": "F",
+            "\uFF26": "F",
+            "\u1E1E": "F",
+            "\u0191": "F",
+            "\uA77B": "F",
+            "\u24BC": "G",
+            "\uFF27": "G",
+            "\u01F4": "G",
+            "\u011C": "G",
+            "\u1E20": "G",
+            "\u011E": "G",
+            "\u0120": "G",
+            "\u01E6": "G",
+            "\u0122": "G",
+            "\u01E4": "G",
+            "\u0193": "G",
+            "\uA7A0": "G",
+            "\uA77D": "G",
+            "\uA77E": "G",
+            "\u24BD": "H",
+            "\uFF28": "H",
+            "\u0124": "H",
+            "\u1E22": "H",
+            "\u1E26": "H",
+            "\u021E": "H",
+            "\u1E24": "H",
+            "\u1E28": "H",
+            "\u1E2A": "H",
+            "\u0126": "H",
+            "\u2C67": "H",
+            "\u2C75": "H",
+            "\uA78D": "H",
+            "\u24BE": "I",
+            "\uFF29": "I",
+            "\u00CC": "I",
+            "\u00CD": "I",
+            "\u00CE": "I",
+            "\u0128": "I",
+            "\u012A": "I",
+            "\u012C": "I",
+            "\u0130": "I",
+            "\u00CF": "I",
+            "\u1E2E": "I",
+            "\u1EC8": "I",
+            "\u01CF": "I",
+            "\u0208": "I",
+            "\u020A": "I",
+            "\u1ECA": "I",
+            "\u012E": "I",
+            "\u1E2C": "I",
+            "\u0197": "I",
+            "\u24BF": "J",
+            "\uFF2A": "J",
+            "\u0134": "J",
+            "\u0248": "J",
+            "\u24C0": "K",
+            "\uFF2B": "K",
+            "\u1E30": "K",
+            "\u01E8": "K",
+            "\u1E32": "K",
+            "\u0136": "K",
+            "\u1E34": "K",
+            "\u0198": "K",
+            "\u2C69": "K",
+            "\uA740": "K",
+            "\uA742": "K",
+            "\uA744": "K",
+            "\uA7A2": "K",
+            "\u24C1": "L",
+            "\uFF2C": "L",
+            "\u013F": "L",
+            "\u0139": "L",
+            "\u013D": "L",
+            "\u1E36": "L",
+            "\u1E38": "L",
+            "\u013B": "L",
+            "\u1E3C": "L",
+            "\u1E3A": "L",
+            "\u0141": "L",
+            "\u023D": "L",
+            "\u2C62": "L",
+            "\u2C60": "L",
+            "\uA748": "L",
+            "\uA746": "L",
+            "\uA780": "L",
+            "\u01C7": "LJ",
+            "\u01C8": "Lj",
+            "\u24C2": "M",
+            "\uFF2D": "M",
+            "\u1E3E": "M",
+            "\u1E40": "M",
+            "\u1E42": "M",
+            "\u2C6E": "M",
+            "\u019C": "M",
+            "\u24C3": "N",
+            "\uFF2E": "N",
+            "\u01F8": "N",
+            "\u0143": "N",
+            "\u00D1": "N",
+            "\u1E44": "N",
+            "\u0147": "N",
+            "\u1E46": "N",
+            "\u0145": "N",
+            "\u1E4A": "N",
+            "\u1E48": "N",
+            "\u0220": "N",
+            "\u019D": "N",
+            "\uA790": "N",
+            "\uA7A4": "N",
+            "\u01CA": "NJ",
+            "\u01CB": "Nj",
+            "\u24C4": "O",
+            "\uFF2F": "O",
+            "\u00D2": "O",
+            "\u00D3": "O",
+            "\u00D4": "O",
+            "\u1ED2": "O",
+            "\u1ED0": "O",
+            "\u1ED6": "O",
+            "\u1ED4": "O",
+            "\u00D5": "O",
+            "\u1E4C": "O",
+            "\u022C": "O",
+            "\u1E4E": "O",
+            "\u014C": "O",
+            "\u1E50": "O",
+            "\u1E52": "O",
+            "\u014E": "O",
+            "\u022E": "O",
+            "\u0230": "O",
+            "\u00D6": "O",
+            "\u022A": "O",
+            "\u1ECE": "O",
+            "\u0150": "O",
+            "\u01D1": "O",
+            "\u020C": "O",
+            "\u020E": "O",
+            "\u01A0": "O",
+            "\u1EDC": "O",
+            "\u1EDA": "O",
+            "\u1EE0": "O",
+            "\u1EDE": "O",
+            "\u1EE2": "O",
+            "\u1ECC": "O",
+            "\u1ED8": "O",
+            "\u01EA": "O",
+            "\u01EC": "O",
+            "\u00D8": "O",
+            "\u01FE": "O",
+            "\u0186": "O",
+            "\u019F": "O",
+            "\uA74A": "O",
+            "\uA74C": "O",
+            "\u01A2": "OI",
+            "\uA74E": "OO",
+            "\u0222": "OU",
+            "\u24C5": "P",
+            "\uFF30": "P",
+            "\u1E54": "P",
+            "\u1E56": "P",
+            "\u01A4": "P",
+            "\u2C63": "P",
+            "\uA750": "P",
+            "\uA752": "P",
+            "\uA754": "P",
+            "\u24C6": "Q",
+            "\uFF31": "Q",
+            "\uA756": "Q",
+            "\uA758": "Q",
+            "\u024A": "Q",
+            "\u24C7": "R",
+            "\uFF32": "R",
+            "\u0154": "R",
+            "\u1E58": "R",
+            "\u0158": "R",
+            "\u0210": "R",
+            "\u0212": "R",
+            "\u1E5A": "R",
+            "\u1E5C": "R",
+            "\u0156": "R",
+            "\u1E5E": "R",
+            "\u024C": "R",
+            "\u2C64": "R",
+            "\uA75A": "R",
+            "\uA7A6": "R",
+            "\uA782": "R",
+            "\u24C8": "S",
+            "\uFF33": "S",
+            "\u1E9E": "S",
+            "\u015A": "S",
+            "\u1E64": "S",
+            "\u015C": "S",
+            "\u1E60": "S",
+            "\u0160": "S",
+            "\u1E66": "S",
+            "\u1E62": "S",
+            "\u1E68": "S",
+            "\u0218": "S",
+            "\u015E": "S",
+            "\u2C7E": "S",
+            "\uA7A8": "S",
+            "\uA784": "S",
+            "\u24C9": "T",
+            "\uFF34": "T",
+            "\u1E6A": "T",
+            "\u0164": "T",
+            "\u1E6C": "T",
+            "\u021A": "T",
+            "\u0162": "T",
+            "\u1E70": "T",
+            "\u1E6E": "T",
+            "\u0166": "T",
+            "\u01AC": "T",
+            "\u01AE": "T",
+            "\u023E": "T",
+            "\uA786": "T",
+            "\uA728": "TZ",
+            "\u24CA": "U",
+            "\uFF35": "U",
+            "\u00D9": "U",
+            "\u00DA": "U",
+            "\u00DB": "U",
+            "\u0168": "U",
+            "\u1E78": "U",
+            "\u016A": "U",
+            "\u1E7A": "U",
+            "\u016C": "U",
+            "\u00DC": "U",
+            "\u01DB": "U",
+            "\u01D7": "U",
+            "\u01D5": "U",
+            "\u01D9": "U",
+            "\u1EE6": "U",
+            "\u016E": "U",
+            "\u0170": "U",
+            "\u01D3": "U",
+            "\u0214": "U",
+            "\u0216": "U",
+            "\u01AF": "U",
+            "\u1EEA": "U",
+            "\u1EE8": "U",
+            "\u1EEE": "U",
+            "\u1EEC": "U",
+            "\u1EF0": "U",
+            "\u1EE4": "U",
+            "\u1E72": "U",
+            "\u0172": "U",
+            "\u1E76": "U",
+            "\u1E74": "U",
+            "\u0244": "U",
+            "\u24CB": "V",
+            "\uFF36": "V",
+            "\u1E7C": "V",
+            "\u1E7E": "V",
+            "\u01B2": "V",
+            "\uA75E": "V",
+            "\u0245": "V",
+            "\uA760": "VY",
+            "\u24CC": "W",
+            "\uFF37": "W",
+            "\u1E80": "W",
+            "\u1E82": "W",
+            "\u0174": "W",
+            "\u1E86": "W",
+            "\u1E84": "W",
+            "\u1E88": "W",
+            "\u2C72": "W",
+            "\u24CD": "X",
+            "\uFF38": "X",
+            "\u1E8A": "X",
+            "\u1E8C": "X",
+            "\u24CE": "Y",
+            "\uFF39": "Y",
+            "\u1EF2": "Y",
+            "\u00DD": "Y",
+            "\u0176": "Y",
+            "\u1EF8": "Y",
+            "\u0232": "Y",
+            "\u1E8E": "Y",
+            "\u0178": "Y",
+            "\u1EF6": "Y",
+            "\u1EF4": "Y",
+            "\u01B3": "Y",
+            "\u024E": "Y",
+            "\u1EFE": "Y",
+            "\u24CF": "Z",
+            "\uFF3A": "Z",
+            "\u0179": "Z",
+            "\u1E90": "Z",
+            "\u017B": "Z",
+            "\u017D": "Z",
+            "\u1E92": "Z",
+            "\u1E94": "Z",
+            "\u01B5": "Z",
+            "\u0224": "Z",
+            "\u2C7F": "Z",
+            "\u2C6B": "Z",
+            "\uA762": "Z",
+            "\u24D0": "a",
+            "\uFF41": "a",
+            "\u1E9A": "a",
+            "\u00E0": "a",
+            "\u00E1": "a",
+            "\u00E2": "a",
+            "\u1EA7": "a",
+            "\u1EA5": "a",
+            "\u1EAB": "a",
+            "\u1EA9": "a",
+            "\u00E3": "a",
+            "\u0101": "a",
+            "\u0103": "a",
+            "\u1EB1": "a",
+            "\u1EAF": "a",
+            "\u1EB5": "a",
+            "\u1EB3": "a",
+            "\u0227": "a",
+            "\u01E1": "a",
+            "\u00E4": "a",
+            "\u01DF": "a",
+            "\u1EA3": "a",
+            "\u00E5": "a",
+            "\u01FB": "a",
+            "\u01CE": "a",
+            "\u0201": "a",
+            "\u0203": "a",
+            "\u1EA1": "a",
+            "\u1EAD": "a",
+            "\u1EB7": "a",
+            "\u1E01": "a",
+            "\u0105": "a",
+            "\u2C65": "a",
+            "\u0250": "a",
+            "\uA733": "aa",
+            "\u00E6": "ae",
+            "\u01FD": "ae",
+            "\u01E3": "ae",
+            "\uA735": "ao",
+            "\uA737": "au",
+            "\uA739": "av",
+            "\uA73B": "av",
+            "\uA73D": "ay",
+            "\u24D1": "b",
+            "\uFF42": "b",
+            "\u1E03": "b",
+            "\u1E05": "b",
+            "\u1E07": "b",
+            "\u0180": "b",
+            "\u0183": "b",
+            "\u0253": "b",
+            "\u24D2": "c",
+            "\uFF43": "c",
+            "\u0107": "c",
+            "\u0109": "c",
+            "\u010B": "c",
+            "\u010D": "c",
+            "\u00E7": "c",
+            "\u1E09": "c",
+            "\u0188": "c",
+            "\u023C": "c",
+            "\uA73F": "c",
+            "\u2184": "c",
+            "\u24D3": "d",
+            "\uFF44": "d",
+            "\u1E0B": "d",
+            "\u010F": "d",
+            "\u1E0D": "d",
+            "\u1E11": "d",
+            "\u1E13": "d",
+            "\u1E0F": "d",
+            "\u0111": "d",
+            "\u018C": "d",
+            "\u0256": "d",
+            "\u0257": "d",
+            "\uA77A": "d",
+            "\u01F3": "dz",
+            "\u01C6": "dz",
+            "\u24D4": "e",
+            "\uFF45": "e",
+            "\u00E8": "e",
+            "\u00E9": "e",
+            "\u00EA": "e",
+            "\u1EC1": "e",
+            "\u1EBF": "e",
+            "\u1EC5": "e",
+            "\u1EC3": "e",
+            "\u1EBD": "e",
+            "\u0113": "e",
+            "\u1E15": "e",
+            "\u1E17": "e",
+            "\u0115": "e",
+            "\u0117": "e",
+            "\u00EB": "e",
+            "\u1EBB": "e",
+            "\u011B": "e",
+            "\u0205": "e",
+            "\u0207": "e",
+            "\u1EB9": "e",
+            "\u1EC7": "e",
+            "\u0229": "e",
+            "\u1E1D": "e",
+            "\u0119": "e",
+            "\u1E19": "e",
+            "\u1E1B": "e",
+            "\u0247": "e",
+            "\u025B": "e",
+            "\u01DD": "e",
+            "\u24D5": "f",
+            "\uFF46": "f",
+            "\u1E1F": "f",
+            "\u0192": "f",
+            "\uA77C": "f",
+            "\u24D6": "g",
+            "\uFF47": "g",
+            "\u01F5": "g",
+            "\u011D": "g",
+            "\u1E21": "g",
+            "\u011F": "g",
+            "\u0121": "g",
+            "\u01E7": "g",
+            "\u0123": "g",
+            "\u01E5": "g",
+            "\u0260": "g",
+            "\uA7A1": "g",
+            "\u1D79": "g",
+            "\uA77F": "g",
+            "\u24D7": "h",
+            "\uFF48": "h",
+            "\u0125": "h",
+            "\u1E23": "h",
+            "\u1E27": "h",
+            "\u021F": "h",
+            "\u1E25": "h",
+            "\u1E29": "h",
+            "\u1E2B": "h",
+            "\u1E96": "h",
+            "\u0127": "h",
+            "\u2C68": "h",
+            "\u2C76": "h",
+            "\u0265": "h",
+            "\u0195": "hv",
+            "\u24D8": "i",
+            "\uFF49": "i",
+            "\u00EC": "i",
+            "\u00ED": "i",
+            "\u00EE": "i",
+            "\u0129": "i",
+            "\u012B": "i",
+            "\u012D": "i",
+            "\u00EF": "i",
+            "\u1E2F": "i",
+            "\u1EC9": "i",
+            "\u01D0": "i",
+            "\u0209": "i",
+            "\u020B": "i",
+            "\u1ECB": "i",
+            "\u012F": "i",
+            "\u1E2D": "i",
+            "\u0268": "i",
+            "\u0131": "i",
+            "\u24D9": "j",
+            "\uFF4A": "j",
+            "\u0135": "j",
+            "\u01F0": "j",
+            "\u0249": "j",
+            "\u24DA": "k",
+            "\uFF4B": "k",
+            "\u1E31": "k",
+            "\u01E9": "k",
+            "\u1E33": "k",
+            "\u0137": "k",
+            "\u1E35": "k",
+            "\u0199": "k",
+            "\u2C6A": "k",
+            "\uA741": "k",
+            "\uA743": "k",
+            "\uA745": "k",
+            "\uA7A3": "k",
+            "\u24DB": "l",
+            "\uFF4C": "l",
+            "\u0140": "l",
+            "\u013A": "l",
+            "\u013E": "l",
+            "\u1E37": "l",
+            "\u1E39": "l",
+            "\u013C": "l",
+            "\u1E3D": "l",
+            "\u1E3B": "l",
+            "\u017F": "l",
+            "\u0142": "l",
+            "\u019A": "l",
+            "\u026B": "l",
+            "\u2C61": "l",
+            "\uA749": "l",
+            "\uA781": "l",
+            "\uA747": "l",
+            "\u01C9": "lj",
+            "\u24DC": "m",
+            "\uFF4D": "m",
+            "\u1E3F": "m",
+            "\u1E41": "m",
+            "\u1E43": "m",
+            "\u0271": "m",
+            "\u026F": "m",
+            "\u24DD": "n",
+            "\uFF4E": "n",
+            "\u01F9": "n",
+            "\u0144": "n",
+            "\u00F1": "n",
+            "\u1E45": "n",
+            "\u0148": "n",
+            "\u1E47": "n",
+            "\u0146": "n",
+            "\u1E4B": "n",
+            "\u1E49": "n",
+            "\u019E": "n",
+            "\u0272": "n",
+            "\u0149": "n",
+            "\uA791": "n",
+            "\uA7A5": "n",
+            "\u01CC": "nj",
+            "\u24DE": "o",
+            "\uFF4F": "o",
+            "\u00F2": "o",
+            "\u00F3": "o",
+            "\u00F4": "o",
+            "\u1ED3": "o",
+            "\u1ED1": "o",
+            "\u1ED7": "o",
+            "\u1ED5": "o",
+            "\u00F5": "o",
+            "\u1E4D": "o",
+            "\u022D": "o",
+            "\u1E4F": "o",
+            "\u014D": "o",
+            "\u1E51": "o",
+            "\u1E53": "o",
+            "\u014F": "o",
+            "\u022F": "o",
+            "\u0231": "o",
+            "\u00F6": "o",
+            "\u022B": "o",
+            "\u1ECF": "o",
+            "\u0151": "o",
+            "\u01D2": "o",
+            "\u020D": "o",
+            "\u020F": "o",
+            "\u01A1": "o",
+            "\u1EDD": "o",
+            "\u1EDB": "o",
+            "\u1EE1": "o",
+            "\u1EDF": "o",
+            "\u1EE3": "o",
+            "\u1ECD": "o",
+            "\u1ED9": "o",
+            "\u01EB": "o",
+            "\u01ED": "o",
+            "\u00F8": "o",
+            "\u01FF": "o",
+            "\u0254": "o",
+            "\uA74B": "o",
+            "\uA74D": "o",
+            "\u0275": "o",
+            "\u01A3": "oi",
+            "\u0223": "ou",
+            "\uA74F": "oo",
+            "\u24DF": "p",
+            "\uFF50": "p",
+            "\u1E55": "p",
+            "\u1E57": "p",
+            "\u01A5": "p",
+            "\u1D7D": "p",
+            "\uA751": "p",
+            "\uA753": "p",
+            "\uA755": "p",
+            "\u24E0": "q",
+            "\uFF51": "q",
+            "\u024B": "q",
+            "\uA757": "q",
+            "\uA759": "q",
+            "\u24E1": "r",
+            "\uFF52": "r",
+            "\u0155": "r",
+            "\u1E59": "r",
+            "\u0159": "r",
+            "\u0211": "r",
+            "\u0213": "r",
+            "\u1E5B": "r",
+            "\u1E5D": "r",
+            "\u0157": "r",
+            "\u1E5F": "r",
+            "\u024D": "r",
+            "\u027D": "r",
+            "\uA75B": "r",
+            "\uA7A7": "r",
+            "\uA783": "r",
+            "\u24E2": "s",
+            "\uFF53": "s",
+            "\u00DF": "s",
+            "\u015B": "s",
+            "\u1E65": "s",
+            "\u015D": "s",
+            "\u1E61": "s",
+            "\u0161": "s",
+            "\u1E67": "s",
+            "\u1E63": "s",
+            "\u1E69": "s",
+            "\u0219": "s",
+            "\u015F": "s",
+            "\u023F": "s",
+            "\uA7A9": "s",
+            "\uA785": "s",
+            "\u1E9B": "s",
+            "\u24E3": "t",
+            "\uFF54": "t",
+            "\u1E6B": "t",
+            "\u1E97": "t",
+            "\u0165": "t",
+            "\u1E6D": "t",
+            "\u021B": "t",
+            "\u0163": "t",
+            "\u1E71": "t",
+            "\u1E6F": "t",
+            "\u0167": "t",
+            "\u01AD": "t",
+            "\u0288": "t",
+            "\u2C66": "t",
+            "\uA787": "t",
+            "\uA729": "tz",
+            "\u24E4": "u",
+            "\uFF55": "u",
+            "\u00F9": "u",
+            "\u00FA": "u",
+            "\u00FB": "u",
+            "\u0169": "u",
+            "\u1E79": "u",
+            "\u016B": "u",
+            "\u1E7B": "u",
+            "\u016D": "u",
+            "\u00FC": "u",
+            "\u01DC": "u",
+            "\u01D8": "u",
+            "\u01D6": "u",
+            "\u01DA": "u",
+            "\u1EE7": "u",
+            "\u016F": "u",
+            "\u0171": "u",
+            "\u01D4": "u",
+            "\u0215": "u",
+            "\u0217": "u",
+            "\u01B0": "u",
+            "\u1EEB": "u",
+            "\u1EE9": "u",
+            "\u1EEF": "u",
+            "\u1EED": "u",
+            "\u1EF1": "u",
+            "\u1EE5": "u",
+            "\u1E73": "u",
+            "\u0173": "u",
+            "\u1E77": "u",
+            "\u1E75": "u",
+            "\u0289": "u",
+            "\u24E5": "v",
+            "\uFF56": "v",
+            "\u1E7D": "v",
+            "\u1E7F": "v",
+            "\u028B": "v",
+            "\uA75F": "v",
+            "\u028C": "v",
+            "\uA761": "vy",
+            "\u24E6": "w",
+            "\uFF57": "w",
+            "\u1E81": "w",
+            "\u1E83": "w",
+            "\u0175": "w",
+            "\u1E87": "w",
+            "\u1E85": "w",
+            "\u1E98": "w",
+            "\u1E89": "w",
+            "\u2C73": "w",
+            "\u24E7": "x",
+            "\uFF58": "x",
+            "\u1E8B": "x",
+            "\u1E8D": "x",
+            "\u24E8": "y",
+            "\uFF59": "y",
+            "\u1EF3": "y",
+            "\u00FD": "y",
+            "\u0177": "y",
+            "\u1EF9": "y",
+            "\u0233": "y",
+            "\u1E8F": "y",
+            "\u00FF": "y",
+            "\u1EF7": "y",
+            "\u1E99": "y",
+            "\u1EF5": "y",
+            "\u01B4": "y",
+            "\u024F": "y",
+            "\u1EFF": "y",
+            "\u24E9": "z",
+            "\uFF5A": "z",
+            "\u017A": "z",
+            "\u1E91": "z",
+            "\u017C": "z",
+            "\u017E": "z",
+            "\u1E93": "z",
+            "\u1E95": "z",
+            "\u01B6": "z",
+            "\u0225": "z",
+            "\u0240": "z",
+            "\u2C6C": "z",
+            "\uA763": "z",
+            "\u0386": "\u0391",
+            "\u0388": "\u0395",
+            "\u0389": "\u0397",
+            "\u038A": "\u0399",
+            "\u03AA": "\u0399",
+            "\u038C": "\u039F",
+            "\u038E": "\u03A5",
+            "\u03AB": "\u03A5",
+            "\u038F": "\u03A9",
+            "\u03AC": "\u03B1",
+            "\u03AD": "\u03B5",
+            "\u03AE": "\u03B7",
+            "\u03AF": "\u03B9",
+            "\u03CA": "\u03B9",
+            "\u0390": "\u03B9",
+            "\u03CC": "\u03BF",
+            "\u03CD": "\u03C5",
+            "\u03CB": "\u03C5",
+            "\u03B0": "\u03C5",
+            "\u03C9": "\u03C9",
+            "\u03C2": "\u03C3"
+        };
 
     $document = $(document);
 
-    nextUid=(function() { var counter=1; return function() { return counter++; }; }());
+    nextUid = (function () {
+        var counter = 1;
+        return function () {
+            return counter++;
+        };
+    }());
 
 
     function reinsertElement(element) {
@@ -4030,8 +4879,8 @@ the specific language governing permissions and limitations under the Apache Lic
         return -1;
     }
 
-    function measureScrollbar () {
-        var $template = $( MEASURE_SCROLLBAR_TEMPLATE );
+    function measureScrollbar() {
+        var $template = $(MEASURE_SCROLLBAR_TEMPLATE);
         $template.appendTo(document.body);
 
         var dim = {
@@ -4054,8 +4903,8 @@ the specific language governing permissions and limitations under the Apache Lic
         if (a === null || b === null) return false;
         // Check whether 'a' or 'b' is a string (primitive or object).
         // The concatenation of an empty string (+'') converts its argument to a string's primitive.
-        if (a.constructor === String) return a+'' === b+''; // a+'' - in case 'a' is a String object
-        if (b.constructor === String) return b+'' === a+''; // b+'' - in case 'b' is a String object
+        if (a.constructor === String) return a + '' === b + ''; // a+'' - in case 'a' is a String object
+        if (b.constructor === String) return b + '' === a + ''; // b+'' - in case 'b' is a String object
         return false;
     }
 
@@ -4078,14 +4927,14 @@ the specific language governing permissions and limitations under the Apache Lic
     }
 
     function installKeyUpChangeEvent(element) {
-        var key="keyup-change-value";
+        var key = "keyup-change-value";
         element.on("keydown", function () {
             if ($.data(element, key) === undefined) {
                 $.data(element, key, element.val());
             }
         });
         element.on("keyup", function () {
-            var val= $.data(element, key);
+            var val = $.data(element, key);
             if (val !== undefined && element.val() !== val) {
                 $.removeData(element, key);
                 element.trigger("keyup-change");
@@ -4124,14 +4973,16 @@ the specific language governing permissions and limitations under the Apache Lic
         return function () {
             var args = arguments;
             window.clearTimeout(timeout);
-            timeout = window.setTimeout(function() {
+            timeout = window.setTimeout(function () {
                 fn.apply(ctx, args);
             }, quietMillis);
         };
     }
 
     function installDebouncedScroll(threshold, element) {
-        var notify = debounce(threshold, function (e) { element.trigger("scroll-debounced", e);});
+        var notify = debounce(threshold, function (e) {
+            element.trigger("scroll-debounced", e);
+        });
         element.on("scroll", function (e) {
             if (indexOf(e.target, element.get()) >= 0) notify(e);
         });
@@ -4141,22 +4992,21 @@ the specific language governing permissions and limitations under the Apache Lic
         if ($el[0] === document.activeElement) return;
 
         /* set the focus in a 0 timeout - that way the focus is set after the processing
-            of the current event has finished - which seems like the only reliable way
-            to set focus */
-        window.setTimeout(function() {
-            var el=$el[0], pos=$el.val().length, range;
+         of the current event has finished - which seems like the only reliable way
+         to set focus */
+        window.setTimeout(function () {
+            var el = $el[0], pos = $el.val().length, range;
 
             $el.focus();
 
             /* make sure el received focus so we do not error out when trying to manipulate the caret.
-                sometimes modals or others listeners may steal it after its set */
+             sometimes modals or others listeners may steal it after its set */
             var isVisible = (el.offsetWidth > 0 || el.offsetHeight > 0);
             if (isVisible && el === document.activeElement) {
 
                 /* after the focus is set move the caret to the end, necessary when we val()
-                    just before setting focus */
-                if(el.setSelectionRange)
-                {
+                 just before setting focus */
+                if (el.setSelectionRange) {
                     el.setSelectionRange(pos, pos);
                 }
                 else if (el.createTextRange) {
@@ -4182,20 +5032,21 @@ the specific language governing permissions and limitations under the Apache Lic
             sel.moveStart('character', -el.value.length);
             offset = sel.text.length - length;
         }
-        return { offset: offset, length: length };
+        return {offset: offset, length: length};
     }
 
     function killEvent(event) {
         event.preventDefault();
         event.stopPropagation();
     }
+
     function killEventImmediately(event) {
         event.preventDefault();
         event.stopImmediatePropagation();
     }
 
     function measureTextWidth(e) {
-        if (!sizer){
+        if (!sizer) {
             var style = e[0].currentStyle || window.getComputedStyle(e[0], null);
             sizer = $(document.createElement("div")).css({
                 position: "absolute",
@@ -4210,7 +5061,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 textTransform: style.textTransform,
                 whiteSpace: "nowrap"
             });
-            sizer.attr("class","select2-sizer");
+            sizer.attr("class", "select2-sizer");
             $(document.body).append(sizer);
         }
         sizer.text(e.val());
@@ -4225,7 +5076,7 @@ the specific language governing permissions and limitations under the Apache Lic
         if (classes) {
             classes = '' + classes; // for IE which returns object
 
-            $(classes.split(/\s+/)).each2(function() {
+            $(classes.split(/\s+/)).each2(function () {
                 if (this.indexOf("select2-") === 0) {
                     replacements.push(this);
                 }
@@ -4237,7 +5088,7 @@ the specific language governing permissions and limitations under the Apache Lic
         if (classes) {
             classes = '' + classes; // for IE which returns object
 
-            $(classes.split(/\s+/)).each2(function() {
+            $(classes.split(/\s+/)).each2(function () {
                 if (this.indexOf("select2-") !== 0) {
                     adapted = adapter(this);
 
@@ -4253,10 +5104,10 @@ the specific language governing permissions and limitations under the Apache Lic
 
 
     function markMatch(text, term, markup, escapeMarkup) {
-        var match=stripDiacritics(text.toUpperCase()).indexOf(stripDiacritics(term.toUpperCase())),
-            tl=term.length;
+        var match = stripDiacritics(text.toUpperCase()).indexOf(stripDiacritics(term.toUpperCase())),
+            tl = term.length;
 
-        if (match<0) {
+        if (match < 0) {
             markup.push(escapeMarkup(text));
             return;
         }
@@ -4313,19 +5164,21 @@ the specific language governing permissions and limitations under the Apache Lic
                 var data = options.data, // ajax data function
                     url = ajaxUrl, // ajax url string or function
                     transport = options.transport || $.fn.select2.ajaxDefaults.transport,
-                    // deprecated - to be removed in 4.0  - use params instead
+                // deprecated - to be removed in 4.0  - use params instead
                     deprecated = {
                         type: options.type || 'GET', // set type of request (GET or POST)
                         cache: options.cache || false,
-                        jsonpCallback: options.jsonpCallback||undefined,
-                        dataType: options.dataType||"json"
+                        jsonpCallback: options.jsonpCallback || undefined,
+                        dataType: options.dataType || "json"
                     },
                     params = $.extend({}, $.fn.select2.ajaxDefaults.params, deprecated);
 
                 data = data ? data.call(self, query.term, query.page, query.context) : null;
                 url = (typeof url === 'function') ? url.call(self, query.term, query.page, query.context) : url;
 
-                if (handler && typeof handler.abort === "function") { handler.abort(); }
+                if (handler && typeof handler.abort === "function") {
+                    handler.abort();
+                }
 
                 if (options.params) {
                     if ($.isFunction(options.params)) {
@@ -4345,7 +5198,7 @@ the specific language governing permissions and limitations under the Apache Lic
                         var results = options.results(data, query.page, query);
                         query.callback(results);
                     },
-                    error: function(jqXHR, textStatus, errorThrown){
+                    error: function (jqXHR, textStatus, errorThrown) {
                         var results = {
                             hasError: true,
                             jqXHR: jqXHR,
@@ -4379,16 +5232,20 @@ the specific language governing permissions and limitations under the Apache Lic
         var data = options, // data elements
             dataText,
             tmp,
-            text = function (item) { return ""+item.text; }; // function used to retrieve the text portion of a data item that is matched against the search
+            text = function (item) {
+                return "" + item.text;
+            }; // function used to retrieve the text portion of a data item that is matched against the search
 
-         if ($.isArray(data)) {
+        if ($.isArray(data)) {
             tmp = data;
-            data = { results: tmp };
+            data = {results: tmp};
         }
 
-         if ($.isFunction(data) === false) {
+        if ($.isFunction(data) === false) {
             tmp = data;
-            data = function() { return tmp; };
+            data = function () {
+                return tmp;
+            };
         }
 
         var dataItem = data();
@@ -4397,27 +5254,31 @@ the specific language governing permissions and limitations under the Apache Lic
             // if text is not a function we assume it to be a key name
             if (!$.isFunction(text)) {
                 dataText = dataItem.text; // we need to store this in a separate variable because in the next step data gets reset and data.text is no longer available
-                text = function (item) { return item[dataText]; };
+                text = function (item) {
+                    return item[dataText];
+                };
             }
         }
 
         return function (query) {
-            var t = query.term, filtered = { results: [] }, process;
+            var t = query.term, filtered = {results: []}, process;
             if (t === "") {
                 query.callback(data());
                 return;
             }
 
-            process = function(datum, collection) {
+            process = function (datum, collection) {
                 var group, attr;
                 datum = datum[0];
                 if (datum.children) {
                     group = {};
                     for (attr in datum) {
-                        if (datum.hasOwnProperty(attr)) group[attr]=datum[attr];
+                        if (datum.hasOwnProperty(attr)) group[attr] = datum[attr];
                     }
-                    group.children=[];
-                    $(datum.children).each2(function(i, childDatum) { process(childDatum, group.children); });
+                    group.children = [];
+                    $(datum.children).each2(function (i, childDatum) {
+                        process(childDatum, group.children);
+                    });
                     if (group.children.length || query.matcher(t, text(group), datum)) {
                         collection.push(group);
                     }
@@ -4428,7 +5289,9 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             };
 
-            $(data().results).each2(function(i, datum) { process(datum, filtered.results); });
+            $(data().results).each2(function (i, datum) {
+                process(datum, filtered.results);
+            });
             query.callback(filtered);
         };
     }
@@ -4464,17 +5327,17 @@ the specific language governing permissions and limitations under the Apache Lic
         if ($.isFunction(formatter)) return true;
         if (!formatter) return false;
         if (typeof(formatter) === 'string') return true;
-        throw new Error(formatterName +" must be a string, function, or falsy value");
+        throw new Error(formatterName + " must be a string, function, or falsy value");
     }
 
-  /**
-   * Returns a given value
-   * If given a function, returns its output
-   *
-   * @param val string|function
-   * @param context value of "this" to be passed to function
-   * @returns {*}
-   */
+    /**
+     * Returns a given value
+     * If given a function, returns its output
+     *
+     * @param val string|function
+     * @param context value of "this" to be passed to function
+     * @returns {*}
+     */
     function evaluate(val, context) {
         if ($.isFunction(val)) {
             var args = Array.prototype.slice.call(arguments, 2);
@@ -4485,7 +5348,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
     function countResults(results) {
         var count = 0;
-        $.each(results, function(i, item) {
+        $.each(results, function (i, item) {
             if (item.children) {
                 count += countResults(item.children);
             } else {
@@ -4536,7 +5399,8 @@ the specific language governing permissions and limitations under the Apache Lic
                     dupe = false;
                     for (i = 0, l = selection.length; i < l; i++) {
                         if (equal(opts.id(token), opts.id(selection[i]))) {
-                            dupe = true; break;
+                            dupe = true;
+                            break;
                         }
                     }
 
@@ -4545,7 +5409,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         }
 
-        if (original!==input) return input;
+        if (original !== input) return input;
     }
 
     function cleanupJQueryElements() {
@@ -4564,7 +5428,8 @@ the specific language governing permissions and limitations under the Apache Lic
      * @param methods
      */
     function clazz(SuperClass, methods) {
-        var constructor = function () {};
+        var constructor = function () {
+        };
         constructor.prototype = new SuperClass;
         constructor.prototype.constructor = constructor;
         constructor.prototype.parent = SuperClass.prototype;
@@ -4589,7 +5454,7 @@ the specific language governing permissions and limitations under the Apache Lic
             // prepare options
             this.opts = opts = this.prepareOpts(opts);
 
-            this.id=opts.id;
+            this.id = opts.id;
 
             // destroy if called on an existing component
             if (opts.element.data("select2") !== undefined &&
@@ -4602,15 +5467,15 @@ the specific language governing permissions and limitations under the Apache Lic
             this.liveRegion = $('.select2-hidden-accessible');
             if (this.liveRegion.length == 0) {
                 this.liveRegion = $("<span>", {
-                        role: "status",
-                        "aria-live": "polite"
-                    })
+                    role: "status",
+                    "aria-live": "polite"
+                })
                     .addClass("select2-hidden-accessible")
                     .appendTo(document.body);
             }
 
-            this.containerId="s2id_"+(opts.element.attr("id") || "autogen"+nextUid());
-            this.containerEventName= this.containerId
+            this.containerId = "s2id_" + (opts.element.attr("id") || "autogen" + nextUid());
+            this.containerEventName = this.containerId
                 .replace(/([.])/g, '_')
                 .replace(/([;&,\-\.\+\*\~':"\!\^#$%@\[\]\(\)=>\|])/g, '\\$1');
             this.container.attr("id", this.containerId);
@@ -4679,8 +5544,12 @@ the specific language governing permissions and limitations under the Apache Lic
             this.dropdown.on("scroll-debounced", resultsSelector, this.bind(this.loadMoreIfNeeded));
 
             // do not propagate change event from the search field out of the component
-            $(this.container).on("change", ".select2-input", function(e) {e.stopPropagation();});
-            $(this.dropdown).on("change", ".select2-input", function(e) {e.stopPropagation();});
+            $(this.container).on("change", ".select2-input", function (e) {
+                e.stopPropagation();
+            });
+            $(this.dropdown).on("change", ".select2-input", function (e) {
+                e.stopPropagation();
+            });
 
             // if jquery.mousewheel plugin is installed we can prevent out-of-bounds scrolling of results via mousewheel
             if ($.fn.mousewheel) {
@@ -4698,8 +5567,12 @@ the specific language governing permissions and limitations under the Apache Lic
 
             installKeyUpChangeEvent(search);
             search.on("keyup-change input paste", this.bind(this.updateResults));
-            search.on("focus", function () { search.addClass("select2-focused"); });
-            search.on("blur", function () { search.removeClass("select2-focused");});
+            search.on("focus", function () {
+                search.addClass("select2-focused");
+            });
+            search.on("blur", function () {
+                search.removeClass("select2-focused");
+            });
 
             this.dropdown.on("mouseup", resultsSelector, this.bind(function (e) {
                 if ($(e.target).closest(".select2-result-selectable").length > 0) {
@@ -4712,7 +5585,9 @@ the specific language governing permissions and limitations under the Apache Lic
             // for mouse events outside of itself so it can close itself. since the dropdown is now outside the select2's
             // dom it will trigger the popup close, which is not what we want
             // focusin can cause focus wars between modals and select2 since the dropdown is outside the modal.
-            this.dropdown.on("click mouseup mousedown touchstart touchend focusin", function (e) { e.stopPropagation(); });
+            this.dropdown.on("click mouseup mousedown touchstart touchend focusin", function (e) {
+                e.stopPropagation();
+            });
 
             this.lastSearchTerm = undefined;
 
@@ -4749,7 +5624,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
         // abstract
         destroy: function () {
-            var element=this.opts.element, select2 = element.data("select2"), self = this;
+            var element = this.opts.element, select2 = element.data("select2"), self = this;
 
             this.close();
 
@@ -4797,11 +5672,11 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // abstract
-        optionToData: function(element) {
+        optionToData: function (element) {
             if (element.is("option")) {
                 return {
-                    id:element.prop("value"),
-                    text:element.text(),
+                    id: element.prop("value"),
+                    text: element.text(),
                     element: element.get(),
                     css: element.attr("class"),
                     disabled: element.prop("disabled"),
@@ -4809,8 +5684,8 @@ the specific language governing permissions and limitations under the Apache Lic
                 };
             } else if (element.is("optgroup")) {
                 return {
-                    text:element.attr("label"),
-                    children:[],
+                    text: element.attr("label"),
+                    children: [],
                     element: element.get(),
                     css: element.attr("class")
                 };
@@ -4986,10 +5861,10 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             opts = $.extend({}, {
-                populateResults: function(container, results, query) {
-                    var populate, id=this.opts.id, liveRegion=this.liveRegion;
+                populateResults: function (container, results, query) {
+                    var populate, id = this.opts.id, liveRegion = this.liveRegion;
 
-                    populate=function(results, container, depth) {
+                    populate = function (results, container, depth) {
 
                         var i, l, result, selectable, disabled, compound, node, label, innerContainer, formatted;
 
@@ -4999,38 +5874,42 @@ the specific language governing permissions and limitations under the Apache Lic
                         var nodes = [];
                         for (i = 0, l = results.length; i < l; i = i + 1) {
 
-                            result=results[i];
+                            result = results[i];
 
                             disabled = (result.disabled === true);
                             selectable = (!disabled) && (id(result) !== undefined);
 
-                            compound=result.children && result.children.length > 0;
+                            compound = result.children && result.children.length > 0;
 
-                            node=$("<li></li>");
-                            node.addClass("select2-results-dept-"+depth);
+                            node = $("<li></li>");
+                            node.addClass("select2-results-dept-" + depth);
                             node.addClass("select2-result");
                             node.addClass(selectable ? "select2-result-selectable" : "select2-result-unselectable");
-                            if (disabled) { node.addClass("select2-disabled"); }
-                            if (compound) { node.addClass("select2-result-with-children"); }
+                            if (disabled) {
+                                node.addClass("select2-disabled");
+                            }
+                            if (compound) {
+                                node.addClass("select2-result-with-children");
+                            }
                             node.addClass(self.opts.formatResultCssClass(result));
                             node.attr("role", "presentation");
 
-                            label=$(document.createElement("div"));
+                            label = $(document.createElement("div"));
                             label.addClass("select2-result-label");
                             label.attr("id", "select2-result-label-" + nextUid());
                             label.attr("role", "option");
 
-                            formatted=opts.formatResult(result, label, query, self.opts.escapeMarkup);
-                            if (formatted!==undefined) {
+                            formatted = opts.formatResult(result, label, query, self.opts.escapeMarkup);
+                            if (formatted !== undefined) {
                                 label.html(formatted);
                                 node.append(label);
                             }
 
 
                             if (compound) {
-                                innerContainer=$("<ul></ul>");
+                                innerContainer = $("<ul></ul>");
                                 innerContainer.addClass("select2-result-sub");
-                                populate(result.children, innerContainer, depth+1);
+                                populate(result.children, innerContainer, depth + 1);
                                 node.append(innerContainer);
                             }
 
@@ -5049,53 +5928,61 @@ the specific language governing permissions and limitations under the Apache Lic
 
             if (typeof(opts.id) !== "function") {
                 idKey = opts.id;
-                opts.id = function (e) { return e[idKey]; };
+                opts.id = function (e) {
+                    return e[idKey];
+                };
             }
 
             if ($.isArray(opts.element.data("select2Tags"))) {
                 if ("tags" in opts) {
                     throw "tags specified as both an attribute 'data-select2-tags' and in options of Select2 " + opts.element.attr("id");
                 }
-                opts.tags=opts.element.data("select2Tags");
+                opts.tags = opts.element.data("select2Tags");
             }
 
             if (select) {
                 opts.query = this.bind(function (query) {
-                    var data = { results: [], more: false },
+                    var data = {results: [], more: false},
                         term = query.term,
                         children, placeholderOption, process;
 
-                    process=function(element, collection) {
+                    process = function (element, collection) {
                         var group;
                         if (element.is("option")) {
                             if (query.matcher(term, element.text(), element)) {
                                 collection.push(self.optionToData(element));
                             }
                         } else if (element.is("optgroup")) {
-                            group=self.optionToData(element);
-                            element.children().each2(function(i, elm) { process(elm, group.children); });
-                            if (group.children.length>0) {
+                            group = self.optionToData(element);
+                            element.children().each2(function (i, elm) {
+                                process(elm, group.children);
+                            });
+                            if (group.children.length > 0) {
                                 collection.push(group);
                             }
                         }
                     };
 
-                    children=element.children();
+                    children = element.children();
 
                     // ignore the placeholder option if there is one
                     if (this.getPlaceholder() !== undefined && children.length > 0) {
                         placeholderOption = this.getPlaceholderOption();
                         if (placeholderOption) {
-                            children=children.not(placeholderOption);
+                            children = children.not(placeholderOption);
                         }
                     }
 
-                    children.each2(function(i, elm) { process(elm, data.results); });
+                    children.each2(function (i, elm) {
+                        process(elm, data.results);
+                    });
 
                     query.callback(data);
                 });
                 // this is needed because inside val() we construct choices from options and their id is hardcoded
-                opts.id=function(e) { return e.id; };
+                opts.id = function (e) {
+                    return e.id;
+                };
             } else {
                 if (!("query" in opts)) {
                     if ("ajax" in opts) {
@@ -5109,16 +5996,23 @@ the specific language governing permissions and limitations under the Apache Lic
                     } else if ("tags" in opts) {
                         opts.query = tags(opts.tags);
                         if (opts.createSearchChoice === undefined) {
-                            opts.createSearchChoice = function (term) { return {id: $.trim(term), text: $.trim(term)}; };
+                            opts.createSearchChoice = function (term) {
+                                return {id: $.trim(term), text: $.trim(term)};
+                            };
                         }
                         if (opts.initSelection === undefined) {
                             opts.initSelection = function (element, callback) {
                                 var data = [];
                                 $(splitVal(element.val(), opts.separator, opts.transformVal)).each(function () {
-                                    var obj = { id: this, text: this },
+                                    var obj = {id: this, text: this},
                                         tags = opts.tags;
-                                    if ($.isFunction(tags)) tags=tags();
-                                    $(tags).each(function() { if (equal(this.id, obj.id)) { obj = this; return false; } });
+                                    if ($.isFunction(tags)) tags = tags();
+                                    $(tags).each(function () {
+                                        if (equal(this.id, obj.id)) {
+                                            obj = this;
+                                            return false;
+                                        }
+                                    });
                                     data.push(obj);
                                 });
 
@@ -5133,12 +6027,16 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             if (opts.createSearchChoicePosition === 'top') {
-                opts.createSearchChoicePosition = function(list, item) { list.unshift(item); };
+                opts.createSearchChoicePosition = function (list, item) {
+                    list.unshift(item);
+                };
             }
             else if (opts.createSearchChoicePosition === 'bottom') {
-                opts.createSearchChoicePosition = function(list, item) { list.push(item); };
+                opts.createSearchChoicePosition = function (list, item) {
+                    list.push(item);
+                };
             }
-            else if (typeof(opts.createSearchChoicePosition) !== "function")  {
+            else if (typeof(opts.createSearchChoicePosition) !== "function") {
                 throw "invalid createSearchChoicePosition option must be 'top', 'bottom' or a custom function";
             }
 
@@ -5183,25 +6081,28 @@ the specific language governing permissions and limitations under the Apache Lic
 
             // IE8-10 (IE9/10 won't fire propertyChange via attachEventListener)
             if (el.length && el[0].attachEvent) {
-                el.each(function() {
+                el.each(function () {
                     this.attachEvent("onpropertychange", self._sync);
                 });
             }
 
             // safari, chrome, firefox, IE11
-            observer = window.MutationObserver || window.WebKitMutationObserver|| window.MozMutationObserver;
+            observer = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
             if (observer !== undefined) {
-                if (this.propertyObserver) { delete this.propertyObserver; this.propertyObserver = null; }
+                if (this.propertyObserver) {
+                    delete this.propertyObserver;
+                    this.propertyObserver = null;
+                }
                 this.propertyObserver = new observer(function (mutations) {
                     $.each(mutations, self._sync);
                 });
-                this.propertyObserver.observe(el.get(0), { attributes:true, subtree:false });
+                this.propertyObserver.observe(el.get(0), {attributes: true, subtree: false});
             }
         },
 
         // abstract
-        triggerSelect: function(data) {
-            var evt = $.Event("select2-selecting", { val: this.id(data), object: data, choice: data });
+        triggerSelect: function (data) {
+            var evt = $.Event("select2-selecting", {val: this.id(data), object: data, choice: data});
             this.opts.element.trigger(evt);
             return !evt.isDefaultPrevented();
         },
@@ -5213,7 +6114,7 @@ the specific language governing permissions and limitations under the Apache Lic
         triggerChange: function (details) {
 
             details = details || {};
-            details= $.extend({}, details, { type: "change", val: this.val() });
+            details = $.extend({}, details, {type: "change", val: this.val()});
             // prevents recursive triggering
             this.opts.element.data("select2-change-triggered", true);
             this.opts.element.trigger(details);
@@ -5230,13 +6131,12 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         //abstract
-        isInterfaceEnabled: function()
-        {
+        isInterfaceEnabled: function () {
             return this.enabledInterface === true;
         },
 
         // abstract
-        enableInterface: function() {
+        enableInterface: function () {
             var enabled = this._enabled && !this._readonly,
                 disabled = !enabled;
 
@@ -5250,7 +6150,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // abstract
-        enable: function(enabled) {
+        enable: function (enabled) {
             if (enabled === undefined) enabled = true;
             if (this._enabled === enabled) return;
             this._enabled = enabled;
@@ -5260,12 +6160,12 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // abstract
-        disable: function() {
+        disable: function () {
             this.enable(false);
         },
 
         // abstract
-        readonly: function(enabled) {
+        readonly: function (enabled) {
             if (enabled === undefined) enabled = false;
             if (this._readonly === enabled) return;
             this._readonly = enabled;
@@ -5280,7 +6180,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // abstract
-        positionDropdown: function() {
+        positionDropdown: function () {
             var $dropdown = this.dropdown,
                 container = this.container,
                 offset = container.offset(),
@@ -5297,11 +6197,11 @@ the specific language governing permissions and limitations under the Apache Lic
                 enoughRoomBelow = dropTop + dropHeight <= viewportBottom,
                 enoughRoomAbove = (offset.top - dropHeight) >= $window.scrollTop(),
                 dropWidth = $dropdown.outerWidth(false),
-                enoughRoomOnRight = function() {
+                enoughRoomOnRight = function () {
                     return dropLeft + dropWidth <= viewPortRight;
                 },
-                enoughRoomOnLeft = function() {
-                    return offset.left + viewPortRight + container.outerWidth(false)  > dropWidth;
+                enoughRoomOnLeft = function () {
+                    return offset.left + viewPortRight + container.outerWidth(false) > dropWidth;
                 },
                 aboveNow = $dropdown.hasClass("select2-drop-above"),
                 bodyOffset,
@@ -5370,7 +6270,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 dropLeft = offset.left + this.container.outerWidth(false) - dropWidth;
             }
 
-            css =  {
+            css = {
                 left: dropLeft,
                 width: width
             };
@@ -5394,7 +6294,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // abstract
-        shouldOpen: function() {
+        shouldOpen: function () {
             var event;
 
             if (this.opened()) return false;
@@ -5407,7 +6307,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // abstract
-        clearDropdownAlignmentPreference: function() {
+        clearDropdownAlignmentPreference: function () {
             // clear the classes used to figure out the preference of where the dropdown should be opened
             this.container.removeClass("select2-drop-above");
             this.dropdown.removeClass("select2-drop-above");
@@ -5439,18 +6339,18 @@ the specific language governing permissions and limitations under the Apache Lic
          * Performs the opening of the dropdown
          */
         // abstract
-        opening: function() {
+        opening: function () {
             var cid = this.containerEventName,
                 scroll = "scroll." + cid,
-                resize = "resize."+cid,
-                orient = "orientationchange."+cid,
+                resize = "resize." + cid,
+                orient = "orientationchange." + cid,
                 mask;
 
             this.container.addClass("select2-dropdown-open").addClass("select2-container-active");
 
             this.clearDropdownAlignmentPreference();
 
-            if(this.dropdown[0] !== this.body.children().last()[0]) {
+            if (this.dropdown[0] !== this.body.children().last()[0]) {
                 this.dropdown.detach().appendTo(this.body);
             }
 
@@ -5458,7 +6358,7 @@ the specific language governing permissions and limitations under the Apache Lic
             mask = $("#select2-drop-mask");
             if (mask.length === 0) {
                 mask = $(document.createElement("div"));
-                mask.attr("id","select2-drop-mask").attr("class","select2-drop-mask");
+                mask.attr("id", "select2-drop-mask").attr("class", "select2-drop-mask");
                 mask.hide();
                 mask.appendTo(this.body);
                 mask.on("mousedown touchstart click", function (e) {
@@ -5467,7 +6367,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
                     var dropdown = $("#select2-drop"), self;
                     if (dropdown.length > 0) {
-                        self=dropdown.data("select2");
+                        self = dropdown.data("select2");
                         if (self.opts.selectOnBlur) {
                             self.selectHighlighted({noFocus: true});
                         }
@@ -5500,7 +6400,7 @@ the specific language governing permissions and limitations under the Apache Lic
             // the position of the dropdown to be updated as well so it does not come unglued from the container
             var that = this;
             this.container.parents().add(window).each(function () {
-                $(this).on(resize+" "+scroll+" "+orient, function (e) {
+                $(this).on(resize + " " + scroll + " " + orient, function (e) {
                     if (that.opened()) that.positionDropdown();
                 });
             });
@@ -5514,11 +6414,13 @@ the specific language governing permissions and limitations under the Apache Lic
 
             var cid = this.containerEventName,
                 scroll = "scroll." + cid,
-                resize = "resize."+cid,
-                orient = "orientationchange."+cid;
+                resize = "resize." + cid,
+                orient = "orientationchange." + cid;
 
             // unbind event listeners
-            this.container.parents().add(window).each(function () { $(this).off(scroll).off(resize).off(orient); });
+            this.container.parents().add(window).each(function () {
+                $(this).off(scroll).off(resize).off(orient);
+            });
 
             this.clearDropdownAlignmentPreference();
 
@@ -5561,12 +6463,12 @@ the specific language governing permissions and limitations under the Apache Lic
         prefillNextSearchTerm: function () {
             // initializes search's value with nextSearchTerm (if defined by user)
             // ignore nextSearchTerm if the dropdown is opened by the user pressing a letter
-            if(this.search.val() !== "") {
+            if (this.search.val() !== "") {
                 return false;
             }
 
             var nextSearchTerm = this.opts.nextSearchTerm(this.data(), this.lastSearchTerm);
-            if(nextSearchTerm !== undefined){
+            if (nextSearchTerm !== undefined) {
                 this.search.val(nextSearchTerm);
                 this.search.select();
                 return true;
@@ -5576,7 +6478,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         //abstract
-        getMaximumSelectionSize: function() {
+        getMaximumSelectionSize: function () {
             return evaluate(this.opts.maximumSelectionSize, this.opts.element);
         },
 
@@ -5621,13 +6523,13 @@ the specific language governing permissions and limitations under the Apache Lic
             y = topOffset - results.offset().top;
 
             // make sure the top of the element is visible
-            if (y < 0 && child.css('display') != 'none' ) {
+            if (y < 0 && child.css('display') != 'none') {
                 results.scrollTop(results.scrollTop() + y); // y is negative
             }
         },
 
         // abstract
-        findHighlightableChoices: function() {
+        findHighlightableChoices: function () {
             return this.results.find(".select2-result-selectable:not(.select2-disabled):not(.select2-selected)");
         },
 
@@ -5673,24 +6575,24 @@ the specific language governing permissions and limitations under the Apache Lic
 
             data = choice.data("select2-data");
             if (data) {
-                this.opts.element.trigger({ type: "select2-highlight", val: this.id(data), choice: data });
+                this.opts.element.trigger({type: "select2-highlight", val: this.id(data), choice: data});
             }
         },
 
-        removeHighlight: function() {
+        removeHighlight: function () {
             this.results.find(".select2-highlighted").removeClass("select2-highlighted");
         },
 
-        touchMoved: function() {
+        touchMoved: function () {
             this._touchMoved = true;
         },
 
-        clearTouchMoved: function() {
-          this._touchMoved = false;
+        clearTouchMoved: function () {
+            this._touchMoved = false;
         },
 
         // abstract
-        countSelectableResults: function() {
+        countSelectableResults: function () {
             return this.findHighlightableChoices().length;
         },
 
@@ -5712,9 +6614,9 @@ the specific language governing permissions and limitations under the Apache Lic
                 more = results.find("li.select2-more-results"),
                 below, // pixels the element is below the scroll fold, below==0 is when the element is starting to be visible
                 page = this.resultsPage + 1,
-                self=this,
-                term=this.search.val(),
-                context=this.context;
+                self = this,
+                term = this.search.val(),
+                context = this.context;
 
             if (more.length === 0) return;
             below = more.offset().top - results.offset().top - results.height();
@@ -5722,38 +6624,45 @@ the specific language governing permissions and limitations under the Apache Lic
             if (below <= this.opts.loadMorePadding) {
                 more.addClass("select2-active");
                 this.opts.query({
-                        element: this.opts.element,
-                        term: term,
-                        page: page,
-                        context: context,
-                        matcher: this.opts.matcher,
-                        callback: this.bind(function (data) {
+                    element: this.opts.element,
+                    term: term,
+                    page: page,
+                    context: context,
+                    matcher: this.opts.matcher,
+                    callback: this.bind(function (data) {
 
-                    // ignore a response if the select2 has been closed before it was received
-                    if (!self.opened()) return;
+                        // ignore a response if the select2 has been closed before it was received
+                        if (!self.opened()) return;
 
 
-                    self.opts.populateResults.call(this, results, data.results, {term: term, page: page, context:context});
-                    self.postprocessResults(data, false, false);
+                        self.opts.populateResults.call(this, results, data.results, {
+                            term: term,
+                            page: page,
+                            context: context
+                        });
+                        self.postprocessResults(data, false, false);
 
-                    if (data.more===true) {
-                        more.detach().appendTo(results).html(self.opts.escapeMarkup(evaluate(self.opts.formatLoadMore, self.opts.element, page+1)));
-                        window.setTimeout(function() { self.loadMoreIfNeeded(); }, 10);
-                    } else {
-                        more.remove();
-                    }
-                    self.positionDropdown();
-                    self.resultsPage = page;
-                    self.context = data.context;
-                    this.opts.element.trigger({ type: "select2-loaded", items: data });
-                })});
+                        if (data.more === true) {
+                            more.detach().appendTo(results).html(self.opts.escapeMarkup(evaluate(self.opts.formatLoadMore, self.opts.element, page + 1)));
+                            window.setTimeout(function () {
+                                self.loadMoreIfNeeded();
+                            }, 10);
+                        } else {
+                            more.remove();
+                        }
+                        self.positionDropdown();
+                        self.resultsPage = page;
+                        self.context = data.context;
+                        this.opts.element.trigger({type: "select2-loaded", items: data});
+                    })
+                });
             }
         },
 
         /**
          * Default tokenizer function which does nothing
          */
-        tokenize: function() {
+        tokenize: function () {
 
         },
 
@@ -5770,7 +6679,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 input,
                 term = search.val(),
                 lastTerm = $.data(this.container, "select2-last-term"),
-                // sequence number used to drop out-of-order responses
+            // sequence number used to drop out-of-order responses
                 queryNumber;
 
             // prevent duplicate queries against the same term
@@ -5802,7 +6711,7 @@ the specific language governing permissions and limitations under the Apache Lic
             queryNumber = ++this.queryCount;
 
             var maxSelSize = this.getMaximumSelectionSize();
-            if (maxSelSize >=1) {
+            if (maxSelSize >= 1) {
                 data = this.data();
                 if ($.isArray(data) && data.length >= maxSelSize && checkFormatter(opts.formatSelectionTooBig, "formatSelectionTooBig")) {
                     render("<li class='select2-selection-limit'>" + evaluate(opts.formatSelectionTooBig, opts.element, maxSelSize) + "</li>");
@@ -5847,67 +6756,74 @@ the specific language governing permissions and limitations under the Apache Lic
 
             opts.query({
                 element: opts.element,
-                    term: search.val(),
-                    page: this.resultsPage,
-                    context: null,
-                    matcher: opts.matcher,
-                    callback: this.bind(function (data) {
-                var def; // default choice
+                term: search.val(),
+                page: this.resultsPage,
+                context: null,
+                matcher: opts.matcher,
+                callback: this.bind(function (data) {
+                    var def; // default choice
 
-                // ignore old responses
-                if (queryNumber != this.queryCount) {
-                  return;
-                }
+                    // ignore old responses
+                    if (queryNumber != this.queryCount) {
+                        return;
+                    }
 
-                // ignore a response if the select2 has been closed before it was received
-                if (!this.opened()) {
-                    this.search.removeClass("select2-active");
-                    return;
-                }
+                    // ignore a response if the select2 has been closed before it was received
+                    if (!this.opened()) {
+                        this.search.removeClass("select2-active");
+                        return;
+                    }
 
-                // handle ajax error
-                if(data.hasError !== undefined && checkFormatter(opts.formatAjaxError, "formatAjaxError")) {
-                    render("<li class='select2-ajax-error'>" + evaluate(opts.formatAjaxError, opts.element, data.jqXHR, data.textStatus, data.errorThrown) + "</li>");
-                    return;
-                }
+                    // handle ajax error
+                    if (data.hasError !== undefined && checkFormatter(opts.formatAjaxError, "formatAjaxError")) {
+                        render("<li class='select2-ajax-error'>" + evaluate(opts.formatAjaxError, opts.element, data.jqXHR, data.textStatus, data.errorThrown) + "</li>");
+                        return;
+                    }
 
-                // save context, if any
-                this.context = (data.context===undefined) ? null : data.context;
-                // create a default choice and prepend it to the list
-                if (this.opts.createSearchChoice && search.val() !== "") {
-                    def = this.opts.createSearchChoice.call(self, search.val(), data.results);
-                    if (def !== undefined && def !== null && self.id(def) !== undefined && self.id(def) !== null) {
-                        if ($(data.results).filter(
-                            function () {
-                                return equal(self.id(this), self.id(def));
-                            }).length === 0) {
-                            this.opts.createSearchChoicePosition(data.results, def);
+                    // save context, if any
+                    this.context = (data.context === undefined) ? null : data.context;
+                    // create a default choice and prepend it to the list
+                    if (this.opts.createSearchChoice && search.val() !== "") {
+                        def = this.opts.createSearchChoice.call(self, search.val(), data.results);
+                        if (def !== undefined && def !== null && self.id(def) !== undefined && self.id(def) !== null) {
+                            if ($(data.results).filter(
+                                    function () {
+                                        return equal(self.id(this), self.id(def));
+                                    }).length === 0) {
+                                this.opts.createSearchChoicePosition(data.results, def);
+                            }
                         }
                     }
-                }
 
-                if (data.results.length === 0 && checkFormatter(opts.formatNoMatches, "formatNoMatches")) {
-                    render("<li class='select2-no-results'>" + evaluate(opts.formatNoMatches, opts.element, search.val()) + "</li>");
-                    if(this.showSearch){
-                        this.showSearch(search.val());
+                    if (data.results.length === 0 && checkFormatter(opts.formatNoMatches, "formatNoMatches")) {
+                        render("<li class='select2-no-results'>" + evaluate(opts.formatNoMatches, opts.element, search.val()) + "</li>");
+                        if (this.showSearch) {
+                            this.showSearch(search.val());
+                        }
+                        return;
                     }
-                    return;
-                }
 
-                results.empty();
-                self.opts.populateResults.call(this, results, data.results, {term: search.val(), page: this.resultsPage, context:null});
+                    results.empty();
+                    self.opts.populateResults.call(this, results, data.results, {
+                        term: search.val(),
+                        page: this.resultsPage,
+                        context: null
+                    });
 
-                if (data.more === true && checkFormatter(opts.formatLoadMore, "formatLoadMore")) {
-                    results.append("<li class='select2-more-results'>" + opts.escapeMarkup(evaluate(opts.formatLoadMore, opts.element, this.resultsPage)) + "</li>");
-                    window.setTimeout(function() { self.loadMoreIfNeeded(); }, 10);
-                }
+                    if (data.more === true && checkFormatter(opts.formatLoadMore, "formatLoadMore")) {
+                        results.append("<li class='select2-more-results'>" + opts.escapeMarkup(evaluate(opts.formatLoadMore, opts.element, this.resultsPage)) + "</li>");
+                        window.setTimeout(function () {
+                            self.loadMoreIfNeeded();
+                        }, 10);
+                    }
 
-                this.postprocessResults(data, initial);
+                    this.postprocessResults(data, initial);
 
-                postRender();
+                    postRender();
 
-                this.opts.element.trigger({ type: "select2-loaded", items: data });
-            })});
+                    this.opts.element.trigger({type: "select2-loaded", items: data});
+                })
+            });
         },
 
         // abstract
@@ -5924,7 +6840,9 @@ the specific language governing permissions and limitations under the Apache Lic
             this.close();
             this.container.removeClass("select2-container-active");
             // synonymous to .is(':focus'), which is available in jquery >= 1.6
-            if (this.search[0] === document.activeElement) { this.search.blur(); }
+            if (this.search[0] === document.activeElement) {
+                this.search.blur();
+            }
             this.clearSearch();
             this.selection.find(".select2-search-choice-focus").removeClass("select2-search-choice-focus");
         },
@@ -5937,11 +6855,11 @@ the specific language governing permissions and limitations under the Apache Lic
         // abstract
         selectHighlighted: function (options) {
             if (this._touchMoved) {
-              this.clearTouchMoved();
-              return;
+                this.clearTouchMoved();
+                return;
             }
-            var index=this.highlight(),
-                highlighted=this.results.find(".select2-highlighted"),
+            var index = this.highlight(),
+                highlighted = this.results.find(".select2-highlighted"),
                 data = highlighted.closest('.select2-result').data("select2-data");
 
             if (data) {
@@ -5963,13 +6881,13 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // abstract
-        getPlaceholderOption: function() {
+        getPlaceholderOption: function () {
             if (this.select) {
                 var firstOption = this.select.children('option').first();
-                if (this.opts.placeholderOption !== undefined ) {
+                if (this.opts.placeholderOption !== undefined) {
                     //Determine the placeholder option based on the specified placeholderOption setting
                     return (this.opts.placeholderOption === "first" && firstOption) ||
-                           (typeof this.opts.placeholderOption === "function" && this.opts.placeholderOption(this.select));
+                        (typeof this.opts.placeholderOption === "function" && this.opts.placeholderOption(this.select));
                 } else if ($.trim(firstOption.text()) === "" && firstOption.val() === "") {
                     //No explicit placeholder option specified, use the first if it's blank
                     return firstOption;
@@ -5990,7 +6908,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
                 if (this.opts.width === "off") {
                     return null;
-                } else if (this.opts.width === "element"){
+                } else if (this.opts.width === "element") {
                     return this.opts.element.outerWidth(false) === 0 ? 'auto' : this.opts.element.outerWidth(false) + 'px';
                 } else if (this.opts.width === "copy" || this.opts.width === "resolve") {
                     // check if there is inline style on the element that contains width
@@ -6020,7 +6938,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     return this.opts.width();
                 } else {
                     return this.opts.width;
-               }
+                }
             };
 
             var width = resolveContainerWidth.call(this);
@@ -6057,7 +6975,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // single
-        enableInterface: function() {
+        enableInterface: function () {
             if (this.parent.enableInterface.apply(this, arguments)) {
                 this.focusser.prop("disabled", !this.isInterfaceEnabled());
             }
@@ -6141,7 +7059,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // single
-        destroy: function() {
+        destroy: function () {
             $("label[for='" + this.focusser.attr('id') + "']")
                 .attr('for', this.opts.element.attr("id"));
             this.parent.destroy.apply(this, arguments);
@@ -6172,16 +7090,18 @@ the specific language governing permissions and limitations under the Apache Lic
             this.focusser = container.find(".select2-focusser");
 
             // add aria associations
-            selection.find(".select2-chosen").attr("id", "select2-chosen-"+idSuffix);
-            this.focusser.attr("aria-labelledby", "select2-chosen-"+idSuffix);
-            this.results.attr("id", "select2-results-"+idSuffix);
-            this.search.attr("aria-owns", "select2-results-"+idSuffix);
+            selection.find(".select2-chosen").attr("id", "select2-chosen-" + idSuffix);
+            this.focusser.attr("aria-labelledby", "select2-chosen-" + idSuffix);
+            this.results.attr("id", "select2-results-" + idSuffix);
+            this.search.attr("aria-owns", "select2-results-" + idSuffix);
 
             // rewrite labels from original element to focusser
-            this.focusser.attr("id", "s2id_autogen"+idSuffix);
+            this.focusser.attr("id", "s2id_autogen" + idSuffix);
 
             elementLabel = $("label[for='" + this.opts.element.attr("id") + "']");
-            this.opts.element.on('focus.select2', this.bind(function () { this.focus(); }));
+            this.opts.element.on('focus.select2', this.bind(function () {
+                this.focus();
+            }));
 
             this.focusser.prev()
                 .text(elementLabel.text())
@@ -6232,11 +7152,11 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }));
 
-            this.search.on("blur", this.bind(function(e) {
+            this.search.on("blur", this.bind(function (e) {
                 // a workaround for chrome to keep the search field focussed when the scroll bar is used to scroll the dropdown.
                 // without this the search field loses focus which is annoying
                 if (document.activeElement === this.body.get(0)) {
-                    window.setTimeout(this.bind(function() {
+                    window.setTimeout(this.bind(function () {
                         if (this.opened() && this.results && this.results.length > 1) {
                             this.search.focus();
                         }
@@ -6277,7 +7197,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
 
             installKeyUpChangeEvent(this.focusser);
-            this.focusser.on("keyup-change input", this.bind(function(e) {
+            this.focusser.on("keyup-change input", this.bind(function (e) {
                 if (this.opts.minimumResultsForSearch >= 0) {
                     e.stopPropagation();
                     if (this.opened()) return;
@@ -6316,28 +7236,28 @@ the specific language governing permissions and limitations under the Apache Lic
                 killEvent(e);
             }));
 
-            dropdown.on("mousedown touchstart", this.bind(function() {
+            dropdown.on("mousedown touchstart", this.bind(function () {
                 if (this.opts.shouldFocusInput(this)) {
                     this.search.focus();
                 }
             }));
 
-            selection.on("focus", this.bind(function(e) {
+            selection.on("focus", this.bind(function (e) {
                 killEvent(e);
             }));
 
-            this.focusser.on("focus", this.bind(function(){
+            this.focusser.on("focus", this.bind(function () {
                 if (!this.container.hasClass("select2-container-active")) {
                     this.opts.element.trigger($.Event("select2-focus"));
                 }
                 this.container.addClass("select2-container-active");
-            })).on("blur", this.bind(function() {
+            })).on("blur", this.bind(function () {
                 if (!this.opened()) {
                     this.container.removeClass("select2-container-active");
                     this.opts.element.trigger($.Event("select2-blur"));
                 }
             }));
-            this.search.on("focus", this.bind(function(){
+            this.search.on("focus", this.bind(function () {
                 if (!this.container.hasClass("select2-container-active")) {
                     this.opts.element.trigger($.Event("select2-focus"));
                 }
@@ -6351,8 +7271,8 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // single
-        clear: function(triggerChange) {
-            var data=this.selection.data("select2-data");
+        clear: function (triggerChange) {
+            var data = this.selection.data("select2-data");
             if (data) { // guard against queued quick consecutive clicks
                 var evt = $.Event("select2-clearing");
                 this.opts.element.trigger(evt);
@@ -6365,9 +7285,9 @@ the specific language governing permissions and limitations under the Apache Lic
                 this.selection.removeData("select2-data");
                 this.setPlaceholder();
 
-                if (triggerChange !== false){
-                    this.opts.element.trigger({ type: "select2-removed", val: this.id(data), choice: data });
-                    this.triggerChange({removed:data});
+                if (triggerChange !== false) {
+                    this.opts.element.trigger({type: "select2-removed", val: this.id(data), choice: data});
+                    this.triggerChange({removed: data});
                 }
             }
         },
@@ -6384,7 +7304,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 this.setPlaceholder();
             } else {
                 var self = this;
-                this.opts.initSelection.call(null, this.opts.element, function(selected){
+                this.opts.initSelection.call(null, this.opts.element, function (selected) {
                     if (selected !== undefined && selected !== null) {
                         self.updateSelection(selected);
                         self.close();
@@ -6395,7 +7315,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         },
 
-        isPlaceholderOptionSelected: function() {
+        isPlaceholderOptionSelected: function () {
             var placeholderOption;
             if (this.getPlaceholder() === undefined) return false; // no placeholder specified so no option should be considered
             return ((placeholderOption = this.getPlaceholderOption()) !== undefined && placeholderOption.prop("selected"))
@@ -6407,41 +7327,43 @@ the specific language governing permissions and limitations under the Apache Lic
         // single
         prepareOpts: function () {
             var opts = this.parent.prepareOpts.apply(this, arguments),
-                self=this;
+                self = this;
 
             if (opts.element.get(0).tagName.toLowerCase() === "select") {
                 // install the selection initializer
                 opts.initSelection = function (element, callback) {
-                    var selected = element.find("option").filter(function() { return this.selected && !this.disabled });
+                    var selected = element.find("option").filter(function () {
+                        return this.selected && !this.disabled
+                    });
                     // a single select box always has a value, no need to null check 'selected'
                     callback(self.optionToData(selected));
                 };
             } else if ("data" in opts) {
                 // install default initSelection when applied to hidden input and data is local
                 opts.initSelection = opts.initSelection || function (element, callback) {
-                    var id = element.val();
-                    //search in data by id, storing the actual matching item
-                    var match = null;
-                    opts.query({
-                        matcher: function(term, text, el){
-                            var is_match = equal(id, opts.id(el));
-                            if (is_match) {
-                                match = el;
+                        var id = element.val();
+                        //search in data by id, storing the actual matching item
+                        var match = null;
+                        opts.query({
+                            matcher: function (term, text, el) {
+                                var is_match = equal(id, opts.id(el));
+                                if (is_match) {
+                                    match = el;
+                                }
+                                return is_match;
+                            },
+                            callback: !$.isFunction(callback) ? $.noop : function () {
+                                callback(match);
                             }
-                            return is_match;
-                        },
-                        callback: !$.isFunction(callback) ? $.noop : function() {
-                            callback(match);
-                        }
-                    });
-                };
+                        });
+                    };
             }
 
             return opts;
         },
 
         // single
-        getPlaceholder: function() {
+        getPlaceholder: function () {
             // if a placeholder is specified on a single select without a valid placeholder option ignore it
             if (this.select) {
                 if (this.getPlaceholderOption() === undefined) {
@@ -6502,7 +7424,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // single
-        showSearch: function(showSearchInput) {
+        showSearch: function (showSearchInput) {
             if (this.showSearchInput === showSearchInput) return;
 
             this.showSearchInput = showSearchInput;
@@ -6516,7 +7438,9 @@ the specific language governing permissions and limitations under the Apache Lic
         // single
         onSelect: function (data, options) {
 
-            if (!this.triggerSelect(data)) { return; }
+            if (!this.triggerSelect(data)) {
+                return;
+            }
 
             var old = this.opts.element.val(),
                 oldData = this.data();
@@ -6524,7 +7448,7 @@ the specific language governing permissions and limitations under the Apache Lic
             this.opts.element.val(this.id(data));
             this.updateSelection(data);
 
-            this.opts.element.trigger({ type: "select2-selected", val: this.id(data), choice: data });
+            this.opts.element.trigger({type: "select2-selected", val: this.id(data), choice: data});
 
             this.lastSearchTerm = this.search.val();
             this.close();
@@ -6534,25 +7458,25 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             if (!equal(old, this.id(data))) {
-                this.triggerChange({ added: data, removed: oldData });
+                this.triggerChange({added: data, removed: oldData});
             }
         },
 
         // single
         updateSelection: function (data) {
 
-            var container=this.selection.find(".select2-chosen"), formatted, cssClass;
+            var container = this.selection.find(".select2-chosen"), formatted, cssClass;
 
             this.selection.data("select2-data", data);
 
             container.empty();
             if (data !== null) {
-                formatted=this.opts.formatSelection(data, container, this.opts.escapeMarkup);
+                formatted = this.opts.formatSelection(data, container, this.opts.escapeMarkup);
             }
             if (formatted !== undefined) {
                 container.append(formatted);
             }
-            cssClass=this.opts.formatSelectionCssClass(data, container);
+            cssClass = this.opts.formatSelectionCssClass(data, container);
             if (cssClass !== undefined) {
                 container.addClass(cssClass);
             }
@@ -6599,14 +7523,16 @@ the specific language governing permissions and limitations under the Apache Lic
 
                 this.select
                     .val(val)
-                    .find("option").filter(function() { return this.selected }).each2(function (i, elm) {
+                    .find("option").filter(function () {
+                        return this.selected
+                    }).each2(function (i, elm) {
                         data = self.optionToData(elm);
                         return false;
                     });
                 this.updateSelection(data);
                 this.setPlaceholder();
                 if (triggerChange) {
-                    this.triggerChange({added: data, removed:oldData});
+                    this.triggerChange({added: data, removed: oldData});
                 }
             } else {
                 // val is an id. !val is true for [undefined,null,'',0] - 0 is legal
@@ -6618,12 +7544,12 @@ the specific language governing permissions and limitations under the Apache Lic
                     throw new Error("cannot call val() if initSelection() is not defined");
                 }
                 this.opts.element.val(val);
-                this.opts.initSelection(this.opts.element, function(data){
+                this.opts.initSelection(this.opts.element, function (data) {
                     self.opts.element.val(!data ? "" : self.id(data));
                     self.updateSelection(data);
                     self.setPlaceholder();
                     if (triggerChange) {
-                        self.triggerChange({added: data, removed:oldData});
+                        self.triggerChange({added: data, removed: oldData});
                     }
                 });
             }
@@ -6636,7 +7562,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // single
-        data: function(value) {
+        data: function (value) {
             var data,
                 triggerChange = false;
 
@@ -6662,7 +7588,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     this.opts.element.val(!value ? "" : this.id(value));
                     this.updateSelection(value);
                     if (triggerChange) {
-                        this.triggerChange({added: value, removed:data});
+                        this.triggerChange({added: value, removed: data});
                     }
                 }
             }
@@ -6692,7 +7618,7 @@ the specific language governing permissions and limitations under the Apache Lic
         // multi
         prepareOpts: function () {
             var opts = this.parent.prepareOpts.apply(this, arguments),
-                self=this;
+                self = this;
 
             // TODO validate placeholder is a string if specified
             if (opts.element.get(0).tagName.toLowerCase() === "select") {
@@ -6701,7 +7627,9 @@ the specific language governing permissions and limitations under the Apache Lic
 
                     var data = [];
 
-                    element.find("option").filter(function() { return this.selected && !this.disabled }).each2(function (i, elm) {
+                    element.find("option").filter(function () {
+                        return this.selected && !this.disabled
+                    }).each2(function (i, elm) {
                         data.push(self.optionToData(elm));
                     });
                     callback(data);
@@ -6709,38 +7637,38 @@ the specific language governing permissions and limitations under the Apache Lic
             } else if ("data" in opts) {
                 // install default initSelection when applied to hidden input and data is local
                 opts.initSelection = opts.initSelection || function (element, callback) {
-                    var ids = splitVal(element.val(), opts.separator, opts.transformVal);
-                    //search in data by array of ids, storing matching items in a list
-                    var matches = [];
-                    opts.query({
-                        matcher: function(term, text, el){
-                            var is_match = $.grep(ids, function(id) {
-                                return equal(id, opts.id(el));
-                            }).length;
-                            if (is_match) {
-                                matches.push(el);
-                            }
-                            return is_match;
-                        },
-                        callback: !$.isFunction(callback) ? $.noop : function() {
-                            // reorder matches based on the order they appear in the ids array because right now
-                            // they are in the order in which they appear in data array
-                            var ordered = [];
-                            for (var i = 0; i < ids.length; i++) {
-                                var id = ids[i];
-                                for (var j = 0; j < matches.length; j++) {
-                                    var match = matches[j];
-                                    if (equal(id, opts.id(match))) {
-                                        ordered.push(match);
-                                        matches.splice(j, 1);
-                                        break;
+                        var ids = splitVal(element.val(), opts.separator, opts.transformVal);
+                        //search in data by array of ids, storing matching items in a list
+                        var matches = [];
+                        opts.query({
+                            matcher: function (term, text, el) {
+                                var is_match = $.grep(ids, function (id) {
+                                    return equal(id, opts.id(el));
+                                }).length;
+                                if (is_match) {
+                                    matches.push(el);
+                                }
+                                return is_match;
+                            },
+                            callback: !$.isFunction(callback) ? $.noop : function () {
+                                // reorder matches based on the order they appear in the ids array because right now
+                                // they are in the order in which they appear in data array
+                                var ordered = [];
+                                for (var i = 0; i < ids.length; i++) {
+                                    var id = ids[i];
+                                    for (var j = 0; j < matches.length; j++) {
+                                        var match = matches[j];
+                                        if (equal(id, opts.id(match))) {
+                                            ordered.push(match);
+                                            matches.splice(j, 1);
+                                            break;
+                                        }
                                     }
                                 }
+                                callback(ordered);
                             }
-                            callback(ordered);
-                        }
-                    });
-                };
+                        });
+                    };
             }
 
             return opts;
@@ -6766,7 +7694,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // multi
-        destroy: function() {
+        destroy: function () {
             $("label[for='" + this.search.attr('id') + "']")
                 .attr('for', this.opts.element.attr("id"));
             this.parent.destroy.apply(this, arguments);
@@ -6792,14 +7720,16 @@ the specific language governing permissions and limitations under the Apache Lic
             });
 
             // rewrite labels from original element to focusser
-            this.search.attr("id", "s2id_autogen"+nextUid());
+            this.search.attr("id", "s2id_autogen" + nextUid());
 
             this.search.prev()
                 .text($("label[for='" + this.opts.element.attr("id") + "']").text())
                 .attr('for', this.search.attr('id'));
-            this.opts.element.on('focus.select2', this.bind(function () { this.focus(); }));
+            this.opts.element.on('focus.select2', this.bind(function () {
+                this.focus();
+            }));
 
-            this.search.on("input paste", this.bind(function() {
+            this.search.on("input paste", this.bind(function () {
                 if (this.search.attr('placeholder') && this.search.val().length == 0) return;
                 if (!this.isInterfaceEnabled()) return;
                 if (!this.opened()) {
@@ -6860,28 +7790,28 @@ the specific language governing permissions and limitations under the Apache Lic
 
                 if (this.opened()) {
                     switch (e.which) {
-                    case KEY.UP:
-                    case KEY.DOWN:
-                        this.moveHighlight((e.which === KEY.UP) ? -1 : 1);
-                        killEvent(e);
-                        return;
-                    case KEY.ENTER:
-                        this.selectHighlighted();
-                        killEvent(e);
-                        return;
-                    case KEY.TAB:
-                        this.selectHighlighted({noFocus:true});
-                        this.close();
-                        return;
-                    case KEY.ESC:
-                        this.cancel(e);
-                        killEvent(e);
-                        return;
+                        case KEY.UP:
+                        case KEY.DOWN:
+                            this.moveHighlight((e.which === KEY.UP) ? -1 : 1);
+                            killEvent(e);
+                            return;
+                        case KEY.ENTER:
+                            this.selectHighlighted();
+                            killEvent(e);
+                            return;
+                        case KEY.TAB:
+                            this.selectHighlighted({noFocus: true});
+                            this.close();
+                            return;
+                        case KEY.ESC:
+                            this.cancel(e);
+                            killEvent(e);
+                            return;
                     }
                 }
 
                 if (e.which === KEY.TAB || KEY.isControl(e) || KEY.isFunctionKey(e)
-                 || e.which === KEY.BACKSPACE || e.which === KEY.ESC) {
+                    || e.which === KEY.BACKSPACE || e.which === KEY.ESC) {
                     return;
                 }
 
@@ -6908,12 +7838,12 @@ the specific language governing permissions and limitations under the Apache Lic
             }));
 
             this.search.on("keyup", this.bind(function (e) {
-                this.keydowns = 0;
-                this.resizeSearch();
-            })
+                    this.keydowns = 0;
+                    this.resizeSearch();
+                })
             );
 
-            this.search.on("blur", this.bind(function(e) {
+            this.search.on("blur", this.bind(function (e) {
                 this.container.removeClass("select2-container-active");
                 this.search.removeClass("select2-focused");
                 this.selectChoice(null);
@@ -6956,7 +7886,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // multi
-        enableInterface: function() {
+        enableInterface: function () {
             if (this.parent.enableInterface.apply(this, arguments)) {
                 this.search.prop("disabled", !this.isInterfaceEnabled());
             }
@@ -6973,7 +7903,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
             if (this.select || this.opts.element.val() !== "") {
                 var self = this;
-                this.opts.initSelection.call(null, this.opts.element, function(data){
+                this.opts.initSelection.call(null, this.opts.element, function (data) {
                     if (data !== undefined && data !== null) {
                         self.updateSelection(data);
                         self.close();
@@ -6989,7 +7919,7 @@ the specific language governing permissions and limitations under the Apache Lic
             var placeholder = this.getPlaceholder(),
                 maxWidth = this.getMaxSearchWidth();
 
-            if (placeholder !== undefined  && this.getVal().length === 0 && this.search.hasClass("select2-focused") === false) {
+            if (placeholder !== undefined && this.getVal().length === 0 && this.search.hasClass("select2-focused") === false) {
                 this.search.val(placeholder).addClass("select2-default");
                 // stretch the search box to full width of the container so as much of the placeholder is visible as possible
                 // we could call this.resizeSearch(), but we do not because that requires a sizer and we do not want to create one so early because of a firefox bug, see #944
@@ -7059,7 +7989,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // multi
-        tokenize: function() {
+        tokenize: function () {
             var input = this.search.val();
             input = this.opts.tokenizer.call(this, input, this.data(), this.bind(this.onSelect), this.opts);
             if (input != null && input != undefined) {
@@ -7074,11 +8004,13 @@ the specific language governing permissions and limitations under the Apache Lic
         // multi
         onSelect: function (data, options) {
 
-            if (!this.triggerSelect(data) || data.text === "") { return; }
+            if (!this.triggerSelect(data) || data.text === "") {
+                return;
+            }
 
             this.addSelectedChoice(data);
 
-            this.opts.element.trigger({ type: "selected", val: this.id(data), choice: data });
+            this.opts.element.trigger({type: "selected", val: this.id(data), choice: data});
 
             // keep track of the search's value before it gets cleared
             this.lastSearchTerm = this.search.val();
@@ -7086,13 +8018,13 @@ the specific language governing permissions and limitations under the Apache Lic
             this.clearSearch();
             this.updateResults();
 
-            if (this.select || !this.opts.closeOnSelect) this.postprocessResults(data, false, this.opts.closeOnSelect===true);
+            if (this.select || !this.opts.closeOnSelect) this.postprocessResults(data, false, this.opts.closeOnSelect === true);
 
             if (this.opts.closeOnSelect) {
                 this.close();
                 this.search.width(10);
             } else {
-                if (this.countSelectableResults()>0) {
+                if (this.countSelectableResults() > 0) {
                     this.search.width(10);
                     this.resizeSearch();
                     if (this.getMaximumSelectionSize() > 0 && this.val().length >= this.getMaximumSelectionSize()) {
@@ -7115,7 +8047,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
             // since its not possible to select an element that has already been
             // added we do not need to check if this is a new element before firing change
-            this.triggerChange({ added: data });
+            this.triggerChange({added: data});
 
             if (!options || !options.noFocus)
                 this.focusSearch();
@@ -7151,31 +8083,31 @@ the specific language governing permissions and limitations under the Apache Lic
                 formatted,
                 cssClass;
 
-            formatted=this.opts.formatSelection(data, choice.find("div"), this.opts.escapeMarkup);
+            formatted = this.opts.formatSelection(data, choice.find("div"), this.opts.escapeMarkup);
             if (formatted != undefined) {
                 choice.find("div").replaceWith($("<div></div>").html(formatted));
             }
-            cssClass=this.opts.formatSelectionCssClass(data, choice.find("div"));
+            cssClass = this.opts.formatSelectionCssClass(data, choice.find("div"));
             if (cssClass != undefined) {
                 choice.addClass(cssClass);
             }
 
-            if(enableChoice){
-              choice.find(".select2-search-choice-close")
-                  .on("mousedown", killEvent)
-                  .on("click dblclick", this.bind(function (e) {
-                  if (!this.isInterfaceEnabled()) return;
+            if (enableChoice) {
+                choice.find(".select2-search-choice-close")
+                    .on("mousedown", killEvent)
+                    .on("click dblclick", this.bind(function (e) {
+                        if (!this.isInterfaceEnabled()) return;
 
-                  this.unselect($(e.target));
-                  this.selection.find(".select2-search-choice-focus").removeClass("select2-search-choice-focus");
-                  killEvent(e);
-                  this.close();
-                  this.focusSearch();
-              })).on("focus", this.bind(function () {
-                  if (!this.isInterfaceEnabled()) return;
-                  this.container.addClass("select2-container-active");
-                  this.dropdown.addClass("select2-drop-active");
-              }));
+                        this.unselect($(e.target));
+                        this.selection.find(".select2-search-choice-focus").removeClass("select2-search-choice-focus");
+                        killEvent(e);
+                        this.close();
+                        this.focusSearch();
+                    })).on("focus", this.bind(function () {
+                        if (!this.isInterfaceEnabled()) return;
+                        this.container.addClass("select2-container-active");
+                        this.dropdown.addClass("select2-drop-active");
+                    }));
             }
 
             choice.data("select2-data", data);
@@ -7212,7 +8144,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 return false;
             }
 
-            while((index = indexOf(this.id(data), val)) >= 0) {
+            while ((index = indexOf(this.id(data), val)) >= 0) {
                 val.splice(index, 1);
                 this.setVal(val);
                 if (this.select) this.postprocessResults();
@@ -7220,8 +8152,8 @@ the specific language governing permissions and limitations under the Apache Lic
 
             selected.remove();
 
-            this.opts.element.trigger({ type: "select2-removed", val: this.id(data), choice: data });
-            this.triggerChange({ removed: data });
+            this.opts.element.trigger({type: "select2-removed", val: this.id(data), choice: data});
+            this.triggerChange({removed: data});
 
             return true;
         },
@@ -7242,7 +8174,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             });
 
-            compound.each2(function(i, choice) {
+            compound.each2(function (i, choice) {
                 // hide an optgroup if it doesn't have any selectable children
                 if (!choice.is('.select2-result-selectable')
                     && choice.find(".select2-result-selectable:not(.select2-selected)").length === 0) {
@@ -7250,13 +8182,13 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             });
 
-            if (this.highlight() == -1 && noHighlightUpdate !== false && this.opts.closeOnSelect === true){
+            if (this.highlight() == -1 && noHighlightUpdate !== false && this.opts.closeOnSelect === true) {
                 self.highlight(0);
             }
 
             //If all results are chosen render formatNoMatches
-            if(!this.opts.createSearchChoice && !choices.filter('.select2-result:not(.select2-selected)').length > 0){
-                if(!data || data && !data.more && this.results.find(".select2-no-results").length === 0) {
+            if (!this.opts.createSearchChoice && !choices.filter('.select2-result:not(.select2-selected)').length > 0) {
+                if (!data || data && !data.more && this.results.find(".select2-no-results").length === 0) {
                     if (checkFormatter(self.opts.formatNoMatches, "formatNoMatches")) {
                         this.results.append("<li class='select2-no-results'>" + evaluate(self.opts.formatNoMatches, self.opts.element, self.search.val()) + "</li>");
                     }
@@ -7266,7 +8198,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // multi
-        getMaxSearchWidth: function() {
+        getMaxSearchWidth: function () {
             return this.selection.width() - getSideBorderPadding(this.search);
         },
 
@@ -7293,7 +8225,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             if (searchWidth <= 0) {
-              searchWidth = minimumWidth;
+                searchWidth = minimumWidth;
             }
 
             this.search.width(Math.floor(searchWidth));
@@ -7351,14 +8283,14 @@ the specific language governing permissions and limitations under the Apache Lic
 
         // multi
         val: function (val, triggerChange) {
-            var oldData, self=this;
+            var oldData, self = this;
 
             if (arguments.length === 0) {
                 return this.getVal();
             }
 
-            oldData=this.data();
-            if (!oldData.length) oldData=[];
+            oldData = this.data();
+            if (!oldData.length) oldData = [];
 
             // val is an id. !val is true for [undefined,null,'',0] - 0 is legal
             if (!val && val !== 0) {
@@ -7384,8 +8316,8 @@ the specific language governing permissions and limitations under the Apache Lic
                     throw new Error("val() cannot be called if initSelection() is not defined");
                 }
 
-                this.opts.initSelection(this.opts.element, function(data){
-                    var ids=$.map(data, self.id);
+                this.opts.initSelection(this.opts.element, function (data) {
+                    var ids = $.map(data, self.id);
                     self.setVal(ids);
                     self.updateSelection(data);
                     self.clearSearch();
@@ -7398,7 +8330,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // multi
-        onSortStart: function() {
+        onSortStart: function () {
             if (this.select) {
                 throw new Error("Sorting of elements is not supported when attached to <select>. Attach to <input type='hidden'/> instead.");
             }
@@ -7410,9 +8342,9 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // multi
-        onSortEnd:function() {
+        onSortEnd: function () {
 
-            var val=[], self=this;
+            var val = [], self = this;
 
             // show search and move it to the end of the list
             this.searchContainer.show();
@@ -7422,7 +8354,7 @@ the specific language governing permissions and limitations under the Apache Lic
             this.resizeSearch();
 
             // update selection
-            this.selection.find(".select2-search-choice").each(function() {
+            this.selection.find(".select2-search-choice").each(function () {
                 val.push(self.opts.id($(this).data("select2-data")));
             });
             this.setVal(val);
@@ -7430,17 +8362,23 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // multi
-        data: function(values, triggerChange) {
-            var self=this, ids, old;
+        data: function (values, triggerChange) {
+            var self = this, ids, old;
             if (arguments.length === 0) {
-                 return this.selection
-                     .children(".select2-search-choice")
-                     .map(function() { return $(this).data("select2-data"); })
-                     .get();
+                return this.selection
+                    .children(".select2-search-choice")
+                    .map(function () {
+                        return $(this).data("select2-data");
+                    })
+                    .get();
             } else {
                 old = this.data();
-                if (!values) { values = []; }
-                ids = $.map(values, function(e) { return self.opts.id(e); });
+                if (!values) {
+                    values = [];
+                }
+                ids = $.map(values, function (e) {
+                    return self.opts.id(e);
+                });
                 this.setVal(ids);
                 this.updateSelection(values);
                 this.clearSearch();
@@ -7460,7 +8398,7 @@ the specific language governing permissions and limitations under the Apache Lic
             allowedMethods = ["val", "destroy", "opened", "open", "close", "focus", "isFocused", "container", "dropdown", "onSortStart", "onSortEnd", "enable", "disable", "readonly", "positionDropdown", "data", "search"],
             valueMethods = ["opened", "isFocused", "container", "dropdown"],
             propertyMethods = ["val", "data"],
-            methodsMap = { search: "externalSearch" };
+            methodsMap = {search: "externalSearch"};
 
         this.each(function () {
             if (args.length === 0 || typeof(args[0]) === "object") {
@@ -7471,7 +8409,9 @@ the specific language governing permissions and limitations under the Apache Lic
                     multiple = opts.element.prop("multiple");
                 } else {
                     multiple = opts.multiple || false;
-                    if ("tags" in opts) {opts.multiple = multiple = true;}
+                    if ("tags" in opts) {
+                        opts.multiple = multiple = true;
+                    }
                 }
 
                 select2 = multiple ? new window.Select2["class"].multi() : new window.Select2["class"].single();
@@ -7486,7 +8426,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 select2 = $(this).data("select2");
                 if (select2 === undefined) return;
 
-                method=args[0];
+                method = args[0];
 
                 if (method === "container") {
                     value = select2.container;
@@ -7519,12 +8459,12 @@ the specific language governing permissions and limitations under the Apache Lic
         dropdownCss: {},
         containerCssClass: "",
         dropdownCssClass: "",
-        formatResult: function(result, container, query, escapeMarkup) {
-            var markup=[];
+        formatResult: function (result, container, query, escapeMarkup) {
+            var markup = [];
             markMatch(this.text(result), query.term, markup, escapeMarkup);
             return markup.join("");
         },
-        transformVal: function(val) {
+        transformVal: function (val) {
             return $.trim(val);
         },
         formatSelection: function (data, container, escapeMarkup) {
@@ -7533,26 +8473,32 @@ the specific language governing permissions and limitations under the Apache Lic
         sortResults: function (results, container, query) {
             return results;
         },
-        formatResultCssClass: function(data) {return data.css;},
-        formatSelectionCssClass: function(data, container) {return undefined;},
+        formatResultCssClass: function (data) {
+            return data.css;
+        },
+        formatSelectionCssClass: function (data, container) {
+            return undefined;
+        },
         minimumResultsForSearch: 0,
         minimumInputLength: 0,
         maximumInputLength: null,
         maximumSelectionSize: 0,
-        id: function (e) { return e == undefined ? null : e.id; },
-        text: function (e) {
-          if (e && this.data && this.data.text) {
-            if ($.isFunction(this.data.text)) {
-              return this.data.text(e);
-            } else {
-              return e[this.data.text];
-            }
-          } else {
-            return e.text;
-          }
+        id: function (e) {
+            return e == undefined ? null : e.id;
         },
-        matcher: function(term, text) {
-            return stripDiacritics(''+text).toUpperCase().indexOf(stripDiacritics(''+term).toUpperCase()) >= 0;
+        text: function (e) {
+            if (e && this.data && this.data.text) {
+                if ($.isFunction(this.data.text)) {
+                    return this.data.text(e);
+                } else {
+                    return e[this.data.text];
+                }
+            } else {
+                return e.text;
+            }
+        },
+        matcher: function (term, text) {
+            return stripDiacritics('' + text).toUpperCase().indexOf(stripDiacritics('' + term).toUpperCase()) >= 0;
         },
         separator: ",",
         tokenSeparators: [],
@@ -7560,15 +8506,21 @@ the specific language governing permissions and limitations under the Apache Lic
         escapeMarkup: defaultEscapeMarkup,
         blurOnChange: false,
         selectOnBlur: false,
-        adaptContainerCssClass: function(c) { return c; },
-        adaptDropdownCssClass: function(c) { return null; },
-        nextSearchTerm: function(selectedObject, currentSearchTerm) { return undefined; },
+        adaptContainerCssClass: function (c) {
+            return c;
+        },
+        adaptDropdownCssClass: function (c) {
+            return null;
+        },
+        nextSearchTerm: function (selectedObject, currentSearchTerm) {
+            return undefined;
+        },
         searchInputPlaceholder: '',
         createSearchChoicePosition: 'top',
         shouldFocusInput: function (instance) {
             // Attempt to detect touch devices
             var supportsTouchEvents = (('ontouchstart' in window) ||
-                                       (navigator.msMaxTouchPoints > 0));
+            (navigator.msMaxTouchPoints > 0));
 
             // Only devices which support touch events should be special cased
             if (!supportsTouchEvents) {
@@ -7587,14 +8539,35 @@ the specific language governing permissions and limitations under the Apache Lic
     $.fn.select2.locales = [];
 
     $.fn.select2.locales['en'] = {
-         formatMatches: function (matches) { if (matches === 1) { return "One result is available, press enter to select it."; } return matches + " results are available, use up and down arrow keys to navigate."; },
-         formatNoMatches: function () { return "No matches found"; },
-         formatAjaxError: function (jqXHR, textStatus, errorThrown) { return "Loading failed"; },
-         formatInputTooShort: function (input, min) { var n = min - input.length; return "Please enter " + n + " or more character" + (n == 1 ? "" : "s"); },
-         formatInputTooLong: function (input, max) { var n = input.length - max; return "Please delete " + n + " character" + (n == 1 ? "" : "s"); },
-         formatSelectionTooBig: function (limit) { return "You can only select " + limit + " item" + (limit == 1 ? "" : "s"); },
-         formatLoadMore: function (pageNumber) { return "Loading more results…"; },
-         formatSearching: function () { return "Searching…"; }
+        formatMatches: function (matches) {
+            if (matches === 1) {
+                return "One result is available, press enter to select it.";
+            }
+            return matches + " results are available, use up and down arrow keys to navigate.";
+        },
+        formatNoMatches: function () {
+            return "No matches found";
+        },
+        formatAjaxError: function (jqXHR, textStatus, errorThrown) {
+            return "Loading failed";
+        },
+        formatInputTooShort: function (input, min) {
+            var n = min - input.length;
+            return "Please enter " + n + " or more character" + (n == 1 ? "" : "s");
+        },
+        formatInputTooLong: function (input, max) {
+            var n = input.length - max;
+            return "Please delete " + n + " character" + (n == 1 ? "" : "s");
+        },
+        formatSelectionTooBig: function (limit) {
+            return "You can only select " + limit + " item" + (limit == 1 ? "" : "s");
+        },
+        formatLoadMore: function (pageNumber) {
+            return "Loading more results…";
+        },
+        formatSearching: function () {
+            return "Searching…";
+        }
     };
 
     $.extend($.fn.select2.defaults, $.fn.select2.locales['en']);
@@ -7634,12 +8607,26 @@ the specific language governing permissions and limitations under the Apache Lic
 (function ($) {
     "use strict";
     $.fn.select2.locales['zh-CN'] = {
-        formatNoMatches: function () { return "没有找到匹配项"; },
-        formatInputTooShort: function (input, min) { var n = min - input.length; return "请再输入" + n + "个字符";},
-        formatInputTooLong: function (input, max) { var n = input.length - max; return "请删掉" + n + "个字符";},
-        formatSelectionTooBig: function (limit) { return "你只能选择最多" + limit + "项"; },
-        formatLoadMore: function (pageNumber) { return "加载结果中…"; },
-        formatSearching: function () { return "搜索中…"; }
+        formatNoMatches: function () {
+            return "没有找到匹配项";
+        },
+        formatInputTooShort: function (input, min) {
+            var n = min - input.length;
+            return "请再输入" + n + "个字符";
+        },
+        formatInputTooLong: function (input, max) {
+            var n = input.length - max;
+            return "请删掉" + n + "个字符";
+        },
+        formatSelectionTooBig: function (limit) {
+            return "你只能选择最多" + limit + "项";
+        },
+        formatLoadMore: function (pageNumber) {
+            return "加载结果中…";
+        },
+        formatSearching: function () {
+            return "搜索中…";
+        }
     };
 
     $.extend($.fn.select2.defaults, $.fn.select2.locales['zh-CN']);
@@ -7647,14 +8634,14 @@ the specific language governing permissions and limitations under the Apache Lic
 
 ///<jscompress sourcefile="crop.org.tree.js" />
 /**
-  * @description {Class} wdTree
-  * This is the main class of wdTree.
-  */
-(function($) {
-    $.fn.swapClass = function(c1, c2) {
+ * @description {Class} wdTree
+ * This is the main class of wdTree.
+ */
+(function ($) {
+    $.fn.swapClass = function (c1, c2) {
         return this.removeClass(c1).addClass(c2);
     };
-    $.fn.switchClass = function(c1, c2) {
+    $.fn.switchClass = function (c1, c2) {
         if (this.hasClass(c1)) {
             return this.swapClass(c1, c2);
         }
@@ -7662,58 +8649,58 @@ the specific language governing permissions and limitations under the Apache Lic
             return this.swapClass(c2, c1);
         }
     };
-    $.fn.treeview = function(settings) {
-    	// 补充checkedIds配置, 要求展示时, 将节点立即选中;linzp@zzsoft
-    	// 补充lockFilter, 表示是否要过滤掉'冻结'状态的节点, true过滤, false不过滤, 默认false
-    	// 补充invoker, 树调用者, 如果取值 batchCreateOU, 不展示勾选框
+    $.fn.treeview = function (settings) {
+        // 补充checkedIds配置, 要求展示时, 将节点立即选中;linzp@zzsoft
+        // 补充lockFilter, 表示是否要过滤掉'冻结'状态的节点, true过滤, false不过滤, 默认false
+        // 补充invoker, 树调用者, 如果取值 batchCreateOU, 不展示勾选框
         var dfop =
-            {
-                method: "POST",
-                datatype: "json",
-                checkedIds :'',
-                lockFilter : 'false',
-                invoker : '',
-                /**
-                 * @description {Config} url  
-                 * {String} Url for child nodes retrieving. 
-                 */
-                url: false,
-                /**
-                 * @description {Config} cbiconpath  
-                 * {String} Checkbox image path.
-                 */
-                cbiconpath: "../img/icons/",
-                icons: ["checkbox_0.gif", "checkbox_1.gif", "checkbox_2.gif"],
-                /**
-                 * @description {Config} showcheck  
-                 * {Boolean} Whether to show check box or not. 
-                 */
-                showcheck: false,            
-                /**
-	 	             * @description {Event} oncheckboxclick:function(tree, item, status)
-	 	             * Fired when check box is clicked on.
-	 	             * @param {Object} tree This tree object. 
-	 	             * @param {Object} item Node item clicked on.
-	 	             * @param {Number} status 1 for checked, 0 for unchecked.	 	             
-	               */
-                oncheckboxclick: false, 
-                /**
-	 	             * @description {Event} onnodeclick:function(tree, item)
-	 	             * Fired when a node is clicked on.
-	 	             * @param {Object} tree This tree object. 
-	 	             * @param {Object} item Ndde item clicked on.
-	               */
-                onnodeclick: false,
-                /**
-                 * @description {Config} cascadecheck  
-                 * {Boolean} Whether node being seleted leads to parent/sub node being selected.  
-                 */
-                cascadecheck: true,
-                /**
-                 * @description {Config} data  
-                 * {Object} Tree theme. Three themes provided. 'bbit-tree-lines' ,'bbit-tree-no-lines' and 'bbit-tree-arrows'.
-                 * @sample 
-                 * data:[{
+        {
+            method: "POST",
+            datatype: "json",
+            checkedIds: '',
+            lockFilter: 'false',
+            invoker: '',
+            /**
+             * @description {Config} url
+             * {String} Url for child nodes retrieving.
+             */
+            url: false,
+            /**
+             * @description {Config} cbiconpath
+             * {String} Checkbox image path.
+             */
+            cbiconpath: "../img/icons/",
+            icons: ["checkbox_0.gif", "checkbox_1.gif", "checkbox_2.gif"],
+            /**
+             * @description {Config} showcheck
+             * {Boolean} Whether to show check box or not.
+             */
+            showcheck: false,
+            /**
+             * @description {Event} oncheckboxclick:function(tree, item, status)
+             * Fired when check box is clicked on.
+             * @param {Object} tree This tree object.
+             * @param {Object} item Node item clicked on.
+             * @param {Number} status 1 for checked, 0 for unchecked.
+             */
+            oncheckboxclick: false,
+            /**
+             * @description {Event} onnodeclick:function(tree, item)
+             * Fired when a node is clicked on.
+             * @param {Object} tree This tree object.
+             * @param {Object} item Ndde item clicked on.
+             */
+            onnodeclick: false,
+            /**
+             * @description {Config} cascadecheck
+             * {Boolean} Whether node being seleted leads to parent/sub node being selected.
+             */
+            cascadecheck: true,
+            /**
+             * @description {Config} data
+             * {Object} Tree theme. Three themes provided. 'bbit-tree-lines' ,'bbit-tree-no-lines' and 'bbit-tree-arrows'.
+             * @sample
+             * data:[{
                  * id:"node1", //node id
                  * text:"node 1", //node text for display.
                  * value:"1", //node value
@@ -7723,20 +8710,20 @@ the specific language governing permissions and limitations under the Apache Lic
                  * isexpand:false, //Expand or collapse.
                  * complete:false, //See hasChildren.
                  * ChildNodes:[] // child nodes
-                 * }]                  
-                 *  */
-                data: null,
-                /**
-                 * @description {Config} clicktoggle  
-                 * {String} Whether to toggle node when node clicked. 
-                 */
-                clicktoggle: true, 
-                /**
-                 * @description {Config} theme  
-                 * {String} Tree theme. Three themes provided. 'bbit-tree-lines' ,'bbit-tree-no-lines' and 'bbit-tree-arrows'. 
-                 */
-                theme: "bbit-tree-lines" //bbit-tree-lines ,bbit-tree-no-lines,bbit-tree-arrows
-            };
+                 * }]
+             *  */
+            data: null,
+            /**
+             * @description {Config} clicktoggle
+             * {String} Whether to toggle node when node clicked.
+             */
+            clicktoggle: true,
+            /**
+             * @description {Config} theme
+             * {String} Tree theme. Three themes provided. 'bbit-tree-lines' ,'bbit-tree-no-lines' and 'bbit-tree-arrows'.
+             */
+            theme: "bbit-tree-lines" //bbit-tree-lines ,bbit-tree-no-lines,bbit-tree-arrows
+        };
 
         $.extend(dfop, settings);
         var treenodes = dfop.data;
@@ -7772,7 +8759,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }
             else {
-                asnyloadc(null, false, function(data) {
+                asnyloadc(null, false, function (data) {
                     if (data && data.length > 0) {
                         treenodes = data;
                         dfop.data = data;
@@ -7787,24 +8774,25 @@ the specific language governing permissions and limitations under the Apache Lic
             ht.push("</div>"); // body end;
             ht.push("</div>"); // Wrap end;
         }
+
         //endregion
         function buildnode(nd, ht, deep, path, isend) {
-        	
-        	// 如果入参中指定选中, 则强制将选中状态改为2, linzp@zzsoft
-            if(dfop.checkedIds && dfop.checkedIds.split(",").indexOf(nd.value) != -1) {
-            	nd.checkstate = 1;
+
+            // 如果入参中指定选中, 则强制将选中状态改为2, linzp@zzsoft
+            if (dfop.checkedIds && dfop.checkedIds.split(",").indexOf(nd.value) != -1) {
+                nd.checkstate = 1;
             }
             // 如果调用方来自ou批量创建, batchCreateOU , 并且ouId有值, 则不展示勾选框;品牌节点也不能勾选
-            if(dfop.invoker == 'batchCreateOU' && (nd.ouId || nd.orgType == 0)) {
-            	nd.showcheck = false;
+            if (dfop.invoker == 'batchCreateOU' && (nd.ouId || nd.orgType == 0)) {
+                nd.showcheck = false;
             }
             // 如果设置了只显示某些orgType才显示勾选框
-            if(dfop.selectOnlyOrgType){
-            	if(dfop.selectOnlyOrgType.split(",").indexOf(String(nd.orgType)) == -1) {
-            		nd.showcheck = false;
-            	}
+            if (dfop.selectOnlyOrgType) {
+                if (dfop.selectOnlyOrgType.split(",").indexOf(String(nd.orgType)) == -1) {
+                    nd.showcheck = false;
+                }
             }
-            
+
             var nid = nd.id.replace(/[^\w]/gi, "_");
             ht.push("<li class='bbit-tree-node'>");
             ht.push("<div id='", id, "_", nid, "' tpath='", path, "' unselectable='on' title='", nd.text, "'");
@@ -7816,7 +8804,9 @@ the specific language governing permissions and limitations under the Apache Lic
             else {
                 cs.push("bbit-tree-node-leaf");
             }
-            if (nd.classes) { cs.push(nd.classes); }
+            if (nd.classes) {
+                cs.push(nd.classes);
+            }
 
             ht.push(" class='", cs.join(" "), "'>");
             //span indent
@@ -7847,7 +8837,7 @@ the specific language governing permissions and limitations under the Apache Lic
             ht.push("<img class='bbit-tree-ec-icon ", cs.join(" "), "' src='" + dfop.cbiconpath + "s.gif'/>");
             // 根据组织类型,显示不同的图标
             var orgTypeCls = "";
-            var orgTypeClsMap = {'0':'brand',"1":"sls-area", "2": "dcomp", "5":"agt1","6":"agt2","9":"store"};
+            var orgTypeClsMap = {'0': 'brand', "1": "sls-area", "2": "dcomp", "5": "agt1", "6": "agt2", "9": "store"};
             orgTypeCls = orgTypeClsMap[nd.orgType];
             ht.push("<img class='bbit-tree-node-icon " + orgTypeCls + "' src='" + dfop.cbiconpath + "s.gif'/>");
             //checkbox
@@ -7861,7 +8851,7 @@ the specific language governing permissions and limitations under the Apache Lic
             // 如果ouId存在, 将加上样式名为 ouId的样式, 样式在crop.org.tree.css中定义
             var ifOuIdCls = dfop.invoker == 'batchCreateOU' && nd.ouId ? " ouNode" : "";
             var ifLockNode = nd.status == "1" ? " lockNode" : "";
-            
+
             ht.push("<a hideFocus class='bbit-tree-node-anchor' tabIndex=1 href='javascript:void(0);'>");
             ht.push("<span unselectable='on' class='" + ifOuIdCls + ifLockNode + "'>", nd.text, "</span>");
             ht.push("</a>");
@@ -7886,6 +8876,7 @@ the specific language governing permissions and limitations under the Apache Lic
             ht.push("</li>");
             nd.render = true;
         }
+
         function getItem(path) {
             var ap = path.split(".");
             var t = treenodes;
@@ -7899,6 +8890,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
             return t;
         }
+
         function check(item, state, type) {
             var pstate = item.checkstate;
             if (type == 1) {
@@ -7930,6 +8922,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }
         }
+
         //iterate all children nodes
         function cascade(fn, item, args) {
             if (fn(item, args, 1) != false) {
@@ -7941,6 +8934,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }
         }
+
         //bubble to parent
         function bubble(fn, item, args) {
             var p = item.parent;
@@ -7951,6 +8945,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 p = p.parent;
             }
         }
+
         function nodeclick(e) {
             var path = $(this).attr("tpath");
             var et = e.target || e.srcElement;
@@ -7970,7 +8965,7 @@ the specific language governing permissions and limitations under the Apache Lic
                         }
                         else {
                             $(this).addClass("bbit-tree-node-loading");
-                            asnyloadc(item, true, function(data) {
+                            asnyloadc(item, true, function (data) {
                                 item.complete = true;
                                 item.ChildNodes = data;
                                 asnybuild(data, deep, path, ul, item);
@@ -7986,7 +8981,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     $(this).swapClass("bbit-tree-node-collapsed", "bbit-tree-node-expanded");
                 }
                 //if expended, collapse it
-                else if ($(et).hasClass("bbit-tree-elbow-minus") || $(et).hasClass("bbit-tree-elbow-end-minus")) {                      
+                else if ($(et).hasClass("bbit-tree-elbow-minus") || $(et).hasClass("bbit-tree-elbow-end-minus")) {
                     $(this).next().hide();
                     if ($(et).hasClass("bbit-tree-elbow-minus")) {
                         $(et).swapClass("bbit-tree-elbow-minus", "bbit-tree-elbow-plus");
@@ -8024,12 +9019,15 @@ the specific language governing permissions and limitations under the Apache Lic
                 $(this).addClass("bbit-tree-selected");
                 if (dfop.onnodeclick) {
                     if (!item.expand) {
-                        item.expand = function() { expandnode.call(item); };
+                        item.expand = function () {
+                            expandnode.call(item);
+                        };
                     }
                     dfop.onnodeclick.call(this, item);
                 }
             }
         }
+
         function expandnode() {
             var item = this;
             var nid = item.id.replace(/[^\w]/gi, "_");
@@ -8038,6 +9036,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 img.click();
             }
         }
+
         function asnybuild(nodes, deep, path, ul, pnode) {
             var l = nodes.length;
             if (l > 0) {
@@ -8050,19 +9049,27 @@ the specific language governing permissions and limitations under the Apache Lic
                 ht = null;
                 InitEvent(ul);
             }
-            ul.addClass("bbit-tree-node-ct").css({ "z-index": 0, position: "static", visibility: "visible", top: "auto", left: "auto", display: "" });
+            ul.addClass("bbit-tree-node-ct").css({
+                "z-index": 0,
+                position: "static",
+                visibility: "visible",
+                top: "auto",
+                left: "auto",
+                display: ""
+            });
             ul.prev().removeClass("bbit-tree-node-loading");
         }
+
         function asnyloadc(pnode, isAsync, callback) {
             if (dfop.url) {
-            	var param = {};
+                var param = {};
                 if (pnode && pnode != null) {
-                	param = builparam(pnode);
+                    param = builparam(pnode);
                 } else {
-                	// 初始加载,指定根节点id
-                	if(dfop.rootId) {
-                		param.rootId = dfop.rootId;
-                	}
+                    // 初始加载,指定根节点id
+                    if (dfop.rootId) {
+                        param.rootId = dfop.rootId;
+                    }
                 }
                 $.ajax({
                     type: dfop.method,
@@ -8071,39 +9078,45 @@ the specific language governing permissions and limitations under the Apache Lic
                     async: isAsync,
                     dataType: dfop.datatype,
                     success: callback,
-                    error: function(e) { alert("error occur!"); }
+                    error: function (e) {
+                        alert("error occur!");
+                    }
                 });
             }
         }
+
         // 提交的参数lockFilter,补充是否要过滤掉'冻结'状态的节点
         function builparam(node) {
-            var p = [{ name: "id", value: encodeURIComponent(node.id) }
-                    , { name: "text", value: encodeURIComponent(node.text) }
-                    , { name: "value", value: encodeURIComponent(node.value) }
-                    , { name: "lockFilter", value: dfop.lockFilter }
-                    , { name: "checkstate", value: node.checkstate}];
+            var p = [{name: "id", value: encodeURIComponent(node.id)}
+                , {name: "text", value: encodeURIComponent(node.text)}
+                , {name: "value", value: encodeURIComponent(node.value)}
+                , {name: "lockFilter", value: dfop.lockFilter}
+                , {name: "checkstate", value: node.checkstate}];
             return p;
         }
+
         function bindevent() {
-            $(this).hover(function() {
+            $(this).hover(function () {
                 $(this).addClass("bbit-tree-node-over");
-            }, function() {
+            }, function () {
                 $(this).removeClass("bbit-tree-node-over");
             }).click(nodeclick)
-             .find("img.bbit-tree-ec-icon").each(function(e) {
-                 if (!$(this).hasClass("bbit-tree-elbow")) {
-                     $(this).hover(function() {
-                         $(this).parent().addClass("bbit-tree-ec-over");
-                     }, function() {
-                         $(this).parent().removeClass("bbit-tree-ec-over");
-                     });
-                 }
-             });
+                .find("img.bbit-tree-ec-icon").each(function (e) {
+                    if (!$(this).hasClass("bbit-tree-elbow")) {
+                        $(this).hover(function () {
+                            $(this).parent().addClass("bbit-tree-ec-over");
+                        }, function () {
+                            $(this).parent().removeClass("bbit-tree-ec-over");
+                        });
+                    }
+                });
         }
+
         function InitEvent(parent) {
             var nodes = $("li.bbit-tree-node>div", parent);
             nodes.each(bindevent);
         }
+
         function reflash(itemId) {
             var nid = itemId.replace(/[^\w-]/gi, "_");
             var node = $("#" + id + "_" + nid);
@@ -8114,7 +9127,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 var deep = path.split(".").length;
                 var item = getItem(path);
                 if (item) {
-                    asnyloadc(item, true, function(data) {
+                    asnyloadc(item, true, function (data) {
                         item.complete = true;
                         item.ChildNodes = data;
                         item.isexpand = true;
@@ -8140,6 +9153,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 //node not created yet
             }
         }
+
         function getck(items, c, fn) {
             for (var i = 0, l = items.length; i < l; i++) {
                 (items[i].showcheck == true && items[i].checkstate == 1) && c.push(fn(items[i]));
@@ -8148,6 +9162,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }
         }
+
         function getCkAndHalfCk(items, c, fn) {
             for (var i = 0, l = items.length; i < l; i++) {
                 (items[i].showcheck == true && (items[i].checkstate == 1 || items[i].checkstate == 2)) && c.push(fn(items[i]));
@@ -8156,26 +9171,33 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             }
         }
+
         me[0].t = {
-            getSelectedNodes: function(gethalfchecknode) {
+            getSelectedNodes: function (gethalfchecknode) {
                 var s = [];
                 if (gethalfchecknode) {
-                    getCkAndHalfCk(treenodes, s, function(item) { return item; });
+                    getCkAndHalfCk(treenodes, s, function (item) {
+                        return item;
+                    });
                 }
                 else {
-                    getck(treenodes, s, function(item) { return item; });
+                    getck(treenodes, s, function (item) {
+                        return item;
+                    });
                 }
                 return s;
             },
-            getSelectedValues: function() {
+            getSelectedValues: function () {
                 var s = [];
-                getck(treenodes, s, function(item) { return item.value; });
+                getck(treenodes, s, function (item) {
+                    return item.value;
+                });
                 return s;
             },
-            getCurrentItem: function() {
+            getCurrentItem: function () {
                 return dfop.citem;
             },
-            reflash: function(itemOrItemId) {
+            reflash: function (itemOrItemId) {
                 var id;
                 if (typeof (itemOrItemId) == "string") {
                     id = itemOrItemId;
@@ -8189,25 +9211,25 @@ the specific language governing permissions and limitations under the Apache Lic
         return me;
     };
     //get all checked nodes, and put them into array. no hierarchy
-    $.fn.getCheckedNodes = function() {
+    $.fn.getCheckedNodes = function () {
         if (this[0].t) {
             return this[0].t.getSelectedValues();
         }
         return null;
     };
-    $.fn.getTSNs = function(gethalfchecknode) {
+    $.fn.getTSNs = function (gethalfchecknode) {
         if (this[0].t) {
             return this[0].t.getSelectedNodes(gethalfchecknode);
         }
         return null;
     };
-    $.fn.getCurrentNode = function() {
+    $.fn.getCurrentNode = function () {
         if (this[0].t) {
             return this[0].t.getCurrentItem();
         }
         return null;
     };
-    $.fn.reflash = function(ItemOrItemId) {
+    $.fn.reflash = function (ItemOrItemId) {
         if (this[0].t) {
             return this[0].t.reflash(ItemOrItemId);
         }
@@ -8223,7 +9245,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
 // @see https://github.com/makeusabrew/bootbox/issues/180
 // @see https://github.com/makeusabrew/bootbox/issues/186
-(function(root, factory) {
+(function (root, factory) {
 
     "use strict";
     if (typeof define === "function" && define.amd) {
@@ -8322,7 +9344,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
     function each(collection, iterator) {
         var index = 0;
-        $.each(collection, function(key, value) {
+        $.each(collection, function (key, value) {
             iterator(key, value, index++);
         });
     }
@@ -8355,7 +9377,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
         total = getKeyLength(buttons);
 
-        each(buttons, function(key, button, index) {
+        each(buttons, function (key, button, index) {
 
             if ($.isFunction(button)) {
                 // short form, assume value is our callback. Since button
@@ -8487,11 +9509,11 @@ the specific language governing permissions and limitations under the Apache Lic
 
     function validateButtons(options, buttons) {
         var allowedButtons = {};
-        each(buttons, function(key, value) {
+        each(buttons, function (key, value) {
             allowedButtons[value] = true;
         });
 
-        each(options.buttons, function(key) {
+        each(options.buttons, function (key) {
             if (allowedButtons[key] === undefined) {
                 throw new Error("button key " + key + " is not allowed (options are " + buttons.join("\n") + ")");
             }
@@ -8500,7 +9522,7 @@ the specific language governing permissions and limitations under the Apache Lic
         return options;
     }
 
-    exports.alert = function() {
+    exports.alert = function () {
         var options;
 
         options = mergeDialogOptions("alert", ["ok"], ["message", "callback"], arguments);
@@ -8512,7 +9534,7 @@ the specific language governing permissions and limitations under the Apache Lic
         /**
          * overrides
          */
-        options.buttons.ok.callback = options.onEscape = function() {
+        options.buttons.ok.callback = options.onEscape = function () {
             if ($.isFunction(options.callback)) {
                 return options.callback();
             }
@@ -8522,7 +9544,7 @@ the specific language governing permissions and limitations under the Apache Lic
         return exports.dialog(options);
     };
 
-    exports.confirm = function() {
+    exports.confirm = function () {
         var options;
 
         options = mergeDialogOptions("confirm", ["cancel", "confirm"], ["message", "callback"], arguments);
@@ -8530,11 +9552,11 @@ the specific language governing permissions and limitations under the Apache Lic
         /**
          * overrides; undo anything the user tried to set they shouldn't have
          */
-        options.buttons.cancel.callback = options.onEscape = function() {
+        options.buttons.cancel.callback = options.onEscape = function () {
             return options.callback(false);
         };
 
-        options.buttons.confirm.callback = function() {
+        options.buttons.confirm.callback = function () {
             return options.callback(true);
         };
 
@@ -8546,7 +9568,7 @@ the specific language governing permissions and limitations under the Apache Lic
         return exports.dialog(options);
     };
 
-    exports.prompt = function() {
+    exports.prompt = function () {
         var options;
         var defaults;
         var dialog;
@@ -8595,11 +9617,11 @@ the specific language governing permissions and limitations under the Apache Lic
          */
         options.message = form;
 
-        options.buttons.cancel.callback = options.onEscape = function() {
+        options.buttons.cancel.callback = options.onEscape = function () {
             return options.callback(null);
         };
 
-        options.buttons.confirm.callback = function() {
+        options.buttons.confirm.callback = function () {
             var value;
 
             switch (options.inputType) {
@@ -8621,7 +9643,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     // hence we default to an empty array
                     value = [];
 
-                    each(checkedItems, function(_, item) {
+                    each(checkedItems, function (_, item) {
                         value.push($(item).val());
                     });
                     break;
@@ -8667,7 +9689,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     throw new Error("prompt with select requires options");
                 }
 
-                each(inputOptions, function(_, option) {
+                each(inputOptions, function (_, option) {
 
                     // assume the element to attach to is the input...
                     var elem = input;
@@ -8691,7 +9713,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     elem.append("<option value='" + option.value + "'>" + option.text + "</option>");
                 });
 
-                each(groups, function(_, group) {
+                each(groups, function (_, group) {
                     input.append(group);
                 });
 
@@ -8716,14 +9738,14 @@ the specific language governing permissions and limitations under the Apache Lic
                 // our 'input' element to this container instead
                 input = $("<div/>");
 
-                each(inputOptions, function(_, option) {
+                each(inputOptions, function (_, option) {
                     var checkbox = $(templates.inputs[options.inputType]);
 
                     checkbox.find("input").attr("value", option.value);
                     checkbox.find("label").append(option.text);
 
                     // we've ensured values is an array so we can always iterate over it
-                    each(values, function(_, value) {
+                    each(values, function (_, value) {
                         if (value === option.value) {
                             checkbox.find("input").prop("checked", true);
                         }
@@ -8745,7 +9767,7 @@ the specific language governing permissions and limitations under the Apache Lic
         // now place it in our form
         form.append(input);
 
-        form.on("submit", function(e) {
+        form.on("submit", function (e) {
             e.preventDefault();
             // @TODO can we actually click *the* button object instead?
             // e.g. buttons.confirm.click() or similar
@@ -8758,7 +9780,7 @@ the specific language governing permissions and limitations under the Apache Lic
         dialog.off("shown.bs.modal");
 
         // ...and replace it with one focusing our input, if possible
-        dialog.on("shown.bs.modal", function() {
+        dialog.on("shown.bs.modal", function () {
             input.focus();
         });
 
@@ -8769,7 +9791,7 @@ the specific language governing permissions and limitations under the Apache Lic
         return dialog;
     };
 
-    exports.dialog = function(options) {
+    exports.dialog = function (options) {
         options = sanitize(options);
 
         var dialog = $(templates.dialog);
@@ -8784,7 +9806,7 @@ the specific language governing permissions and limitations under the Apache Lic
             onEscape: options.onEscape
         };
 
-        each(buttons, function(key, button) {
+        each(buttons, function (key, button) {
 
             // @TODO I don't like this string appending to itself; bit dirty. Needs reworking
             // can we just build up button elements instead? slower but neater. Then button
@@ -8879,7 +9901,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * modal has performed certain actions
          */
 
-        dialog.on("hidden.bs.modal", function(e) {
+        dialog.on("hidden.bs.modal", function (e) {
             // ensure we don't accidentally intercept hidden events triggered
             // by children of the current dialog. We shouldn't anymore now BS
             // namespaces its events; but still worth doing
@@ -8899,7 +9921,7 @@ the specific language governing permissions and limitations under the Apache Lic
         // });
 
 
-        dialog.on("shown.bs.modal", function() {
+        dialog.on("shown.bs.modal", function () {
             dialog.find(".btn-primary:first").focus();
         });
 
@@ -8909,7 +9931,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * respective triggers
          */
 
-        dialog.on("escape.close.bb", function(e) {
+        dialog.on("escape.close.bb", function (e) {
             if (callbacks.onEscape) {
                 processCallback(e, dialog, callbacks.onEscape);
             }
@@ -8920,21 +9942,21 @@ the specific language governing permissions and limitations under the Apache Lic
          * interaction with our dialog
          */
 
-        dialog.on("click", ".modal-footer button", function(e) {
+        dialog.on("click", ".modal-footer button", function (e) {
             var callbackKey = $(this).data("bb-handler");
 
             processCallback(e, dialog, callbacks[callbackKey]);
 
         });
 
-        dialog.on("click", ".bootbox-close-button", function(e) {
+        dialog.on("click", ".bootbox-close-button", function (e) {
             // onEscape might be falsy but that's fine; the fact is
             // if the user has managed to click the close button we
             // have to close the dialog, callback or not
             processCallback(e, dialog, callbacks.onEscape);
         });
 
-        dialog.on("keyup", function(e) {
+        dialog.on("keyup", function (e) {
             if (e.which === 27) {
                 dialog.trigger("escape.close.bb");
             }
@@ -8981,7 +10003,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
     };
 
-    exports.setDefaults = function() {
+    exports.setDefaults = function () {
         var values = {};
 
         if (arguments.length === 2) {
@@ -8995,7 +10017,7 @@ the specific language governing permissions and limitations under the Apache Lic
         $.extend(defaults, values);
     };
 
-    exports.hideAll = function() {
+    exports.hideAll = function () {
         $(".bootbox").modal("hide");
     };
 
@@ -9102,7 +10124,7 @@ the specific language governing permissions and limitations under the Apache Lic
         }
     };
 
-    exports.init = function(_$) {
+    exports.init = function (_$) {
         return init(_$ || $);
     };
 
@@ -9119,7 +10141,7 @@ the specific language governing permissions and limitations under the Apache Lic
  *
  * Date: 2014-03-16T06:23Z
  */
-(function(factory) {
+(function (factory) {
     /* global define */
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
@@ -9128,14 +10150,14 @@ the specific language governing permissions and limitations under the Apache Lic
         // Browser globals: jQuery, CodeMirror
         factory(window.jQuery, window.CodeMirror);
     }
-}(function($, CodeMirror) {
+}(function ($, CodeMirror) {
     if ('function' !== typeof Array.prototype.reduce) {
         /**
          * Array.prototype.reduce fallback
          *
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
          */
-        Array.prototype.reduce = function(callback, optInitialValue) {
+        Array.prototype.reduce = function (callback, optInitialValue) {
             var idx, value, length = this.length >>> 0,
                 isValueSet = false;
             if (1 < arguments.length) {
@@ -9167,38 +10189,38 @@ the specific language governing permissions and limitations under the Apache Lic
         bMSIE: navigator.userAgent.indexOf('MSIE') > -1,
         bFF: navigator.userAgent.indexOf('Firefox') > -1,
         jqueryVersion: parseFloat($.fn.jquery),
-        bCodeMirror: !! CodeMirror
+        bCodeMirror: !!CodeMirror
     };
 
     /**
      * func utils (for high-order func's arg)
      */
-    var func = (function() {
-        var eq = function(elA) {
-            return function(elB) {
+    var func = (function () {
+        var eq = function (elA) {
+            return function (elB) {
                 return elA === elB;
             };
         };
 
-        var eq2 = function(elA, elB) {
+        var eq2 = function (elA, elB) {
             return elA === elB;
         };
 
-        var ok = function() {
+        var ok = function () {
             return true;
         };
 
-        var fail = function() {
+        var fail = function () {
             return false;
         };
 
-        var not = function(f) {
-            return function() {
+        var not = function (f) {
+            return function () {
                 return !f.apply(f, arguments);
             };
         };
 
-        var self = function(a) {
+        var self = function (a) {
             return a;
         };
 
@@ -9215,12 +10237,12 @@ the specific language governing permissions and limitations under the Apache Lic
     /**
      * list utils
      */
-    var list = (function() {
+    var list = (function () {
         /**
          * returns the first element of an array.
          * @param {Array} array
          */
-        var head = function(array) {
+        var head = function (array) {
             return array[0];
         };
 
@@ -9228,7 +10250,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * returns the last element of an array.
          * @param {Array} array
          */
-        var last = function(array) {
+        var last = function (array) {
             return array[array.length - 1];
         };
 
@@ -9236,7 +10258,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * returns everything but the last entry of the array.
          * @param {Array} array
          */
-        var initial = function(array) {
+        var initial = function (array) {
             return array.slice(0, array.length - 1);
         };
 
@@ -9244,7 +10266,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * returns the rest of the elements in an array.
          * @param {Array} array
          */
-        var tail = function(array) {
+        var tail = function (array) {
             return array.slice(1);
         };
 
@@ -9252,7 +10274,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * returns next item.
          * @param {Array} array
          */
-        var next = function(array, item) {
+        var next = function (array, item) {
             var idx = array.indexOf(item);
             if (idx === -1) {
                 return null;
@@ -9265,7 +10287,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * returns prev item.
          * @param {Array} array
          */
-        var prev = function(array, item) {
+        var prev = function (array, item) {
             var idx = array.indexOf(item);
             if (idx === -1) {
                 return null;
@@ -9279,9 +10301,9 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Array} array - array
          * @param {Function} fn - iterator
          */
-        var sum = function(array, fn) {
+        var sum = function (array, fn) {
             fn = fn || func.self;
-            return array.reduce(function(memo, v) {
+            return array.reduce(function (memo, v) {
                 return memo + fn(v);
             }, 0);
         };
@@ -9290,7 +10312,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * returns a copy of the collection with array type.
          * @param {Collection} collection - collection eg) node.childNodes, ...
          */
-        var from = function(collection) {
+        var from = function (collection) {
             var result = [],
                 idx = -1,
                 length = collection.length;
@@ -9306,12 +10328,12 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Function} fn - predicate function for cluster rule
          * @param {Array[]}
          */
-        var clusterBy = function(array, fn) {
+        var clusterBy = function (array, fn) {
             if (array.length === 0) {
                 return [];
             }
             var aTail = tail(array);
-            return aTail.reduce(function(memo, v) {
+            return aTail.reduce(function (memo, v) {
                 var aLast = last(memo);
                 if (fn(last(aLast), v)) {
                     aLast[aLast.length] = v;
@@ -9329,7 +10351,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Array} array - array
          * @param {Function} fn - predicate function for cluster rule
          */
-        var compact = function(array) {
+        var compact = function (array) {
             var aResult = [];
             for (var idx = 0, sz = array.length; idx < sz; idx++) {
                 if (array[idx]) {
@@ -9356,18 +10378,18 @@ the specific language governing permissions and limitations under the Apache Lic
     /**
      * Dom functions
      */
-    var dom = (function() {
+    var dom = (function () {
         /**
          * returns whether node is `note-editable` or not.
          *
          * @param {Element} node
          * @return {Boolean}
          */
-        var isEditable = function(node) {
+        var isEditable = function (node) {
             return node && $(node).hasClass('note-editable');
         };
 
-        var isControlSizing = function(node) {
+        var isControlSizing = function (node) {
             return node && $(node).hasClass('note-control-sizing');
         };
 
@@ -9377,14 +10399,14 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $editor
          * @return {Object}
          */
-        var buildLayoutInfo = function($editor) {
-            var makeFinder = function(sClassName) {
-                return function() {
+        var buildLayoutInfo = function ($editor) {
+            var makeFinder = function (sClassName) {
+                return function () {
                     return $editor.find(sClassName);
                 };
             };
             return {
-                editor: function() {
+                editor: function () {
                     return $editor;
                 },
                 dropzone: makeFinder('.note-dropzone'),
@@ -9402,23 +10424,23 @@ the specific language governing permissions and limitations under the Apache Lic
          * returns predicate which judge whether nodeName is same
          * @param {String} sNodeName
          */
-        var makePredByNodeName = function(sNodeName) {
+        var makePredByNodeName = function (sNodeName) {
             // nodeName is always uppercase.
-            return function(node) {
+            return function (node) {
                 return node && node.nodeName === sNodeName;
             };
         };
 
-        var isPara = function(node) {
+        var isPara = function (node) {
             // Chrome(v31.0), FF(v25.0.1) use DIV for paragraph
             return node && /^DIV|^P|^LI|^H[1-7]/.test(node.nodeName);
         };
 
-        var isList = function(node) {
+        var isList = function (node) {
             return node && /^UL|^OL/.test(node.nodeName);
         };
 
-        var isCell = function(node) {
+        var isCell = function (node) {
             return node && /^TD|^TH/.test(node.nodeName);
         };
 
@@ -9428,7 +10450,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} node
          * @param {Function} pred - predicate function
          */
-        var ancestor = function(node, pred) {
+        var ancestor = function (node, pred) {
             while (node) {
                 if (pred(node)) {
                     return node;
@@ -9448,11 +10470,11 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} node
          * @param {Function} [optional] pred - predicate function
          */
-        var listAncestor = function(node, pred) {
+        var listAncestor = function (node, pred) {
             pred = pred || func.fail;
 
             var aAncestor = [];
-            ancestor(node, function(el) {
+            ancestor(node, function (el) {
                 aAncestor.push(el);
                 return pred(el);
             });
@@ -9465,7 +10487,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} nodeA
          * @param {Element} nodeB
          */
-        var commonAncestor = function(nodeA, nodeB) {
+        var commonAncestor = function (nodeA, nodeB) {
             var aAncestor = listAncestor(nodeA);
             for (var n = nodeB; n; n = n.parentNode) {
                 if ($.inArray(n, aAncestor) > -1) {
@@ -9482,7 +10504,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} nodeA
          * @param {Element} nodeB
          */
-        var listBetween = function(nodeA, nodeB) {
+        var listBetween = function (nodeA, nodeB) {
             var aNode = [];
 
             var bStart = false,
@@ -9517,7 +10539,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} node
          * @param {Function} [optional] pred - predicate function
          */
-        var listPrev = function(node, pred) {
+        var listPrev = function (node, pred) {
             pred = pred || func.fail;
 
             var aNext = [];
@@ -9537,7 +10559,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} node
          * @param {Function} [pred] - predicate function
          */
-        var listNext = function(node, pred) {
+        var listNext = function (node, pred) {
             pred = pred || func.fail;
 
             var aNext = [];
@@ -9557,7 +10579,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} node
          * @param {Function} [pred] - predicate function
          */
-        var listDescendant = function(node, pred) {
+        var listDescendant = function (node, pred) {
             var aDescendant = [];
             pred = pred || func.ok;
 
@@ -9580,7 +10602,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} node
          * @param {Element} preceding - predicate function
          */
-        var insertAfter = function(node, preceding) {
+        var insertAfter = function (node, preceding) {
             var next = preceding.nextSibling,
                 parent = preceding.parentNode;
             if (next) {
@@ -9597,8 +10619,8 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} node
          * @param {Collection} aChild
          */
-        var appends = function(node, aChild) {
-            $.each(aChild, function(idx, child) {
+        var appends = function (node, aChild) {
+            $.each(aChild, function (idx, child) {
                 node.appendChild(child);
             });
             return node;
@@ -9611,7 +10633,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {Element} node
          */
-        var length = function(node) {
+        var length = function (node) {
             if (isText(node)) {
                 return node.nodeValue.length;
             }
@@ -9623,7 +10645,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {Element} node
          */
-        var position = function(node) {
+        var position = function (node) {
             var offset = 0;
             while ((node = node.previousSibling)) {
                 offset += 1;
@@ -9637,7 +10659,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} ancestor - ancestor node
          * @param {Element} node
          */
-        var makeOffsetPath = function(ancestor, node) {
+        var makeOffsetPath = function (ancestor, node) {
             var aAncestor = list.initial(listAncestor(node, func.eq(ancestor)));
             return $.map(aAncestor, position).reverse();
         };
@@ -9648,7 +10670,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} ancestor - ancestor node
          * @param {array} aOffset - offsetPath
          */
-        var fromOffsetPath = function(ancestor, aOffset) {
+        var fromOffsetPath = function (ancestor, aOffset) {
             var current = ancestor;
             for (var i = 0, sz = aOffset.length; i < sz; i++) {
                 current = current.childNodes[aOffset[i]];
@@ -9662,7 +10684,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} node
          * @param {Number} offset
          */
-        var splitData = function(node, offset) {
+        var splitData = function (node, offset) {
             if (offset === 0) {
                 return node;
             }
@@ -9688,12 +10710,12 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} pivot - this will be boundaryPoint's node
          * @param {Number} offset - this will be boundaryPoint's offset
          */
-        var split = function(root, pivot, offset) {
+        var split = function (root, pivot, offset) {
             var aAncestor = listAncestor(pivot, func.eq(root));
             if (aAncestor.length === 1) {
                 return splitData(pivot, offset);
             }
-            return aAncestor.reduce(function(node, parent) {
+            return aAncestor.reduce(function (node, parent) {
                 var clone = parent.cloneNode(false);
                 insertAfter(clone, parent);
                 if (node === pivot) {
@@ -9709,7 +10731,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} node
          * @param {Boolean} bRemoveChild
          */
-        var remove = function(node, bRemoveChild) {
+        var remove = function (node, bRemoveChild) {
             if (!node || !node.parentNode) {
                 return;
             }
@@ -9733,7 +10755,7 @@ the specific language governing permissions and limitations under the Apache Lic
             elParent.removeChild(node);
         };
 
-        var html = function($node) {
+        var html = function ($node) {
             return dom.isTextarea($node[0]) ? $node.val() : $node.html();
         };
 
@@ -10093,21 +11115,21 @@ the specific language governing permissions and limitations under the Apache Lic
     /**
      * Async functions which returns `Promise`
      */
-    var async = (function() {
+    var async = (function () {
         /**
          * read contents of file as representing URL
          *
          * @param {File} file
          * @return {Promise} - then: sDataUrl
          */
-        var readFileAsDataURL = function(file) {
-            return $.Deferred(function(deferred) {
+        var readFileAsDataURL = function (file) {
+            return $.Deferred(function (deferred) {
                 $.extend(new FileReader(), {
-                    onload: function(e) {
+                    onload: function (e) {
                         var sDataURL = e.target.result;
                         deferred.resolve(sDataURL);
                     },
-                    onerror: function() {
+                    onerror: function () {
                         deferred.reject(this);
                     }
                 }).readAsDataURL(file);
@@ -10120,11 +11142,11 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} sUrl
          * @return {Promise} - then: $image
          */
-        var createImage = function(sUrl) {
-            return $.Deferred(function(deferred) {
-                $('<img>').one('load', function() {
+        var createImage = function (sUrl) {
+            return $.Deferred(function (deferred) {
+                $('<img>').one('load', function () {
                     deferred.resolve($(this));
-                }).one('error abort', function() {
+                }).one('error abort', function () {
                     deferred.reject($(this));
                 }).css({
                     display: 'none'
@@ -10142,7 +11164,7 @@ the specific language governing permissions and limitations under the Apache Lic
      * Object for keycodes.
      */
     var key = {
-        isEdit: function(keyCode) {
+        isEdit: function (keyCode) {
             return [8, 9, 13, 32].indexOf(keyCode) !== -1;
         },
         nameFromCode: {
@@ -10186,7 +11208,7 @@ the specific language governing permissions and limitations under the Apache Lic
      * Style
      * @class
      */
-    var Style = function() {
+    var Style = function () {
         /**
          * passing an array of style properties to .css()
          * will result in an object of property-value pairs.
@@ -10196,10 +11218,10 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param  {Array} propertyNames - An array of one or more CSS properties.
          * @returns {Object}
          */
-        var jQueryCSS = function($obj, propertyNames) {
+        var jQueryCSS = function ($obj, propertyNames) {
             if (agent.jqueryVersion < 1.9) {
                 var result = {};
-                $.each(propertyNames, function(idx, propertyName) {
+                $.each(propertyNames, function (idx, propertyName) {
                     result[propertyName] = $obj.css(propertyName);
                 });
                 return result;
@@ -10213,8 +11235,8 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {WrappedRange} rng
          * @param {Object} oStyle
          */
-        this.stylePara = function(rng, oStyle) {
-            $.each(rng.nodes(dom.isPara), function(idx, elPara) {
+        this.stylePara = function (rng, oStyle) {
+            $.each(rng.nodes(dom.isPara), function (idx, elPara) {
                 $(elPara).css(oStyle);
             });
         };
@@ -10226,7 +11248,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} elTarget - target element on event
          * @return {Object} - object contains style properties.
          */
-        this.current = function(rng, elTarget) {
+        this.current = function (rng, elTarget) {
             var $cont = $(dom.isText(rng.sc) ? rng.sc.parentNode : rng.sc);
             var properties = ['font-family', 'font-size', 'text-align', 'list-style-type', 'line-height'];
             var oStyle = jQueryCSS($cont, properties) || {};
@@ -10266,8 +11288,8 @@ the specific language governing permissions and limitations under the Apache Lic
     /**
      * range module
      */
-    var range = (function() {
-        var bW3CRangeSupport = !! document.createRange;
+    var range = (function () {
+        var bW3CRangeSupport = !!document.createRange;
 
         /**
          * return boundaryPoint from TextRange, inspired by Andy Na's HuskyRange.js
@@ -10275,7 +11297,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Boolean} bStart
          * @return {BoundaryPoint}
          */
-        var textRange2bp = function(textRange, bStart) {
+        var textRange2bp = function (textRange, bStart) {
             var elCont = textRange.parentElement(),
                 nOffset;
 
@@ -10334,8 +11356,8 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {BoundaryPoint} bp
          * @return {TextRange}
          */
-        var bp2textRange = function(bp) {
-            var textRangeInfo = function(elCont, nOffset) {
+        var bp2textRange = function (bp) {
+            var textRangeInfo = function (elCont, nOffset) {
                 var elNode, bCollapseToStart;
 
                 if (dom.isText(elCont)) {
@@ -10378,14 +11400,14 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} ec - end container
          * @param {Number} eo - end offset
          */
-        var WrappedRange = function(sc, so, ec, eo) {
+        var WrappedRange = function (sc, so, ec, eo) {
             this.sc = sc;
             this.so = so;
             this.ec = ec;
             this.eo = eo;
 
             // nativeRange: get nativeRange from sc, so, ec, eo
-            var nativeRange = function() {
+            var nativeRange = function () {
                 if (bW3CRangeSupport) {
                     var w3cRange = document.createRange();
                     w3cRange.setStart(sc, so);
@@ -10407,7 +11429,7 @@ the specific language governing permissions and limitations under the Apache Lic
             /**
              * select update visible range
              */
-            this.select = function() {
+            this.select = function () {
                 var nativeRng = nativeRange();
                 if (bW3CRangeSupport) {
                     var selection = document.getSelection();
@@ -10426,9 +11448,9 @@ the specific language governing permissions and limitations under the Apache Lic
              * @param {Function} pred - predicate function
              * @return {Element[]}
              */
-            this.nodes = function(pred) {
+            this.nodes = function (pred) {
                 var aNode = dom.listBetween(sc, ec);
-                var aMatched = list.compact($.map(aNode, function(node) {
+                var aMatched = list.compact($.map(aNode, function (node) {
                     return dom.ancestor(node, pred);
                 }));
                 return $.map(list.clusterBy(aMatched, func.eq2), list.head);
@@ -10438,15 +11460,15 @@ the specific language governing permissions and limitations under the Apache Lic
              * returns commonAncestor of range
              * @return {Element} - commonAncestor
              */
-            this.commonAncestor = function() {
+            this.commonAncestor = function () {
                 return dom.commonAncestor(sc, ec);
             };
 
             /**
              * makeIsOn: return isOn(pred) function
              */
-            var makeIsOn = function(pred) {
-                return function() {
+            var makeIsOn = function (pred) {
+                return function () {
                     var elAncestor = dom.ancestor(sc, pred);
                     return !!elAncestor && (elAncestor === dom.ancestor(ec, pred));
                 };
@@ -10461,7 +11483,7 @@ the specific language governing permissions and limitations under the Apache Lic
             // isOnAnchor: judge whether range is on cell node or not
             this.isOnCell = makeIsOn(dom.isCell);
             // isCollapsed: judge whether range was collapsed
-            this.isCollapsed = function() {
+            this.isCollapsed = function () {
                 return sc === ec && so === eo;
             };
 
@@ -10469,7 +11491,7 @@ the specific language governing permissions and limitations under the Apache Lic
              * insert node at current cursor
              * @param {Element} node
              */
-            this.insertNode = function(node) {
+            this.insertNode = function (node) {
                 var nativeRng = nativeRange();
                 if (bW3CRangeSupport) {
                     nativeRng.insertNode(node);
@@ -10478,13 +11500,13 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             };
 
-            this.toString = function() {
+            this.toString = function () {
                 var nativeRng = nativeRange();
                 return bW3CRangeSupport ? nativeRng.toString() : nativeRng.text;
             };
 
             // bookmark: offsetPath bookmark
-            this.bookmark = function(elEditable) {
+            this.bookmark = function (elEditable) {
                 return {
                     s: {
                         path: dom.makeOffsetPath(elEditable, sc),
@@ -10507,7 +11529,7 @@ the specific language governing permissions and limitations under the Apache Lic
              * @param {Element} ec - end container
              * @param {Number} eo - end offset
              */
-            create: function(sc, so, ec, eo) {
+            create: function (sc, so, ec, eo) {
                 if (arguments.length === 0) { // from Browser Selection
                     if (bW3CRangeSupport) { // webkit, firefox
                         var selection = document.getSelection();
@@ -10548,7 +11570,7 @@ the specific language governing permissions and limitations under the Apache Lic
              * @param {Element} node
              * @return {WrappedRange}
              */
-            createFromNode: function(node) {
+            createFromNode: function (node) {
                 return this.create(node, 0, node, 1);
             },
 
@@ -10559,7 +11581,7 @@ the specific language governing permissions and limitations under the Apache Lic
              * @param {Obkect} bookmark
              * @return {WrappedRange}
              */
-            createFromBookmark: function(elEditable, bookmark) {
+            createFromBookmark: function (elEditable, bookmark) {
                 var sc = dom.fromOffsetPath(elEditable, bookmark.s.path);
                 var so = bookmark.s.offset;
                 var ec = dom.fromOffsetPath(elEditable, bookmark.e.path);
@@ -10573,14 +11595,14 @@ the specific language governing permissions and limitations under the Apache Lic
      * Table
      * @class
      */
-    var Table = function() {
+    var Table = function () {
         /**
          * handle tab key
          *
          * @param {WrappedRange} rng
          * @param {Boolean} bShift
          */
-        this.tab = function(rng, bShift) {
+        this.tab = function (rng, bShift) {
             var elCell = dom.ancestor(rng.commonAncestor(), dom.isCell);
             var elTable = dom.ancestor(elCell, dom.isTable);
             var aCell = dom.listDescendant(elTable, dom.isCell);
@@ -10597,7 +11619,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Number} nRow
          * @param {Number} nCol
          */
-        this.createTable = function(nCol, nRow) {
+        this.createTable = function (nCol, nRow) {
             var aTD = [],
                 sTD;
             for (var idxCol = 0; idxCol < nCol; idxCol++) {
@@ -10621,7 +11643,7 @@ the specific language governing permissions and limitations under the Apache Lic
      * Editor
      * @class
      */
-    var Editor = function() {
+    var Editor = function () {
 
         var style = new Style();
         var table = new Table();
@@ -10631,7 +11653,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {jQuery} $editable
          */
-        this.saveRange = function($editable) {
+        this.saveRange = function ($editable) {
             $editable.data('range', range.create());
         };
 
@@ -10640,7 +11662,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {jQuery} $editable
          */
-        this.restoreRange = function($editable) {
+        this.restoreRange = function ($editable) {
             var rng = $editable.data('range');
             if (rng) {
                 rng.select();
@@ -10651,7 +11673,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * current style
          * @param {Element} elTarget
          */
-        this.currentStyle = function(elTarget) {
+        this.currentStyle = function (elTarget) {
             var rng = range.create();
             return rng && rng.isOnEditable() && style.current(rng, elTarget);
         };
@@ -10660,7 +11682,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * undo
          * @param {jQuery} $editable
          */
-        this.undo = function($editable) {
+        this.undo = function ($editable) {
             $editable.data('NoteHistory').undo($editable);
         };
 
@@ -10668,7 +11690,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * redo
          * @param {jQuery} $editable
          */
-        this.redo = function($editable) {
+        this.redo = function ($editable) {
             $editable.data('NoteHistory').redo($editable);
         };
 
@@ -10676,7 +11698,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * record Undo
          * @param {jQuery} $editable
          */
-        var recordUndo = this.recordUndo = function($editable) {
+        var recordUndo = this.recordUndo = function ($editable) {
             $editable.data('NoteHistory').recordUndo($editable);
         };
 
@@ -10690,8 +11712,8 @@ the specific language governing permissions and limitations under the Apache Lic
         ];
 
         for (var idx = 0, len = aCmd.length; idx < len; idx++) {
-            this[aCmd[idx]] = (function(sCmd) {
-                return function($editable, sValue) {
+            this[aCmd[idx]] = (function (sCmd) {
+                return function ($editable, sValue) {
                     recordUndo($editable);
                     document.execCommand(sCmd, false, sValue);
                 };
@@ -10704,7 +11726,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {WrappedRange} rng
          * @param {Number} nTabsize
          */
-        var insertTab = function($editable, rng, nTabsize) {
+        var insertTab = function ($editable, rng, nTabsize) {
             recordUndo($editable);
             var sNbsp = new Array(nTabsize + 1).join('&nbsp;');
             rng.insertNode($('<span id="noteTab">' + sNbsp + '</span>')[0]);
@@ -10720,7 +11742,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Number} nTabsize
          * @param {Boolean} bShift
          */
-        this.tab = function($editable, options) {
+        this.tab = function ($editable, options) {
             var rng = range.create();
             if (rng.isCollapsed() && rng.isOnCell()) {
                 table.tab(rng);
@@ -10732,7 +11754,7 @@ the specific language governing permissions and limitations under the Apache Lic
         /**
          * handle shift+tab key
          */
-        this.untab = function() {
+        this.untab = function () {
             var rng = range.create();
             if (rng.isCollapsed() && rng.isOnCell()) {
                 table.tab(rng, true);
@@ -10745,15 +11767,15 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $editable
          * @param {String} sUrl
          */
-        this.insertImage = function($editable, sUrl) {
-            async.createImage(sUrl).then(function($image) {
+        this.insertImage = function ($editable, sUrl) {
+            async.createImage(sUrl).then(function ($image) {
                 recordUndo($editable);
                 $image.css({
                     display: '',
                     width: Math.min($editable.width(), $image.width())
                 });
                 range.create().insertNode($image[0]);
-            }).fail(function() {
+            }).fail(function () {
                 var callbacks = $editable.data('callbacks');
                 if (callbacks.onImageUploadError) {
                     callbacks.onImageUploadError();
@@ -10766,7 +11788,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $editable
          * @param {String} sUrl
          */
-        this.insertVideo = function($editable, sUrl) {
+        this.insertVideo = function ($editable, sUrl) {
             recordUndo($editable);
 
             // video url patterns(youtube, instagram, vimeo, dailymotion)
@@ -10826,24 +11848,25 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $editable
          * @param {String} sTagName
          */
-        this.formatBlock = function($editable, sTagName) {
+        this.formatBlock = function ($editable, sTagName) {
             recordUndo($editable);
             sTagName = agent.bMSIE ? '<' + sTagName + '>' : sTagName;
             document.execCommand('FormatBlock', false, sTagName);
         };
 
-        this.formatPara = function($editable) {
+        this.formatPara = function ($editable) {
             this.formatBlock($editable, 'P');
         };
 
         /* jshint ignore:start */
         for (var idx = 1; idx <= 6; idx++) {
-            this['formatH' + idx] = function(idx) {
-                return function($editable) {
+            this['formatH' + idx] = function (idx) {
+                return function ($editable) {
                     this.formatBlock($editable, 'H' + idx);
                 };
             }(idx);
-        };
+        }
+        ;
         /* jshint ignore:end */
 
         /**
@@ -10853,7 +11876,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $editable
          * @param {String} sValue - px
          */
-        this.fontSize = function($editable, sValue) {
+        this.fontSize = function ($editable, sValue) {
             recordUndo($editable);
             document.execCommand('fontSize', false, 3);
             if (agent.bFF) {
@@ -10861,7 +11884,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 $editable.find('font[size=3]').removeAttr('size').css('font-size', sValue + 'px');
             } else {
                 // chrome: <span style="font-size: medium"> to <span style='font-size={sValue}px;'>
-                $editable.find('span').filter(function() {
+                $editable.find('span').filter(function () {
                     return this.style.fontSize === 'medium';
                 }).css('font-size', sValue + 'px');
             }
@@ -10872,7 +11895,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $editable
          * @param {String} sValue
          */
-        this.lineHeight = function($editable, sValue) {
+        this.lineHeight = function ($editable, sValue) {
             recordUndo($editable);
             style.stylePara(range.create(), {
                 lineHeight: sValue
@@ -10883,7 +11906,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * unlink
          * @param {jQuery} $editable
          */
-        this.unlink = function($editable) {
+        this.unlink = function ($editable) {
             var rng = range.create();
             if (rng.isOnAnchor()) {
                 recordUndo($editable);
@@ -10901,7 +11924,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} sLinkUrl
          * @param {Boolean} bNewWindow
          */
-        this.createLink = function($editable, sLinkUrl, bNewWindow) {
+        this.createLink = function ($editable, sLinkUrl, bNewWindow) {
             var rng = range.create();
             recordUndo($editable);
 
@@ -10925,7 +11948,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             // target
-            $.each(rng.nodes(dom.isAnchor), function(idx, elAnchor) {
+            $.each(rng.nodes(dom.isAnchor), function (idx, elAnchor) {
                 if (bNewWindow) {
                     $(elAnchor).attr('target', '_blank');
                 } else {
@@ -10939,7 +11962,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @return {Promise}
          */
-        this.getLinkInfo = function() {
+        this.getLinkInfo = function () {
             var rng = range.create();
             var bNewWindow = true;
             var sUrl = '';
@@ -10964,7 +11987,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @return {Object}
          */
-        this.getVideoInfo = function() {
+        this.getVideoInfo = function () {
             var rng = range.create();
 
             if (rng.isOnAnchor()) {
@@ -10977,7 +12000,7 @@ the specific language governing permissions and limitations under the Apache Lic
             };
         };
 
-        this.color = function($editable, sObjColor) {
+        this.color = function ($editable, sObjColor) {
             var oColor = JSON.parse(sObjColor);
             var foreColor = oColor.foreColor,
                 backColor = oColor.backColor;
@@ -10991,7 +12014,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         };
 
-        this.insertTable = function($editable, sDim) {
+        this.insertTable = function ($editable, sDim) {
             recordUndo($editable);
             var aDim = sDim.split('x');
             range.create().insertNode(table.createTable(aDim[0], aDim[1]));
@@ -11002,7 +12025,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} sValue
          * @param {jQuery} $target
          */
-        this.floatMe = function($editable, sValue, $target) {
+        this.floatMe = function ($editable, sValue, $target) {
             recordUndo($editable);
             $target.css('float', sValue);
         };
@@ -11013,7 +12036,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} sValue
          * @param {jQuery} $target - target element
          */
-        this.resize = function($editable, sValue, $target) {
+        this.resize = function ($editable, sValue, $target) {
             recordUndo($editable);
 
             $target.css({
@@ -11027,7 +12050,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $target - target element
          * @param {Boolean} [bKeepRatio] - keep ratio
          */
-        this.resizeTo = function(pos, $target, bKeepRatio) {
+        this.resizeTo = function (pos, $target, bKeepRatio) {
             var szImage;
             if (bKeepRatio) {
                 var newRatio = pos.y / pos.x;
@@ -11053,7 +12076,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} sValue - dummy argument (for keep interface)
          * @param {jQuery} $target - target element
          */
-        this.removeMedia = function($editable, sValue, $target) {
+        this.removeMedia = function ($editable, sValue, $target) {
             recordUndo($editable);
             $target.detach();
         };
@@ -11063,11 +12086,11 @@ the specific language governing permissions and limitations under the Apache Lic
      * History
      * @class
      */
-    var History = function() {
+    var History = function () {
         var aUndo = [],
             aRedo = [];
 
-        var makeSnap = function($editable) {
+        var makeSnap = function ($editable) {
             var elEditable = $editable[0],
                 rng = range.create();
             return {
@@ -11077,12 +12100,12 @@ the specific language governing permissions and limitations under the Apache Lic
             };
         };
 
-        var applySnap = function($editable, oSnap) {
+        var applySnap = function ($editable, oSnap) {
             $editable.html(oSnap.contents).scrollTop(oSnap.scrollTop);
             range.createFromBookmark($editable[0], oSnap.bookmark).select();
         };
 
-        this.undo = function($editable) {
+        this.undo = function ($editable) {
             var oSnap = makeSnap($editable);
             if (aUndo.length === 0) {
                 return;
@@ -11091,7 +12114,7 @@ the specific language governing permissions and limitations under the Apache Lic
             aRedo.push(oSnap);
         };
 
-        this.redo = function($editable) {
+        this.redo = function ($editable) {
             var oSnap = makeSnap($editable);
             if (aRedo.length === 0) {
                 return;
@@ -11100,7 +12123,7 @@ the specific language governing permissions and limitations under the Apache Lic
             aUndo.push(oSnap);
         };
 
-        this.recordUndo = function($editable) {
+        this.recordUndo = function ($editable) {
             aRedo = [];
             aUndo.push(makeSnap($editable));
         };
@@ -11109,22 +12132,22 @@ the specific language governing permissions and limitations under the Apache Lic
     /**
      * Toolbar
      */
-    var Toolbar = function() {
+    var Toolbar = function () {
         /**
          * update button status
          *
          * @param {jQuery} $toolbar
          * @param {Object} oStyle
          */
-        this.update = function($toolbar, oStyle) {
+        this.update = function ($toolbar, oStyle) {
 
             /**
              * handle dropdown's check mark (for fontname, fontsize, lineHeight).
              * @param {jQuery} $btn
              * @param {Number} nValue
              */
-            var checkDropdownMenu = function($btn, nValue) {
-                $btn.find('.dropdown-menu li a').each(function() {
+            var checkDropdownMenu = function ($btn, nValue) {
+                $btn.find('.dropdown-menu li a').each(function () {
                     // always compare string to avoid creating another func.
                     var bChecked = ($(this).data('value') + '') === (nValue + '');
                     this.className = bChecked ? 'checked' : '';
@@ -11137,7 +12160,7 @@ the specific language governing permissions and limitations under the Apache Lic
              * @param {String} sSelector
              * @param {Function} pred
              */
-            var btnState = function(sSelector, pred) {
+            var btnState = function (sSelector, pred) {
                 var $btn = $toolbar.find(sSelector);
                 $btn.toggleClass('active', pred());
             };
@@ -11146,7 +12169,7 @@ the specific language governing permissions and limitations under the Apache Lic
             var $fontname = $toolbar.find('.note-fontname');
             if ($fontname.length > 0) {
                 var selectedFont = oStyle['font-family'];
-                if ( !! selectedFont) {
+                if (!!selectedFont) {
                     selectedFont = list.head(selectedFont.split(','));
                     selectedFont = selectedFont.replace(/\'/g, '');
                     $fontname.find('.note-current-fontname').text(selectedFont);
@@ -11163,31 +12186,31 @@ the specific language governing permissions and limitations under the Apache Lic
             var $lineHeight = $toolbar.find('.note-height');
             checkDropdownMenu($lineHeight, parseFloat(oStyle['line-height']));
 
-            btnState('button[data-event="bold"]', function() {
+            btnState('button[data-event="bold"]', function () {
                 return oStyle['font-bold'] === 'bold';
             });
-            btnState('button[data-event="italic"]', function() {
+            btnState('button[data-event="italic"]', function () {
                 return oStyle['font-italic'] === 'italic';
             });
-            btnState('button[data-event="underline"]', function() {
+            btnState('button[data-event="underline"]', function () {
                 return oStyle['font-underline'] === 'underline';
             });
-            btnState('button[data-event="justifyLeft"]', function() {
+            btnState('button[data-event="justifyLeft"]', function () {
                 return oStyle['text-align'] === 'left' || oStyle['text-align'] === 'start';
             });
-            btnState('button[data-event="justifyCenter"]', function() {
+            btnState('button[data-event="justifyCenter"]', function () {
                 return oStyle['text-align'] === 'center';
             });
-            btnState('button[data-event="justifyRight"]', function() {
+            btnState('button[data-event="justifyRight"]', function () {
                 return oStyle['text-align'] === 'right';
             });
-            btnState('button[data-event="justifyFull"]', function() {
+            btnState('button[data-event="justifyFull"]', function () {
                 return oStyle['text-align'] === 'justify';
             });
-            btnState('button[data-event="insertUnorderedList"]', function() {
+            btnState('button[data-event="insertUnorderedList"]', function () {
                 return oStyle['list-style'] === 'unordered';
             });
-            btnState('button[data-event="insertOrderedList"]', function() {
+            btnState('button[data-event="insertOrderedList"]', function () {
                 return oStyle['list-style'] === 'ordered';
             });
         };
@@ -11199,7 +12222,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} sEvent
          * @param {sValue} sValue
          */
-        this.updateRecentColor = function(elBtn, sEvent, sValue) {
+        this.updateRecentColor = function (elBtn, sEvent, sValue) {
             var $color = $(elBtn).closest('.note-color');
             var $recentColor = $color.find('.note-recent-color');
             var oColor = JSON.parse($recentColor.attr('data-value'));
@@ -11209,12 +12232,12 @@ the specific language governing permissions and limitations under the Apache Lic
             $recentColor.find('i').css(sKey, sValue);
         };
 
-        this.updateFullscreen = function($toolbar, bFullscreen) {
+        this.updateFullscreen = function ($toolbar, bFullscreen) {
             var $btn = $toolbar.find('button[data-event="fullscreen"]');
             $btn.toggleClass('active', bFullscreen);
         };
 
-        this.updateCodeview = function($toolbar, bCodeview) {
+        this.updateCodeview = function ($toolbar, bCodeview) {
             var $btn = $toolbar.find('button[data-event="codeview"]');
             $btn.toggleClass('active', bCodeview);
         };
@@ -11223,7 +12246,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * activate buttons exclude codeview
          * @param {jQuery} $toolbar
          */
-        this.activate = function($toolbar) {
+        this.activate = function ($toolbar) {
             $toolbar.find('button').not('button[data-event="codeview"]').removeClass('disabled');
         };
 
@@ -11231,7 +12254,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * deactivate buttons exclude codeview
          * @param {jQuery} $toolbar
          */
-        this.deactivate = function($toolbar) {
+        this.deactivate = function ($toolbar) {
             $toolbar.find('button').not('button[data-event="codeview"]').addClass('disabled');
         };
     };
@@ -11239,13 +12262,13 @@ the specific language governing permissions and limitations under the Apache Lic
     /**
      * Popover (http://getbootstrap.com/javascript/#popovers)
      */
-    var Popover = function() {
+    var Popover = function () {
         /**
          * show popover
          * @param {jQuery} popover
          * @param {Element} elPlaceholder - placeholder for popover
          */
-        var showPopover = function($popover, elPlaceholder) {
+        var showPopover = function ($popover, elPlaceholder) {
             var $placeholder = $(elPlaceholder);
             var pos = $placeholder.position(),
                 height = $placeholder.height();
@@ -11263,7 +12286,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $popover - popover container
          * @param {Object} oStyle - style object
          */
-        this.update = function($popover, oStyle) {
+        this.update = function ($popover, oStyle) {
             var $linkPopover = $popover.find('.note-link-popover');
 
             if (oStyle.anchor) {
@@ -11286,7 +12309,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * hide all popovers
          * @param {jQuery} $popover - popover contaienr
          */
-        this.hide = function($popover) {
+        this.hide = function ($popover) {
             $popover.children().hide();
         };
     };
@@ -11294,13 +12317,13 @@ the specific language governing permissions and limitations under the Apache Lic
     /**
      * Handle
      */
-    var Handle = function() {
+    var Handle = function () {
         /**
          * update handle
          * @param {jQuery} $handle
          * @param {Object} oStyle
          */
-        this.update = function($handle, oStyle) {
+        this.update = function ($handle, oStyle) {
             var $selection = $handle.find('.note-control-selection');
             if (oStyle.image) {
                 var $image = $(oStyle.image);
@@ -11323,7 +12346,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         };
 
-        this.hide = function($handle) {
+        this.hide = function ($handle) {
             $handle.children().hide();
         };
     };
@@ -11333,7 +12356,7 @@ the specific language governing permissions and limitations under the Apache Lic
      *
      * @class
      */
-    var Dialog = function() {
+    var Dialog = function () {
 
         /**
          * toggle button status
@@ -11341,7 +12364,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $btn
          * @param {Boolean} bEnable
          */
-        var toggleBtn = function($btn, bEnable) {
+        var toggleBtn = function ($btn, bEnable) {
             $btn.toggleClass('disabled', !bEnable);
             $btn.attr('disabled', !bEnable);
         };
@@ -11353,36 +12376,36 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $dialog
          * @return {Promise}
          */
-        this.showImageDialog = function($editable, $dialog) {
-            return $.Deferred(function(deferred) {
+        this.showImageDialog = function ($editable, $dialog) {
+            return $.Deferred(function (deferred) {
                 var $imageDialog = $dialog.find('.note-image-dialog');
 
                 var $imageInput = $dialog.find('.note-image-input'),
                     $imageUrl = $dialog.find('.note-image-url'),
                     $imageBtn = $dialog.find('.note-image-btn');
 
-                $imageDialog.one('shown.bs.modal', function(event) {
+                $imageDialog.one('shown.bs.modal', function (event) {
                     event.stopPropagation();
 
                     // Cloning imageInput to clear element.
                     $imageInput.replaceWith($imageInput.clone()
-                        .on('change', function() {
-                            $imageDialog.modal('hide');
-                            deferred.resolve(this.files);
-                        })
+                            .on('change', function () {
+                                $imageDialog.modal('hide');
+                                deferred.resolve(this.files);
+                            })
                     );
 
-                    $imageBtn.click(function(event) {
+                    $imageBtn.click(function (event) {
                         event.preventDefault();
 
                         $imageDialog.modal('hide');
                         deferred.resolve($imageUrl.val());
                     });
 
-                    $imageUrl.keyup(function() {
+                    $imageUrl.keyup(function () {
                         toggleBtn($imageBtn, $imageUrl.val());
                     }).val('').focus();
-                }).one('hidden.bs.modal', function(event) {
+                }).one('hidden.bs.modal', function (event) {
                     event.stopPropagation();
 
                     $editable.focus();
@@ -11400,26 +12423,26 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Object} videoInfo
          * @return {Promise}
          */
-        this.showVideoDialog = function($editable, $dialog, videoInfo) {
-            return $.Deferred(function(deferred) {
+        this.showVideoDialog = function ($editable, $dialog, videoInfo) {
+            return $.Deferred(function (deferred) {
                 var $videoDialog = $dialog.find('.note-video-dialog');
                 var $videoUrl = $videoDialog.find('.note-video-url'),
                     $videoBtn = $videoDialog.find('.note-video-btn');
 
-                $videoDialog.one('shown.bs.modal', function(event) {
+                $videoDialog.one('shown.bs.modal', function (event) {
                     event.stopPropagation();
 
-                    $videoUrl.val(videoInfo.text).keyup(function() {
+                    $videoUrl.val(videoInfo.text).keyup(function () {
                         toggleBtn($videoBtn, $videoUrl.val());
                     }).trigger('keyup').trigger('focus');
 
-                    $videoBtn.click(function(event) {
+                    $videoBtn.click(function (event) {
                         event.preventDefault();
 
                         $videoDialog.modal('hide');
                         deferred.resolve($videoUrl.val());
                     });
-                }).one('hidden.bs.modal', function(event) {
+                }).one('hidden.bs.modal', function (event) {
                     event.stopPropagation();
 
                     $editable.focus();
@@ -11436,8 +12459,8 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Object} linkInfo
          * @return {Promise}
          */
-        this.showLinkDialog = function($editable, $dialog, linkInfo) {
-            return $.Deferred(function(deferred) {
+        this.showLinkDialog = function ($editable, $dialog, linkInfo) {
+            return $.Deferred(function (deferred) {
                 var $linkDialog = $dialog.find('.note-link-dialog');
 
                 var $linkText = $linkDialog.find('.note-link-text'),
@@ -11445,12 +12468,12 @@ the specific language governing permissions and limitations under the Apache Lic
                     $linkBtn = $linkDialog.find('.note-link-btn'),
                     $openInNewWindow = $linkDialog.find('input[type=checkbox]');
 
-                $linkDialog.one('shown.bs.modal', function(event) {
+                $linkDialog.one('shown.bs.modal', function (event) {
                     event.stopPropagation();
 
                     $linkText.val(linkInfo.text);
 
-                    $linkUrl.keyup(function() {
+                    $linkUrl.keyup(function () {
                         toggleBtn($linkBtn, $linkUrl.val());
                         // display same link on `Text to display` input
                         // when create a new link
@@ -11461,13 +12484,13 @@ the specific language governing permissions and limitations under the Apache Lic
 
                     $openInNewWindow.prop('checked', linkInfo.newWindow);
 
-                    $linkBtn.one('click', function(event) {
+                    $linkBtn.one('click', function (event) {
                         event.preventDefault();
 
                         $linkDialog.modal('hide');
                         deferred.resolve($linkUrl.val(), $openInNewWindow.is(':checked'));
                     });
-                }).one('hidden.bs.modal', function(event) {
+                }).one('hidden.bs.modal', function (event) {
                     event.stopPropagation();
 
                     $editable.focus();
@@ -11481,10 +12504,10 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {jQuery} $dialog
          */
-        this.showHelpDialog = function($editable, $dialog) {
+        this.showHelpDialog = function ($editable, $dialog) {
             var $helpDialog = $dialog.find('.note-help-dialog');
 
-            $helpDialog.one('hidden.bs.modal', function(event) {
+            $helpDialog.one('hidden.bs.modal', function (event) {
                 event.stopPropagation();
                 $editable.focus();
             }).modal('show');
@@ -11494,7 +12517,7 @@ the specific language governing permissions and limitations under the Apache Lic
     /**
      * EventHandler
      */
-    var EventHandler = function() {
+    var EventHandler = function () {
         var editor = new Editor();
         var toolbar = new Toolbar(),
             popover = new Popover();
@@ -11507,7 +12530,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Element} descendant
          * @returns {Object}
          */
-        var makeLayoutInfo = function(descendant) {
+        var makeLayoutInfo = function (descendant) {
             var $editor = $(descendant).closest('.note-editor');
             return $editor.length > 0 && dom.buildLayoutInfo($editor);
         };
@@ -11518,7 +12541,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $editable
          * @param {File[]} files
          */
-        var insertImages = function($editable, files) {
+        var insertImages = function ($editable, files) {
             editor.restoreRange($editable);
             var callbacks = $editable.data('callbacks');
 
@@ -11527,10 +12550,10 @@ the specific language governing permissions and limitations under the Apache Lic
                 callbacks.onImageUpload(files, editor, $editable);
                 // else insert Image as dataURL
             } else {
-                $.each(files, function(idx, file) {
-                    async.readFileAsDataURL(file).then(function(sDataURL) {
+                $.each(files, function (idx, file) {
+                    async.readFileAsDataURL(file).then(function (sDataURL) {
                         editor.insertImage($editable, sDataURL);
-                    }).fail(function() {
+                    }).fail(function () {
                         if (callbacks.onImageUploadError) {
                             callbacks.onImageUploadError();
                         }
@@ -11539,14 +12562,14 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         };
 
-        var hMousedown = function(event) {
+        var hMousedown = function (event) {
             //preventDefault Selection for FF, IE8+
             if (dom.isImg(event.target)) {
                 event.preventDefault();
             }
         };
 
-        var hToolbarAndPopoverUpdate = function(event) {
+        var hToolbarAndPopoverUpdate = function (event) {
             var oLayoutInfo = makeLayoutInfo(event.currentTarget || event.target);
             var oStyle = editor.currentStyle(event.target);
             if (!oStyle) {
@@ -11557,7 +12580,7 @@ the specific language governing permissions and limitations under the Apache Lic
             handle.update(oLayoutInfo.handle(), oStyle);
         };
 
-        var hScroll = function(event) {
+        var hScroll = function (event) {
             var oLayoutInfo = makeLayoutInfo(event.currentTarget || event.target);
             //hide popover and handle when scrolled
             popover.hide(oLayoutInfo.popover());
@@ -11570,7 +12593,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {MouseEvent} event
          */
-        var hHandleMousedown = function(event) {
+        var hHandleMousedown = function (event) {
             if (dom.isControlSizing(event.target)) {
                 var oLayoutInfo = makeLayoutInfo(event.target),
                     $handle = oLayoutInfo.handle(),
@@ -11583,7 +12606,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 var posStart = $target.offset(),
                     scrollTop = $(document).scrollTop();
 
-                $editor.on('mousemove', function(event) {
+                $editor.on('mousemove', function (event) {
 
                     editor.resizeTo({
                         x: event.clientX - posStart.left,
@@ -11596,7 +12619,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     popover.update($popover, {
                         image: elTarget
                     });
-                }).one('mouseup', function() {
+                }).one('mouseup', function () {
                     $editor.off('mousemove');
                 });
 
@@ -11610,7 +12633,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         };
 
-        var hToolbarAndPopoverMousedown = function(event) {
+        var hToolbarAndPopoverMousedown = function (event) {
             // prevent default event when insertTable (FF, Webkit)
             var $btn = $(event.target).closest('[data-event]');
             if ($btn.length > 0) {
@@ -11618,7 +12641,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         };
 
-        var hToolbarAndPopoverClick = function(event) {
+        var hToolbarAndPopoverClick = function (event) {
             var $btn = $(event.target).closest('[data-event]');
 
             if ($btn.length > 0) {
@@ -11658,14 +12681,14 @@ the specific language governing permissions and limitations under the Apache Lic
                     var linkInfo = editor.getLinkInfo();
 
                     editor.saveRange($editable);
-                    dialog.showLinkDialog($editable, $dialog, linkInfo).then(function(sLinkUrl, bNewWindow) {
+                    dialog.showLinkDialog($editable, $dialog, linkInfo).then(function (sLinkUrl, bNewWindow) {
                         editor.restoreRange($editable);
                         editor.createLink($editable, sLinkUrl, bNewWindow);
                     });
                 } else if (sEvent === 'showImageDialog') {
                     $editable.focus();
 
-                    dialog.showImageDialog($editable, $dialog).then(function(data) {
+                    dialog.showImageDialog($editable, $dialog).then(function (data) {
                         if (typeof data === 'string') {
                             editor.restoreRange($editable);
                             editor.insertImage($editable, data);
@@ -11678,7 +12701,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     var videoInfo = editor.getVideoInfo();
 
                     editor.saveRange($editable);
-                    dialog.showVideoDialog($editable, $dialog, videoInfo).then(function(sUrl) {
+                    dialog.showVideoDialog($editable, $dialog, videoInfo).then(function (sUrl) {
                         editor.restoreRange($editable);
                         editor.insertVideo($editable, sUrl);
                     });
@@ -11687,7 +12710,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 } else if (sEvent === 'fullscreen') {
                     var $scrollbar = $('html, body');
 
-                    var resize = function(size) {
+                    var resize = function (size) {
                         $editor.css('width', size.w);
                         $editable.css('height', size.h);
                         $codable.css('height', size.h);
@@ -11701,7 +12724,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     if (isFullscreen) {
                         $editable.data('orgHeight', $editable.css('height'));
 
-                        $(window).on('resize', function() {
+                        $(window).on('resize', function () {
                             resize({
                                 w: $(window).width(),
                                 h: $(window).height() - $toolbar.outerHeight()
@@ -11738,7 +12761,7 @@ the specific language governing permissions and limitations under the Apache Lic
                             if (tern) {
                                 server = new CodeMirror.TernServer(tern);
                                 cmEditor.ternServer = server;
-                                cmEditor.on('cursorActivity', function(cm) {
+                                cmEditor.on('cursorActivity', function (cm) {
                                     server.updateArgHints(cm);
                                 });
                             }
@@ -11785,15 +12808,15 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {MouseEvent} event
          */
-        var hStatusbarMousedown = function(event) {
+        var hStatusbarMousedown = function (event) {
             var $document = $(document);
             var $editable = makeLayoutInfo(event.target).editable();
             var nEditableTop = $editable.offset().top - $document.scrollTop();
 
-            $document.on('mousemove', function(event) {
+            $document.on('mousemove', function (event) {
                 var nHeight = event.clientY - (nEditableTop + EDITABLE_PADDING);
                 $editable.height(nHeight);
-            }).one('mouseup', function() {
+            }).one('mouseup', function () {
                 $document.off('mousemove');
             });
 
@@ -11802,7 +12825,7 @@ the specific language governing permissions and limitations under the Apache Lic
         };
 
         var PX_PER_EM = 18;
-        var hDimensionPickerMove = function(event) {
+        var hDimensionPickerMove = function (event) {
             var $picker = $(event.target.parentNode); // target is mousecatcher
             var $dimensionDisplay = $picker.next();
             var $catcher = $picker.find('.note-dimension-picker-mousecatcher');
@@ -11855,13 +12878,13 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {Object} oLayoutInfo - layout Informations
          */
-        var attachDragAndDropEvent = function(oLayoutInfo) {
+        var attachDragAndDropEvent = function (oLayoutInfo) {
             var collection = $(),
                 $dropzone = oLayoutInfo.dropzone,
                 $dropzoneMessage = oLayoutInfo.dropzone.find('.note-dropzone-message');
 
             // show dropzone on dragenter when dragging a object to document.
-            $(document).on('dragenter', function(e) {
+            $(document).on('dragenter', function (e) {
                 var bCodeview = oLayoutInfo.editor.hasClass('codeview');
                 if (!bCodeview && collection.length === 0) {
                     oLayoutInfo.editor.addClass('dragover');
@@ -11870,27 +12893,27 @@ the specific language governing permissions and limitations under the Apache Lic
                     $dropzoneMessage.text('Drag Image Here');
                 }
                 collection = collection.add(e.target);
-            }).on('dragleave', function(e) {
+            }).on('dragleave', function (e) {
                 collection = collection.not(e.target);
                 if (collection.length === 0) {
                     oLayoutInfo.editor.removeClass('dragover');
                 }
-            }).on('drop', function() {
+            }).on('drop', function () {
                 collection = $();
                 oLayoutInfo.editor.removeClass('dragover');
             });
 
             // change dropzone's message on hover.
-            $dropzone.on('dragenter', function() {
+            $dropzone.on('dragenter', function () {
                 $dropzone.addClass('hover');
                 $dropzoneMessage.text('Drop Image');
-            }).on('dragleave', function() {
+            }).on('dragleave', function () {
                 $dropzone.removeClass('hover');
                 $dropzoneMessage.text('Drag Image Here');
             });
 
             // attach dropImage
-            $dropzone.on('drop', function(event) {
+            $dropzone.on('drop', function (event) {
                 var dataTransfer = event.originalEvent.dataTransfer;
                 if (dataTransfer && dataTransfer.files) {
                     var oLayoutInfo = makeLayoutInfo(event.currentTarget || event.target);
@@ -11908,11 +12931,11 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Object} oLayoutInfo
          * @param {Object} keyMap
          */
-        this.bindKeyMap = function(oLayoutInfo, keyMap) {
+        this.bindKeyMap = function (oLayoutInfo, keyMap) {
             var $editor = oLayoutInfo.editor;
             var $editable = oLayoutInfo.editable;
 
-            $editable.on('keydown', function(event) {
+            $editable.on('keydown', function (event) {
                 var aKey = [];
 
                 // modifier
@@ -11950,7 +12973,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Object} options - user options include custom event handlers
          * @param {Function} options.enter - enter key handler
          */
-        this.attach = function(oLayoutInfo, options) {
+        this.attach = function (oLayoutInfo, options) {
             var keyMap = options.keyMap[agent.bMac ? 'mac' : 'pc'];
             this.bindKeyMap(oLayoutInfo, keyMap);
 
@@ -11977,7 +13000,7 @@ the specific language governing permissions and limitations under the Apache Lic
             $catcher.on('mousemove', hDimensionPickerMove);
 
             // save selection when focusout
-            oLayoutInfo.editable.on('blur', function() {
+            oLayoutInfo.editable.on('blur', function () {
                 editor.saveRange(oLayoutInfo.editable);
             });
 
@@ -11987,7 +13010,7 @@ the specific language governing permissions and limitations under the Apache Lic
             // ret styleWithCSS for backColor / foreColor clearing with 'inherit'.
             if (options.styleWithSpan && !agent.bMSIE) {
                 // protect FF Error: NS_ERROR_FAILURE: Failure
-                setTimeout(function() {
+                setTimeout(function () {
                     document.execCommand('styleWithCSS', 0, true);
                 });
             }
@@ -11998,7 +13021,7 @@ the specific language governing permissions and limitations under the Apache Lic
             // basic event callbacks (lowercase)
             // enter, focus, blur, keyup, keydown
             if (options.onenter) {
-                oLayoutInfo.editable.keypress(function(event) {
+                oLayoutInfo.editable.keypress(function (event) {
                     if (event.keyCode === key.ENTER) {
                         options.onenter(event);
                     }
@@ -12036,7 +13059,7 @@ the specific language governing permissions and limitations under the Apache Lic
             });
         };
 
-        this.dettach = function(oLayoutInfo) {
+        this.dettach = function (oLayoutInfo) {
             oLayoutInfo.editable.off();
             oLayoutInfo.toolbar.off();
             oLayoutInfo.handle.off();
@@ -12049,24 +13072,24 @@ the specific language governing permissions and limitations under the Apache Lic
      *
      * rendering toolbar and editable
      */
-    var Renderer = function() {
+    var Renderer = function () {
         var tplToolbarInfo, tplPopover, tplHandle, tplDialog, tplStatusbar;
 
         /* jshint ignore:start */
         tplToolbarInfo = {
-            picture: function(lang) {
+            picture: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.image.image + '" data-event="showImageDialog" tabindex="-1"><i class="fa fa-picture-o icon-picture"></i></button>';
             },
-            ownpicture: function(lang) {
+            ownpicture: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.image.image + '" data-event="showPersonalImageDialog" tabindex="-1"><i class="fa fa-picture-o icon-picture"></i></button>';
             },
-            link: function(lang) {
+            link: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.link.link + '" data-event="showLinkDialog" tabindex="-1"><i class="fa fa-link icon-link"></i></button>';
             },
-            video: function(lang) {
+            video: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.video.video + '" data-event="showVideoDialog" tabindex="-1"><i class="fa fa-youtube-play icon-play"></i></button>';
             },
-            table: function(lang) {
+            table: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" title="' + lang.table.table + '" data-toggle="dropdown" tabindex="-1"><i class="fa fa-table icon-table"></i> <span class="caret"></span></button>' +
                     '<ul class="dropdown-menu">' +
                     '<div class="note-dimension-picker">' +
@@ -12077,7 +13100,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     '<div class="note-dimension-display"> 1 x 1 </div>' +
                     '</ul>';
             },
-            style: function(lang) {
+            style: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" title="' + lang.style.style + '" data-toggle="dropdown" tabindex="-1"><i class="fa fa-magic icon-magic"></i> <span class="caret"></span></button>' +
                     '<ul class="dropdown-menu">' +
                     '<li><a data-event="formatBlock" data-value="p">' + lang.style.normal + '</a></li>' +
@@ -12091,7 +13114,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     '<li><a data-event="formatBlock" data-value="h6"><h6>' + lang.style.h6 + '</h6></a></li>' +
                     '</ul>';
             },
-            fontname: function(lang) {
+            fontname: function (lang) {
                 var aFont = [
                     'Serif', 'Sans', 'Arial', 'Arial Black', 'Courier',
                     'Courier New', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande',
@@ -12107,7 +13130,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
                 return sMarkup;
             },
-            fontsize: function(lang) {
+            fontsize: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" data-toggle="dropdown" title="' + lang.font.size + '" tabindex="-1"><span class="note-current-fontsize">11</span> <b class="caret"></b></button>' +
                     '<ul class="dropdown-menu">' +
                     '<li><a data-event="fontSize" data-value="8"><i class="fa fa-check icon-ok"></i> 8</a></li>' +
@@ -12121,7 +13144,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     '<li><a data-event="fontSize" data-value="36"><i class="fa fa-check icon-ok"></i> 36</a></li>' +
                     '</ul>';
             },
-            color: function(lang) {
+            color: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small note-recent-color" title="' + lang.color.recent + '" data-event="color" data-value=\'{"backColor":"yellow"}\' tabindex="-1"><i class="fa fa-font icon-font" style="color:black;background-color:yellow;"></i></button>' +
                     '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" title="' + lang.color.more + '" data-toggle="dropdown" tabindex="-1">' +
                     '<span class="caret"></span>' +
@@ -12141,25 +13164,25 @@ the specific language governing permissions and limitations under the Apache Lic
                     '</li>' +
                     '</ul>';
             },
-            bold: function(lang) {
+            bold: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.font.bold + '" data-shortcut="Ctrl+B" data-mac-shortcut="⌘+B" data-event="bold" tabindex="-1"><i class="fa fa-bold icon-bold"></i></button>';
             },
-            italic: function(lang) {
+            italic: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.font.italic + '" data-shortcut="Ctrl+I" data-mac-shortcut="⌘+I" data-event="italic" tabindex="-1"><i class="fa fa-italic icon-italic"></i></button>';
             },
-            underline: function(lang) {
+            underline: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.font.underline + '" data-shortcut="Ctrl+U" data-mac-shortcut="⌘+U" data-event="underline" tabindex="-1"><i class="fa fa-underline icon-underline"></i></button>';
             },
-            clear: function(lang) {
+            clear: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.font.clear + '" data-shortcut="Ctrl+\\" data-mac-shortcut="⌘+\\" data-event="removeFormat" tabindex="-1"><i class="fa fa-eraser icon-eraser"></i></button>';
             },
-            ul: function(lang) {
+            ul: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.lists.unordered + '" data-shortcut="Ctrl+Shift+8" data-mac-shortcut="⌘+⇧+7" data-event="insertUnorderedList" tabindex="-1"><i class="fa fa-list-ul icon-list-ul"></i></button>';
             },
-            ol: function(lang) {
+            ol: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.lists.ordered + '" data-shortcut="Ctrl+Shift+7" data-mac-shortcut="⌘+⇧+8" data-event="insertOrderedList" tabindex="-1"><i class="fa fa-list-ol icon-list-ol"></i></button>';
             },
-            paragraph: function(lang) {
+            paragraph: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" title="' + lang.paragraph.paragraph + '" data-toggle="dropdown" tabindex="-1"><i class="fa fa-align-left icon-align-left"></i>  <span class="caret"></span></button>' +
                     '<div class="dropdown-menu">' +
                     '<div class="note-align btn-group">' +
@@ -12174,7 +13197,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     '</div>' +
                     '</div>';
             },
-            height: function(lang) {
+            height: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small dropdown-toggle" data-toggle="dropdown" title="' + lang.font.height + '" tabindex="-1"><i class="fa fa-text-height icon-text-height"></i>&nbsp; <b class="caret"></b></button>' +
                     '<ul class="dropdown-menu">' +
                     '<li><a data-event="lineHeight" data-value="1.0"><i class="fa fa-check icon-ok"></i> 1.0</a></li>' +
@@ -12187,23 +13210,23 @@ the specific language governing permissions and limitations under the Apache Lic
                     '<li><a data-event="lineHeight" data-value="3.0"><i class="fa fa-check icon-ok"></i> 3.0</a></li>' +
                     '</ul>';
             },
-            help: function(lang) {
+            help: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.options.help + '" data-event="showHelpDialog" tabindex="-1"><i class="fa fa-question icon-question"></i></button>';
             },
-            fullscreen: function(lang) {
+            fullscreen: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.options.fullscreen + '" data-event="fullscreen" tabindex="-1"><i class="fa fa-arrows-alt icon-fullscreen"></i></button>';
             },
-            codeview: function(lang) {
+            codeview: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.options.codeview + '" data-event="codeview" tabindex="-1"><i class="fa fa-code icon-code"></i></button>';
             },
-            undo: function(lang) {
+            undo: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.history.undo + '" data-event="undo" tabindex="-1"><i class="fa fa-undo icon-undo"></i></button>';
             },
-            redo: function(lang) {
+            redo: function (lang) {
                 return '<button type="button" class="btn btn-default btn-sm btn-small" title="' + lang.history.redo + '" data-event="redo" tabindex="-1"><i class="fa fa-repeat icon-repeat"></i></button>';
             }
         };
-        tplPopover = function(lang) {
+        tplPopover = function (lang) {
             return '<div class="note-popover">' +
                 '<div class="note-link-popover popover bottom in" style="display: none;">' +
                 '<div class="arrow"></div>' +
@@ -12236,7 +13259,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 '</div>';
         };
 
-        var tplHandle = function() {
+        var tplHandle = function () {
             return '<div class="note-handle">' +
                 '<div class="note-control-selection">' +
                 '<div class="note-control-selection-bg"></div>' +
@@ -12249,7 +13272,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 '</div>';
         };
 
-        var tplShortcutText = function(lang, options) {
+        var tplShortcutText = function (lang, options) {
             return '<table class="note-shortcut">' +
                 '<thead>' +
                 '<tr><th></th><th>' + lang.shortcut.textFormatting + '</th></tr>' +
@@ -12265,7 +13288,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 '</table>';
         };
 
-        var tplShortcutAction = function(lang, options) {
+        var tplShortcutAction = function (lang, options) {
             return '<table class="note-shortcut">' +
                 '<thead>' +
                 '<tr><th></th><th>' + lang.shortcut.action + '</th></tr>' +
@@ -12280,7 +13303,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 '</table>';
         };
 
-        var tplExtraShortcuts = function(lang, options) {
+        var tplExtraShortcuts = function (lang, options) {
             var template =
                 '<table class="note-shortcut">' +
                 '<thead>' +
@@ -12297,7 +13320,7 @@ the specific language governing permissions and limitations under the Apache Lic
             return template;
         };
 
-        var tplShortcutPara = function(lang, options) {
+        var tplShortcutPara = function (lang, options) {
             return '<table class="note-shortcut">' +
                 '<thead>' +
                 '<tr><th></th><th>' + lang.shortcut.paragraphFormatting + '</th></tr>' +
@@ -12313,7 +13336,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 '</table>';
         };
 
-        var tplShortcutStyle = function(lang, options) {
+        var tplShortcutStyle = function (lang, options) {
             return '<table class="note-shortcut">' +
                 '<thead>' +
                 '<tr><th></th><th>' + lang.shortcut.documentStyle + '</th></tr>' +
@@ -12330,7 +13353,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 '</table>';
         };
 
-        var tplShortcutTable = function(lang, options) {
+        var tplShortcutTable = function (lang, options) {
             var template = '<table class="note-shortcut-layout">' +
                 '<tbody>' +
                 '<tr><td>' + tplShortcutAction(lang, options) + '</td><td>' + tplShortcutText(lang, options) + '</td></tr>' +
@@ -12342,12 +13365,12 @@ the specific language governing permissions and limitations under the Apache Lic
             return template;
         };
 
-        var replaceMacKeys = function(sHtml) {
+        var replaceMacKeys = function (sHtml) {
             return sHtml.replace(/⌘/g, 'Ctrl').replace(/⇧/g, 'Shift');
         };
 
-        tplDialog = function(lang, options) {
-            var tplImageDialog = function() {
+        tplDialog = function (lang, options) {
+            var tplImageDialog = function () {
                 return '<div class="note-image-dialog modal" aria-hidden="false">' +
                     '<div class="modal-dialog">' +
                     '<div class="modal-content">' +
@@ -12371,7 +13394,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     '</div>';
             };
 
-            var tplLinkDialog = function() {
+            var tplLinkDialog = function () {
                 return '<div class="note-link-dialog modal" aria-hidden="false">' +
                     '<div class="modal-dialog">' +
                     '<div class="modal-content">' +
@@ -12390,12 +13413,12 @@ the specific language governing permissions and limitations under the Apache Lic
                     '<input class="note-link-url form-control span12" type="text" />' +
                     '</div>' +
                     (!options.disableLinkTarget ?
-                    '<div class="checkbox">' +
-                    '<label>' + '<input type="checkbox" checked> ' +
-                    lang.link.openInNewWindow +
-                    '</label>' +
-                    '</div>' : ''
-                ) +
+                        '<div class="checkbox">' +
+                        '<label>' + '<input type="checkbox" checked> ' +
+                        lang.link.openInNewWindow +
+                        '</label>' +
+                        '</div>' : ''
+                    ) +
                     '</div>' +
                     '</div>' +
                     '<div class="modal-footer">' +
@@ -12406,7 +13429,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     '</div>';
             };
 
-            var tplVideoDialog = function() {
+            var tplVideoDialog = function () {
                 return '<div class="note-video-dialog modal" aria-hidden="false">' +
                     '<div class="modal-dialog">' +
                     '<div class="modal-content">' +
@@ -12417,7 +13440,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     '<div class="modal-body">' +
                     '<div class="row-fluid">' +
 
-                '<div class="form-group">' +
+                    '<div class="form-group">' +
                     '<label>' + lang.video.url + '</label>&nbsp;<small class="text-muted">' + lang.video.providers + '</small>' +
                     '<input class="note-video-url form-control span12" type="text" />' +
                     '</div>' +
@@ -12431,7 +13454,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     '</div>';
             };
 
-            var tplHelpDialog = function() {
+            var tplHelpDialog = function () {
                 return '<div class="note-help-dialog modal" aria-hidden="false">' +
                     '<div class="modal-dialog">' +
                     '<div class="modal-content">' +
@@ -12454,18 +13477,18 @@ the specific language governing permissions and limitations under the Apache Lic
                 '</div>';
         };
 
-        tplStatusbar = function() {
+        tplStatusbar = function () {
             return '<div class="note-resizebar"><div class="note-icon-bar"></div><div class="note-icon-bar"></div><div class="note-icon-bar"></div></div>';
         };
         /* jshint ignore:end */
 
         // createTooltip
-        var createTooltip = function($container, sPlacement) {
-            $container.find('button').each(function(i, elBtn) {
+        var createTooltip = function ($container, sPlacement) {
+            $container.find('button').each(function (i, elBtn) {
                 var $btn = $(elBtn);
                 var tplShortcut = $btn.attr(agent.bMac ? 'data-mac-shortcut' : 'data-shortcut');
                 if (tplShortcut) {
-                    $btn.attr('title', function(i, v) {
+                    $btn.attr('title', function (i, v) {
                         return v + ' (' + tplShortcut + ')';
                     });
                 }
@@ -12474,7 +13497,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 container: 'body',
                 trigger: 'hover',
                 placement: sPlacement || 'top'
-            }).on('click', function() {
+            }).on('click', function () {
                 $(this).tooltip('hide');
             });
         };
@@ -12492,8 +13515,8 @@ the specific language governing permissions and limitations under the Apache Lic
         ];
 
         // createPalette
-        var createPalette = function($container) {
-            $container.find('.note-color-palette').each(function() {
+        var createPalette = function ($container) {
+            $container.find('.note-color-palette').each(function () {
                 var $palette = $(this),
                     sEvent = $palette.attr('data-target-event');
                 var aPaletteContents = [];
@@ -12521,7 +13544,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $holder
          * @param {Object} options
          */
-        this.createLayout = function($holder, options) {
+        this.createLayout = function ($holder, options) {
             //already created
             var next = $holder.next();
             if (next && next.hasClass('note-editor')) {
@@ -12583,7 +13606,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
             //07. create Dialog
             var $dialog = $(tplDialog(langInfo, options)).prependTo($editor);
-            $dialog.find('button.close, a.modal-close').click(function() {
+            $dialog.find('button.close, a.modal-close').click(function () {
                 $(this).closest('.modal').modal('hide');
             });
 
@@ -12601,7 +13624,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $holder - placeholder
          * @returns {Object}
          */
-        this.layoutInfoFromHolder = function($holder) {
+        this.layoutInfoFromHolder = function ($holder) {
             var $editor = $holder.next();
             if (!$editor.hasClass('note-editor')) {
                 return;
@@ -12622,7 +13645,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {jQuery} $holder - placeholder
          */
-        this.removeLayout = function($holder) {
+        this.removeLayout = function ($holder) {
             var info = this.layoutInfoFromHolder($holder);
             if (!info) {
                 return;
@@ -12655,11 +13678,11 @@ the specific language governing permissions and limitations under the Apache Lic
          * @returns {this}
          */
 
-        summernote: function(options) {
+        summernote: function (options) {
             // extend default options
             options = $.extend({}, $.summernote.options, options);
 
-            this.each(function(idx, elHolder) {
+            this.each(function (idx, elHolder) {
                 var $holder = $(elHolder);
 
                 // createLayout with options
@@ -12670,7 +13693,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
                 // Textarea: auto filling the code before form submit.
                 if (dom.isTextarea($holder[0])) {
-                    $holder.closest('form').submit(function() {
+                    $holder.closest('form').submit(function () {
                         $holder.html($holder.code());
                     });
                 }
@@ -12696,7 +13719,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} [sHTML] - HTML contents(optional, set)
          * @returns {this|String} - context(set) or HTML contents of note(get).
          */
-        code: function(sHTML) {
+        code: function (sHTML) {
             // get the HTML contents of note
             if (sHTML === undefined) {
                 var $holder = this.first();
@@ -12704,7 +13727,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     return;
                 }
                 var info = renderer.layoutInfoFromHolder($holder);
-                if ( !! (info && info.editable)) {
+                if (!!(info && info.editable)) {
                     var bCodeview = info.editor.hasClass('codeview');
                     if (bCodeview && agent.bCodeMirror) {
                         info.codable.data('cmEditor').save();
@@ -12715,7 +13738,7 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             // set the HTML contents of note
-            this.each(function(i, elHolder) {
+            this.each(function (i, elHolder) {
                 var info = renderer.layoutInfoFromHolder($(elHolder));
                 if (info && info.editable) {
                     info.editable.html(sHTML);
@@ -12725,10 +13748,10 @@ the specific language governing permissions and limitations under the Apache Lic
             return this;
         },
 
-        insertImage: function(imgSrc) {
+        insertImage: function (imgSrc) {
             var $img = $('<img>');
             var self = this;
-            $img.one('load', function() {
+            $img.one('load', function () {
                 $('.note-editable').focus();
                 var oldRange = $('.note-editable').data('range');
                 rangeObj = document.createRange();
@@ -12746,8 +13769,8 @@ the specific language governing permissions and limitations under the Apache Lic
          * destroy Editor Layout and dettach Key and Mouse Event
          * @returns {this}
          */
-        destroy: function() {
-            this.each(function(idx, elHolder) {
+        destroy: function () {
+            this.each(function (idx, elHolder) {
                 var $holder = $(elHolder);
 
                 var info = renderer.layoutInfoFromHolder($holder);
@@ -12774,8 +13797,8 @@ the specific language governing permissions and limitations under the Apache Lic
  * @license     MIT
  */
 
-(function($) {
-    var BootstrapValidator = function(form, options) {
+(function ($) {
+    var BootstrapValidator = function (form, options) {
         this.$form = $(form);
         this.options = $.extend({}, BootstrapValidator.DEFAULT_OPTIONS, options);
 
@@ -12793,7 +13816,7 @@ the specific language governing permissions and limitations under the Apache Lic
         // IE 9 supports input event but the event is still not fired if I press the backspace key.
         // Get IE version
         // https://gist.github.com/padolsey/527683/#comment-7595
-        var ieVersion = (function() {
+        var ieVersion = (function () {
             var v = 3,
                 div = document.createElement('div'),
                 a = div.all || [];
@@ -12897,7 +13920,7 @@ the specific language governing permissions and limitations under the Apache Lic
         /**
          * Init form
          */
-        _init: function() {
+        _init: function () {
             var that = this,
                 options = {
                     excluded: this.$form.attr('data-bv-excluded'),
@@ -12921,74 +13944,74 @@ the specific language governing permissions and limitations under the Apache Lic
                 html5Attrs;
 
             this.$form
-            // Disable client side validation in HTML 5
-            .attr('novalidate', 'novalidate')
+                // Disable client side validation in HTML 5
+                .attr('novalidate', 'novalidate')
                 .addClass(this.options.elementClass)
-            // Disable the default submission first
-            /*.on('submit.bv', function(e) {
-                e.preventDefault();
-                that.validate();
-            })*/
-            .on('click', this.options.submitButtons, function() {
-                that.$submitButton = $(this);
-                // The user just click the submit button
-                that._submitIfValid = true;
-            })
-            // Find all fields which have either "name" or "data-bv-field" attribute
-            .find('[name], [data-bv-field]').each(function() {
-                var $field = $(this);
-                // Don't initialize hidden input
-                if ('hidden' == $field.attr('type')) {
-                    return;
-                }
+                // Disable the default submission first
+                /*.on('submit.bv', function(e) {
+                 e.preventDefault();
+                 that.validate();
+                 })*/
+                .on('click', this.options.submitButtons, function () {
+                    that.$submitButton = $(this);
+                    // The user just click the submit button
+                    that._submitIfValid = true;
+                })
+                // Find all fields which have either "name" or "data-bv-field" attribute
+                .find('[name], [data-bv-field]').each(function () {
+                    var $field = $(this);
+                    // Don't initialize hidden input
+                    if ('hidden' == $field.attr('type')) {
+                        return;
+                    }
 
-                // add by zhufeng
-                if ('radio' === $field.attr('type') || 'checkbox' === $field.attr('type')) {
-                    return;
-                }
+                    // add by zhufeng
+                    if ('radio' === $field.attr('type') || 'checkbox' === $field.attr('type')) {
+                        return;
+                    }
 
-                var field = $field.attr('name') || $field.attr('data-bv-field');
-                $field.attr('data-bv-field', field);
+                    var field = $field.attr('name') || $field.attr('data-bv-field');
+                    $field.attr('data-bv-field', field);
 
-                options.fields[field] = $.extend({}, {
-                    trigger: $field.attr('data-bv-trigger'),
-                    message: $field.attr('data-bv-message'),
-                    container: $field.attr('data-bv-container'),
-                    selector: $field.attr('data-bv-selector'),
-                    validators: {}
-                }, options.fields[field]);
+                    options.fields[field] = $.extend({}, {
+                        trigger: $field.attr('data-bv-trigger'),
+                        message: $field.attr('data-bv-message'),
+                        container: $field.attr('data-bv-container'),
+                        selector: $field.attr('data-bv-selector'),
+                        validators: {}
+                    }, options.fields[field]);
 
-                for (v in $.fn.bootstrapValidator.validators) {
-                    validator = $.fn.bootstrapValidator.validators[v];
-                    enabled = $field.attr('data-bv-' + v.toLowerCase()) + '';
-                    html5Attrs = ('function' == typeof validator.enableByHtml5) ? validator.enableByHtml5($(this)) : null;
+                    for (v in $.fn.bootstrapValidator.validators) {
+                        validator = $.fn.bootstrapValidator.validators[v];
+                        enabled = $field.attr('data-bv-' + v.toLowerCase()) + '';
+                        html5Attrs = ('function' == typeof validator.enableByHtml5) ? validator.enableByHtml5($(this)) : null;
 
-                    if ((html5Attrs && enabled != 'false') || (html5Attrs !== true && ('' == enabled || 'true' == enabled))) {
-                        // Try to parse the options via attributes
-                        validator.html5Attributes = validator.html5Attributes || {
-                            message: 'message'
-                        };
-                        options.fields[field]['validators'][v] = $.extend({}, html5Attrs == true ? {} : html5Attrs, options.fields[field]['validators'][v]);
+                        if ((html5Attrs && enabled != 'false') || (html5Attrs !== true && ('' == enabled || 'true' == enabled))) {
+                            // Try to parse the options via attributes
+                            validator.html5Attributes = validator.html5Attributes || {
+                                    message: 'message'
+                                };
+                            options.fields[field]['validators'][v] = $.extend({}, html5Attrs == true ? {} : html5Attrs, options.fields[field]['validators'][v]);
 
-                        for (html5AttrName in validator.html5Attributes) {
-                            optionName = validator.html5Attributes[html5AttrName];
-                            optionValue = $field.attr('data-bv-' + v.toLowerCase() + '-' + html5AttrName);
-                            if (optionValue) {
-                                if ('true' == optionValue) {
-                                    optionValue = true;
-                                } else if ('false' == optionValue) {
-                                    optionValue = false;
+                            for (html5AttrName in validator.html5Attributes) {
+                                optionName = validator.html5Attributes[html5AttrName];
+                                optionValue = $field.attr('data-bv-' + v.toLowerCase() + '-' + html5AttrName);
+                                if (optionValue) {
+                                    if ('true' == optionValue) {
+                                        optionValue = true;
+                                    } else if ('false' == optionValue) {
+                                        optionValue = false;
+                                    }
+                                    options.fields[field]['validators'][v][optionName] = optionValue;
                                 }
-                                options.fields[field]['validators'][v][optionName] = optionValue;
                             }
                         }
                     }
-                }
-            });
+                });
 
             this.options = $.extend(true, this.options, options);
             if ('string' == typeof this.options.excluded) {
-                this.options.excluded = $.map(this.options.excluded.split(','), function(item) {
+                this.options.excluded = $.map(this.options.excluded.split(','), function (item) {
                     // Trim the spaces
                     return $.trim(item);
                 });
@@ -13006,7 +14029,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @param {String} field The field name
          */
-        _initField: function(field) {
+        _initField: function (field) {
             if (this.options.fields[field] == null || this.options.fields[field].validators == null) {
                 return;
             }
@@ -13033,7 +14056,7 @@ the specific language governing permissions and limitations under the Apache Lic
             for (var i = 0; i < total; i++) {
                 var $field = $(fields[i]),
                     $parent = $field.parents('.form-group'),
-                    // Allow user to indicate where the error messages are shown
+                // Allow user to indicate where the error messages are shown
                     $message = this.options.fields[field].container ? $parent.find(this.options.fields[field].container) : this._getMessageContainer($field);
 
                 // Set the attribute to indicate the fields which are defined by selector
@@ -13042,7 +14065,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
 
                 // Whenever the user change the field value, mark it as not validated yet
-                $field.on(event + '.update.bv', function() {
+                $field.on(event + '.update.bv', function () {
                     // Reset the flag
                     that._submitIfValid = false;
                     updateAll ? that.updateStatus(field, that.STATUS_NOT_VALIDATED, null) : that.updateElementStatus($(this), that.STATUS_NOT_VALIDATED, null);
@@ -13088,7 +14111,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $field The field element
          * @returns {jQuery}
          */
-        _getMessageContainer: function($field) {
+        _getMessageContainer: function ($field) {
             var $parent = $field.parent();
             if ($parent.hasClass('form-group')) {
                 return $parent;
@@ -13113,7 +14136,7 @@ the specific language governing permissions and limitations under the Apache Lic
         /**
          * Called when all validations are completed
          */
-        _submit: function() {
+        _submit: function () {
             if (!this.isValid()) {
                 if ('submitted' == this.options.live) {
                     this.setLiveMode('enabled');
@@ -13135,12 +14158,12 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             /*// Call the custom submission if enabled
-            if (this.options.submitHandler && 'function' == typeof this.options.submitHandler) {
-                // If you want to submit the form inside your submit handler, please call defaultSubmit() method
-                this.options.submitHandler.call(this, this, this.$form, this.$submitButton);
-            } else {
-                this.disableSubmitButtons(true).defaultSubmit();
-            }*/
+             if (this.options.submitHandler && 'function' == typeof this.options.submitHandler) {
+             // If you want to submit the form inside your submit handler, please call defaultSubmit() method
+             this.options.submitHandler.call(this, this, this.$form, this.$submitButton);
+             } else {
+             this.disableSubmitButtons(true).defaultSubmit();
+             }*/
         },
 
         /**
@@ -13150,7 +14173,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {jQuery} $field The field element
          * @return {Boolean}
          */
-        _isExcluded: function($field) {
+        _isExcluded: function ($field) {
             if (this.options.excluded) {
                 for (var i in this.options.excluded) {
                     if (('string' == typeof this.options.excluded[i] && $field.is(this.options.excluded[i])) || ('function' == typeof this.options.excluded[i] && this.options.excluded[i].call(this, $field, this) == true)) {
@@ -13170,7 +14193,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} field The field name
          * @returns {null|jQuery[]}
          */
-        getFieldElements: function(field) {
+        getFieldElements: function (field) {
             var fields = this.options.fields[field].selector ? $(this.options.fields[field].selector) : this.$form.find('[name="' + field + '"]');
             return (fields.length == 0) ? null : fields;
         },
@@ -13181,7 +14204,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} mode Live validating mode. Can be 'enabled', 'disabled', 'submitted'
          * @returns {BootstrapValidator}
          */
-        setLiveMode: function(mode) {
+        setLiveMode: function (mode) {
             this.options.live = mode;
             if ('submitted' == mode) {
                 return this;
@@ -13189,19 +14212,19 @@ the specific language governing permissions and limitations under the Apache Lic
 
             var that = this;
             for (var field in this.options.fields) {
-                (function(f) {
+                (function (f) {
                     var fields = that.getFieldElements(f);
                     if (fields) {
                         var type = fields.attr('type'),
                             total = fields.length,
                             updateAll = (total == 1) || ('radio' == type) || ('checkbox' == type),
                             trigger = that.options.fields[field].trigger || that.options.trigger || (('radio' == type || 'checkbox' == type || 'file' == type || 'SELECT' == fields[0].tagName) ? 'change' : that._changeEvent),
-                            events = $.map(trigger.split(' '), function(item) {
+                            events = $.map(trigger.split(' '), function (item) {
                                 return item + '.live.bv';
                             }).join(' ');
 
                         for (var i = 0; i < total; i++) {
-                            ('enabled' == mode) ? $(fields[i]).on(events, function() {
+                            ('enabled' == mode) ? $(fields[i]).on(events, function () {
                                 updateAll ? that.validateField(f) : that.validateFieldElement($(this), false);
                             }) : $(fields[i]).off(events);
                         }
@@ -13218,7 +14241,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Boolean} disabled Can be true or false
          * @returns {BootstrapValidator}
          */
-        disableSubmitButtons: function(disabled) {
+        disableSubmitButtons: function (disabled) {
             if (!disabled) {
                 this.$form.find(this.options.submitButtons).removeAttr('disabled');
             } else if (this.options.live != 'disabled') {
@@ -13234,7 +14257,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @return {BootstrapValidator}
          */
-        validate: function() {
+        validate: function () {
             if (!this.options.fields) {
                 return this;
             }
@@ -13258,7 +14281,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} field The field name
          * @returns {BootstrapValidator}
          */
-        validateField: function(field) {
+        validateField: function (field) {
             var fields = this.getFieldElements(field);
             if (!fields) {
                 return;
@@ -13280,7 +14303,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Boolean} updateAll If true, update status of all elements which have the same name
          * @returns {BootstrapValidator}
          */
-        validateFieldElement: function($field, updateAll) {
+        validateFieldElement: function ($field, updateAll) {
             var that = this,
                 field = $field.attr('data-bv-field'),
                 validators = this.options.fields[field].validators,
@@ -13312,7 +14335,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     updateAll ? this.updateStatus(field, this.STATUS_VALIDATING, validatorName) : this.updateElementStatus($field, this.STATUS_VALIDATING, validatorName);
                     $field.data('bv.dfs.' + validatorName, validateResult);
 
-                    validateResult.done(function($f, v, isValid) {
+                    validateResult.done(function ($f, v, isValid) {
                         // v is validator name
                         $f.removeData('bv.dfs.' + v);
                         updateAll ? that.updateStatus($f.attr('data-bv-field'), isValid ? that.STATUS_VALID : that.STATUS_INVALID, v) : that.updateElementStatus($f, isValid ? that.STATUS_VALID : that.STATUS_INVALID, v);
@@ -13338,7 +14361,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} [validatorName] The validator name. If null, the method updates validity result for all validators
          * @return {BootstrapValidator}
          */
-        updateStatus: function(field, status, validatorName) {
+        updateStatus: function (field, status, validatorName) {
             var fields = this.getFieldElements(field),
                 type = fields.attr('type'),
                 n = (('radio' == type) || ('checkbox' == type)) ? 1 : fields.length;
@@ -13358,7 +14381,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} [validatorName] The validator name. If null, the method updates validity result for all validators
          * @return {BootstrapValidator}
          */
-        updateElementStatus: function($field, status, validatorName) {
+        updateElementStatus: function ($field, status, validatorName) {
             var that = this,
                 field = $field.attr('data-bv-field'),
                 $parent = $field.parents('.form-group').eq(0),
@@ -13414,7 +14437,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     validatorName ? $errors.filter('[data-bv-validator="' + validatorName + '"]').hide() : $errors.hide();
 
                     // If the field is valid (passes all validators)
-                    var validField = ($errors.filter(function() {
+                    var validField = ($errors.filter(function () {
                         var display = $(this).css('display'),
                             v = $(this).attr('data-bv-validator');
                         return ('block' == display) || ($field.data('bv.result.' + v) != that.STATUS_VALID);
@@ -13428,15 +14451,15 @@ the specific language governing permissions and limitations under the Apache Lic
                     }
 
                     // Check if all elements in given container are valid
-                    var isValidContainer = function($container) {
+                    var isValidContainer = function ($container) {
                         return $container
-                            .find('.help-block[data-bv-validator]')
-                            .filter(function() {
-                                var display = $(this).css('display'),
-                                    v = $(this).attr('data-bv-validator');
-                                return ('block' == display) || ($field.data('bv.result.' + v) && $field.data('bv.result.' + v) != that.STATUS_VALID);
-                            })
-                            .length == 0;
+                                .find('.help-block[data-bv-validator]')
+                                .filter(function () {
+                                    var display = $(this).css('display'),
+                                        v = $(this).attr('data-bv-validator');
+                                    return ('block' == display) || ($field.data('bv.result.' + v) && $field.data('bv.result.' + v) != that.STATUS_VALID);
+                                })
+                                .length == 0;
                     };
                     $parent.removeClass('has-error has-success').addClass(isValidContainer($parent) ? 'has-success' : 'has-error');
                     if ($tab) {
@@ -13466,7 +14489,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * @returns {Boolean}
          */
-        isValid: function() {
+        isValid: function () {
             var fields, field, $field,
                 type, status, validatorName,
                 n, i;
@@ -13508,7 +14531,7 @@ the specific language governing permissions and limitations under the Apache Lic
          *
          * It might be used when you want to submit the form right inside the submitHandler()
          */
-        defaultSubmit: function() {
+        defaultSubmit: function () {
             this.$form.off('submit.bv').submit();
         },
 
@@ -13520,7 +14543,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Boolean} resetFormData Reset current form data
          * @return {BootstrapValidator}
          */
-        resetForm: function(resetFormData) {
+        resetForm: function (resetFormData) {
             var field, fields, total, type, validator;
             for (field in this.options.fields) {
                 fields = this.getFieldElements(field);
@@ -13557,7 +14580,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Boolean} enabled Enable/Disable field validators
          * @return {BootstrapValidator}
          */
-        enableFieldValidators: function(field, enabled) {
+        enableFieldValidators: function (field, enabled) {
             this.options.fields[field]['enabled'] = enabled;
             this.updateStatus(field, this.STATUS_NOT_VALIDATED, null);
 
@@ -13566,8 +14589,8 @@ the specific language governing permissions and limitations under the Apache Lic
     };
 
     // Plugin definition
-    $.fn.bootstrapValidator = function(option, params) {
-        return this.each(function() {
+    $.fn.bootstrapValidator = function (option, params) {
+        return this.each(function () {
             var $this = $(this),
                 data = $this.data('bootstrapValidator'),
                 options = 'object' == typeof option && option;
@@ -13597,7 +14620,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value
          * @returns {Boolean}
          */
-        luhn: function(value) {
+        luhn: function (value) {
             var length = value.length,
                 mul = 0,
                 prodArr = [
@@ -13620,7 +14643,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value
          * @returns {Boolean}
          */
-        mod_11_10: function(value) {
+        mod_11_10: function (value) {
             var check = 5,
                 length = value.length;
             for (var i = 0; i < length; i++) {
@@ -13639,7 +14662,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} alphabet
          * @returns {Boolean}
          */
-        mod_37_36: function(value, alphabet) {
+        mod_37_36: function (value, alphabet) {
             alphabet = alphabet || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             var modulus = alphabet.length,
                 length = value.length,
@@ -13650,8 +14673,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (check == 1);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.base64 = {
         /**
          * Return true if the input value is a base 64 encoded string.
@@ -13662,7 +14686,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -13671,8 +14695,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$/.test(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.between = {
         html5Attributes: {
             message: 'message',
@@ -13681,7 +14706,7 @@ the specific language governing permissions and limitations under the Apache Lic
             inclusive: 'inclusive'
         },
 
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             if ('range' == $field.attr('type')) {
                 return {
                     min: $field.attr('min'),
@@ -13704,7 +14729,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -13714,8 +14739,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (options.inclusive === true) ? (value > options.min && value < options.max) : (value >= options.min && value <= options.max);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.callback = {
         /**
          * Return result from the callback method
@@ -13731,7 +14757,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean|Deferred}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (options.callback && 'function' == typeof options.callback) {
                 var dfd = new $.Deferred();
@@ -13741,8 +14767,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return true;
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.choice = {
         html5Attributes: {
             message: 'message',
@@ -13762,7 +14789,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var numChoices = $field.is('select') ? validator.getFieldElements($field.attr('data-bv-field')).find('option').filter(':selected').length : validator.getFieldElements($field.attr('data-bv-field')).filter(':checked').length;
             if ((options.min && numChoices < options.min) || (options.max && numChoices > options.max)) {
                 return false;
@@ -13771,8 +14798,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return true;
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.creditCard = {
         /**
          * Return true if the input value is valid credit card number
@@ -13784,7 +14812,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -13872,8 +14900,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return false;
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.cvv = {
         html5Attributes: {
             message: 'message',
@@ -13890,7 +14919,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -13982,8 +15011,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (creditCardType == null) ? false : (('AMERICAN_EXPRESS' == creditCardType) ? (value.length == 4) : (value.length == 3));
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.date = {
         html5Attributes: {
             message: 'message',
@@ -14006,7 +15036,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * ii) date, time and A (indicating AM or PM)
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14045,7 +15075,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 seconds = null;
             if (timeFormat) {
                 timeFormat = timeFormat.split(':'),
-                time = time.split(':');
+                    time = time.split(':');
 
                 if (timeFormat.length != time.length) {
                     return false;
@@ -14099,8 +15129,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (day > 0 && day <= numDays[month - 1]);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.different = {
         html5Attributes: {
             message: 'message',
@@ -14117,7 +15148,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14136,8 +15167,9 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.digits = {
         /**
          * Return true if the input value contains digits only
@@ -14147,7 +15179,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Object} options
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14156,8 +15188,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return /^\d+$/.test(value);
         }
     }
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.ean = {
         /**
          * Validate EAN (International Article Number)
@@ -14172,7 +15205,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14192,10 +15225,11 @@ the specific language governing permissions and limitations under the Apache Lic
             return (sum == value.charAt(length - 1));
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.emailAddress = {
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             return ('email' == $field.attr('type'));
         },
 
@@ -14207,7 +15241,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Object} options
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14219,8 +15253,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return emailRegExp.test(value);
         }
     }
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.file = {
         html5Attributes: {
             extension: 'extension',
@@ -14241,7 +15276,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - type: The allowed MIME type, separated by a comma
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14284,8 +15319,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return true;
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.greaterThan = {
         html5Attributes: {
             message: 'message',
@@ -14293,7 +15329,7 @@ the specific language governing permissions and limitations under the Apache Lic
             inclusive: 'inclusive'
         },
 
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             var min = $field.attr('min');
             if (min) {
                 return {
@@ -14315,7 +15351,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14324,8 +15360,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (options.inclusive === true) ? (value > options.value) : (value >= options.value);
         }
     }
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.grid = {
         /**
          * Validate GRId (Global Release Identifier)
@@ -14340,7 +15377,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14357,8 +15394,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return $.fn.bootstrapValidator.helpers.mod_37_36(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.hex = {
         /**
          * Return true if and only if the input value is a valid hexadecimal number
@@ -14369,7 +15407,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14378,10 +15416,11 @@ the specific language governing permissions and limitations under the Apache Lic
             return /^[0-9a-fA-F]+$/.test(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.hexColor = {
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             return ('color' == $field.attr('type'));
         },
 
@@ -14394,7 +15433,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14402,8 +15441,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.iban = {
         html5Attributes: {
             message: 'message',
@@ -14422,7 +15462,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - country: The ISO 3166-1 country code
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14522,11 +15562,11 @@ the specific language governing permissions and limitations under the Apache Lic
             }
 
             value = value.substr(4) + value.substr(0, 4);
-            value = value.split('').map(function(n) {
+            value = value.split('').map(function (n) {
                 var code = n.charCodeAt(0);
                 return (code >= 'A'.charCodeAt(0) && code <= 'Z'.charCodeAt(0))
-                // Replace A, B, C, ..., Z with 10, 11, ..., 35
-                ? (code - 'A'.charCodeAt(0) + 10) : n;
+                    // Replace A, B, C, ..., Z with 10, 11, ..., 35
+                    ? (code - 'A'.charCodeAt(0) + 10) : n;
             }).join('');
 
             var temp = parseInt(value.substr(0, 1), 10),
@@ -14537,8 +15577,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (temp == 1);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.identical = {
         html5Attributes: {
             message: 'message',
@@ -14554,7 +15595,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - field: The name of field that will be used to compare with current one
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14573,8 +15614,9 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.imei = {
         /**
          * Validate IMEI (International Mobile Station Equipment Identity)
@@ -14589,7 +15631,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14614,10 +15656,11 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.integer = {
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             return ('number' == $field.attr('type'));
         },
 
@@ -14630,7 +15673,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14638,8 +15681,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return /^(?:-?(?:0|[1-9][0-9]*))$/.test(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.ip = {
         html5Attributes: {
             message: 'message',
@@ -14658,7 +15702,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14676,8 +15720,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return false;
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.isbn = {
         /**
          * Return true if the input value is a valid ISBN 10 or ISBN 13 number
@@ -14696,7 +15741,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14757,8 +15802,9 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.ismn = {
         /**
          * Validate ISMN (International Standard Music Number)
@@ -14773,7 +15819,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14812,8 +15858,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (sum == value.charAt(length - 1));
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.issn = {
         /**
          * Validate ISSN (International Standard Serial Number)
@@ -14828,7 +15875,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14854,8 +15901,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (sum % 11 == 0);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.lessThan = {
         html5Attributes: {
             message: 'message',
@@ -14863,7 +15911,7 @@ the specific language governing permissions and limitations under the Apache Lic
             inclusive: 'inclusive'
         },
 
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             var max = $field.attr('max');
             if (max) {
                 return {
@@ -14885,7 +15933,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14894,8 +15942,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (options.inclusive === false) ? (value <= options.value) : (value < options.value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.mac = {
         /**
          * Return true if the input value is a MAC address.
@@ -14906,7 +15955,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14915,10 +15964,11 @@ the specific language governing permissions and limitations under the Apache Lic
             return /^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/.test(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.notEmpty = {
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             var required = $field.attr('required') + '';
             return ('required' == required || 'true' == required);
         },
@@ -14931,20 +15981,21 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Object} options
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var type = $field.attr('type');
             if ('radio' == type || 'checkbox' == type) {
                 return validator
-                    .getFieldElements($field.attr('data-bv-field'))
-                    .filter(':checked')
-                    .length > 0;
+                        .getFieldElements($field.attr('data-bv-field'))
+                        .filter(':checked')
+                        .length > 0;
             }
 
             return $.trim($field.val()) != '';
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.numeric = {
         /**
          * Validate decimal number
@@ -14955,7 +16006,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -14964,8 +16015,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return !isNaN(parseFloat(value)) && isFinite(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.phone = {
         html5Attributes: {
             message: 'message',
@@ -14983,7 +16035,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * Currently it only supports United State (US) country
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15002,15 +16054,16 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         }
     }
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.regexp = {
         html5Attributes: {
             message: 'message',
             regexp: 'regexp'
         },
 
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             var pattern = $field.attr('pattern');
             if (pattern) {
                 return {
@@ -15030,7 +16083,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - regexp: The regular expression you need to check
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15040,8 +16093,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return regexp.test(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.remote = {
         html5Attributes: {
             message: 'message',
@@ -15064,7 +16118,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean|Deferred}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15088,19 +16142,20 @@ the specific language governing permissions and limitations under the Apache Lic
                 dataType: 'json',
                 data: data
             });
-            xhr.then(function(response) {
+            xhr.then(function (response) {
                 dfd.resolve($field, 'remote', response.valid === true || response.valid === 'true');
             });
 
-            dfd.fail(function() {
+            dfd.fail(function () {
                 xhr.abort();
             });
 
             return dfd;
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.siren = {
         /**
          * Check if a string is a siren number
@@ -15111,7 +16166,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15123,8 +16178,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return $.fn.bootstrapValidator.helpers.luhn(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.siret = {
         /**
          * Check if a string is a siret number
@@ -15135,7 +16191,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15157,8 +16213,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (sum % 10 == 0);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.step = {
         html5Attributes: {
             message: 'message',
@@ -15177,7 +16234,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15192,18 +16249,18 @@ the specific language governing permissions and limitations under the Apache Lic
                 return false;
             }
 
-            var round = function(x, precision) {
-                var m = Math.pow(10, precision);
-                x = x * m;
-                var sign = (x > 0) | -(x < 0),
-                    isHalf = (x % 1 === 0.5 * sign);
-                if (isHalf) {
-                    return (Math.floor(x) + (sign > 0)) / m;
-                } else {
-                    return Math.round(x) / m;
-                }
-            },
-                floatMod = function(x, y) {
+            var round = function (x, precision) {
+                    var m = Math.pow(10, precision);
+                    x = x * m;
+                    var sign = (x > 0) | -(x < 0),
+                        isHalf = (x % 1 === 0.5 * sign);
+                    if (isHalf) {
+                        return (Math.floor(x) + (sign > 0)) / m;
+                    } else {
+                        return Math.round(x) / m;
+                    }
+                },
+                floatMod = function (x, y) {
                     if (y == 0.0) {
                         return 1.0;
                     }
@@ -15217,8 +16274,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (mod == 0.0 || mod == options.step);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.stringCase = {
         html5Attributes: {
             message: 'message',
@@ -15235,7 +16293,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - case: Can be 'lower' (default) or 'upper'
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15251,8 +16309,9 @@ the specific language governing permissions and limitations under the Apache Lic
             }
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.stringLength = {
         html5Attributes: {
             message: 'message',
@@ -15260,7 +16319,7 @@ the specific language governing permissions and limitations under the Apache Lic
             max: 'max'
         },
 
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             var maxLength = $field.attr('maxlength');
             if (maxLength) {
                 return {
@@ -15283,7 +16342,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15297,10 +16356,11 @@ the specific language governing permissions and limitations under the Apache Lic
             return true;
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.uri = {
-        enableByHtml5: function($field) {
+        enableByHtml5: function ($field) {
             return ('url' == $field.attr('type'));
         },
 
@@ -15312,7 +16372,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Object} options
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15357,45 +16417,46 @@ the specific language governing permissions and limitations under the Apache Lic
             // _^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)(?:\.(?:[a-z\x{00a1}-\x{ffff}0-9]+-?)*[a-z\x{00a1}-\x{ffff}0-9]+)*(?:\.(?:[a-z\x{00a1}-\x{ffff}]{2,})))(?::\d{2,5})?(?:/[^\s]*)?$_iuS
             var urlExp = new RegExp(
                 "^" +
-                // protocol identifier
+                    // protocol identifier
                 "(?:(?:https?|ftp)://)" +
-                // user:pass authentication
+                    // user:pass authentication
                 "(?:\\S+(?::\\S*)?@)?" +
                 "(?:" +
-                // IP address exclusion
-                // private & local networks
+                    // IP address exclusion
+                    // private & local networks
                 "(?!10(?:\\.\\d{1,3}){3})" +
                 "(?!127(?:\\.\\d{1,3}){3})" +
                 "(?!169\\.254(?:\\.\\d{1,3}){2})" +
                 "(?!192\\.168(?:\\.\\d{1,3}){2})" +
                 "(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})" +
-                // IP address dotted notation octets
-                // excludes loopback network 0.0.0.0
-                // excludes reserved space >= 224.0.0.0
-                // excludes network & broacast addresses
-                // (first & last IP address of each class)
+                    // IP address dotted notation octets
+                    // excludes loopback network 0.0.0.0
+                    // excludes reserved space >= 224.0.0.0
+                    // excludes network & broacast addresses
+                    // (first & last IP address of each class)
                 "(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])" +
                 "(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}" +
                 "(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))" +
                 "|" +
-                // host name
+                    // host name
                 "(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)" +
-                // domain name
+                    // domain name
                 "(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*" +
-                // TLD identifier
+                    // TLD identifier
                 "(?:\\.(?:[a-z\\u00a1-\\uffff]{2,}))" +
                 ")" +
-                // port number
+                    // port number
                 "(?::\\d{2,5})?" +
-                // resource path
+                    // resource path
                 "(?:/[^\\s]*)?" +
                 "$", "i"
             );
             return urlExp.test(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.uuid = {
         html5Attributes: {
             message: 'message',
@@ -15413,7 +16474,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - version: Can be 3, 4, 5, null
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15421,17 +16482,18 @@ the specific language governing permissions and limitations under the Apache Lic
 
             // See the format at http://en.wikipedia.org/wiki/Universally_unique_identifier#Variants_and_versions
             var patterns = {
-                '3': /^[0-9A-F]{8}-[0-9A-F]{4}-3[0-9A-F]{3}-[0-9A-F]{4}-[0-9A-F]{12}$/i,
-                '4': /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
-                '5': /^[0-9A-F]{8}-[0-9A-F]{4}-5[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
-                all: /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i
-            },
+                    '3': /^[0-9A-F]{8}-[0-9A-F]{4}-3[0-9A-F]{3}-[0-9A-F]{4}-[0-9A-F]{12}$/i,
+                    '4': /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
+                    '5': /^[0-9A-F]{8}-[0-9A-F]{4}-5[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i,
+                    all: /^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i
+                },
                 version = options.version ? (options.version + '') : 'all';
             return (null == patterns[version]) ? true : patterns[version].test(value);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.vat = {
         html5Attributes: {
             message: 'message',
@@ -15448,7 +16510,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - country: The ISO 3166-1 country code
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -15474,7 +16536,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _at: function(value) {
+        _at: function (value) {
             if (!/^ATU[0-9]{8}$/.test(value)) {
                 return false;
             }
@@ -15509,7 +16571,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _be: function(value) {
+        _be: function (value) {
             if (!/^BE[0]{0,1}[0-9]{9}$/.test(value)) {
                 return false;
             }
@@ -15539,7 +16601,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _bg: function(value) {
+        _bg: function (value) {
             if (!/^BG[0-9]{9,10}$/.test(value)) {
                 return false;
             }
@@ -15569,35 +16631,35 @@ the specific language governing permissions and limitations under the Apache Lic
             // Physical persons, foreigners and others
             else if (value.length == 10) {
                 // Validate Bulgarian national identification numbers
-                var egn = function(value) {
-                    // Check the birth date
-                    var year = parseInt(value.substr(0, 2), 10) + 1900,
-                        month = parseInt(value.substr(2, 2), 10),
-                        day = parseInt(value.substr(4, 2), 10);
-                    if (month > 40) {
-                        year += 100;
-                        month -= 40;
-                    } else if (month > 20) {
-                        year -= 100;
-                        month -= 20;
-                    }
+                var egn = function (value) {
+                        // Check the birth date
+                        var year = parseInt(value.substr(0, 2), 10) + 1900,
+                            month = parseInt(value.substr(2, 2), 10),
+                            day = parseInt(value.substr(4, 2), 10);
+                        if (month > 40) {
+                            year += 100;
+                            month -= 40;
+                        } else if (month > 20) {
+                            year -= 100;
+                            month -= 20;
+                        }
 
-                    try {
-                        var d = new Date(year, month, day);
-                    } catch (ex) {
-                        return false;
-                    }
+                        try {
+                            var d = new Date(year, month, day);
+                        } catch (ex) {
+                            return false;
+                        }
 
-                    var sum = 0,
-                        weight = [2, 4, 8, 5, 10, 9, 7, 3, 6];
-                    for (var i = 0; i < 9; i++) {
-                        sum += parseInt(value.charAt(i)) * weight[i];
-                    }
-                    sum = (sum % 11) % 10;
-                    return (sum == value.substr(9, 1));
-                },
-                    // Validate Bulgarian personal number of a foreigner
-                    pnf = function(value) {
+                        var sum = 0,
+                            weight = [2, 4, 8, 5, 10, 9, 7, 3, 6];
+                        for (var i = 0; i < 9; i++) {
+                            sum += parseInt(value.charAt(i)) * weight[i];
+                        }
+                        sum = (sum % 11) % 10;
+                        return (sum == value.substr(9, 1));
+                    },
+                // Validate Bulgarian personal number of a foreigner
+                    pnf = function (value) {
                         var sum = 0,
                             weight = [21, 19, 17, 13, 11, 9, 7, 3, 1];
                         for (var i = 0; i < 9; i++) {
@@ -15606,8 +16668,8 @@ the specific language governing permissions and limitations under the Apache Lic
                         sum = sum % 10;
                         return (sum == value.substr(9, 1));
                     },
-                    // Finally, consider it as a VAT number
-                    vat = function(value) {
+                // Finally, consider it as a VAT number
+                    vat = function (value) {
                         var sum = 0,
                             weight = [4, 3, 2, 7, 6, 5, 4, 3, 2];
                         for (var i = 0; i < 9; i++) {
@@ -15634,7 +16696,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _ch: function(value) {
+        _ch: function (value) {
             if (!/^CHE[0-9]{9}(MWST)?$/.test(value)) {
                 return false;
             }
@@ -15666,7 +16728,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _cy: function(value) {
+        _cy: function (value) {
             if (!/^CY[0-5|9]{1}[0-9]{7}[A-Z]{1}$/.test(value)) {
                 return false;
             }
@@ -15718,7 +16780,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _cz: function(value) {
+        _cz: function (value) {
             if (!/^CZ[0-9]{8,10}$/.test(value)) {
                 return false;
             }
@@ -15807,7 +16869,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _de: function(value) {
+        _de: function (value) {
             if (!/^DE[0-9]{9}$/.test(value)) {
                 return false;
             }
@@ -15825,7 +16887,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _dk: function(value) {
+        _dk: function (value) {
             if (!/^DK[0-9]{8}$/.test(value)) {
                 return false;
             }
@@ -15849,7 +16911,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _ee: function(value) {
+        _ee: function (value) {
             if (!/^EE[0-9]{9}$/.test(value)) {
                 return false;
             }
@@ -15879,24 +16941,24 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _es: function(value) {
+        _es: function (value) {
             if (!/^ES[0-9A-Z][0-9]{7}[0-9A-Z]$/.test(value)) {
                 return false;
             }
 
             value = value.substr(2);
-            var dni = function(value) {
-                var check = parseInt(value.substr(0, 8), 10);
-                check = 'TRWAGMYFPDXBNJZSQVHLCKE' [check % 23];
-                return (check == value.substr(8, 1));
-            },
-                nie = function(value) {
+            var dni = function (value) {
+                    var check = parseInt(value.substr(0, 8), 10);
+                    check = 'TRWAGMYFPDXBNJZSQVHLCKE' [check % 23];
+                    return (check == value.substr(8, 1));
+                },
+                nie = function (value) {
                     var check = ['XYZ'.indexOf(value.charAt(0)), value.substr(1)].join('');
                     check = parseInt(check, 10);
                     check = 'TRWAGMYFPDXBNJZSQVHLCKE' [check % 23];
                     return (check == value.substr(8, 1));
                 },
-                cif = function(value) {
+                cif = function (value) {
                     var first = value.charAt(0),
                         check;
                     if ('KLM'.indexOf(first) != -1) {
@@ -15944,7 +17006,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _fi: function(value) {
+        _fi: function (value) {
             if (!/^FI[0-9]{8}$/.test(value)) {
                 return false;
             }
@@ -15971,7 +17033,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _fr: function(value) {
+        _fr: function (value) {
             if (!/^FR[0-9A-Z]{2}[0-9]{9}$/.test(value)) {
                 return false;
             }
@@ -16008,7 +17070,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _gb: function(value) {
+        _gb: function (value) {
             if (!/^GB[0-9]{9}$/.test(value) // Standard
                 && !/^GB[0-9]{12}$/.test(value) // Branches
                 && !/^GBGD[0-9]{3}$/.test(value) // Government department
@@ -16055,7 +17117,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _gr: function(value) {
+        _gr: function (value) {
             if (!/^GR[0-9]{9}$/.test(value)) {
                 return false;
             }
@@ -16076,7 +17138,7 @@ the specific language governing permissions and limitations under the Apache Lic
         },
 
         // EL is traditionally prefix of Greek VAT numbers
-        _el: function(value) {
+        _el: function (value) {
             if (!/^EL[0-9]{9}$/.test(value)) {
                 return false;
             }
@@ -16094,7 +17156,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _hu: function(value) {
+        _hu: function (value) {
             if (!/^HU[0-9]{8}$/.test(value)) {
                 return false;
             }
@@ -16119,7 +17181,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _hr: function(value) {
+        _hr: function (value) {
             if (!/^HR[0-9]{11}$/.test(value)) {
                 return false;
             }
@@ -16137,13 +17199,13 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _ie: function(value) {
+        _ie: function (value) {
             if (!/^IE[0-9]{1}[0-9A-Z\*\+]{1}[0-9]{5}[A-Z]{1,2}$/.test(value)) {
                 return false;
             }
 
             value = value.substr(2);
-            var getCheckDigit = function(value) {
+            var getCheckDigit = function (value) {
                 while (value.length < 7) {
                     value = '0' + value;
                 }
@@ -16181,7 +17243,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _it: function(value) {
+        _it: function (value) {
             if (!/^IT[0-9]{11}$/.test(value)) {
                 return false;
             }
@@ -16212,7 +17274,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _lt: function(value) {
+        _lt: function (value) {
             if (!/^LT([0-9]{7}1[0-9]{1}|[0-9]{10}1[0-9]{1})$/.test(value)) {
                 return false;
             }
@@ -16243,7 +17305,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _lu: function(value) {
+        _lu: function (value) {
             if (!/^LU[0-9]{8}$/.test(value)) {
                 return false;
             }
@@ -16261,7 +17323,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _lv: function(value) {
+        _lv: function (value) {
             if (!/^LV[0-9]{11}$/.test(value)) {
                 return false;
             }
@@ -16316,7 +17378,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _mt: function(value) {
+        _mt: function (value) {
             if (!/^MT[0-9]{8}$/.test(value)) {
                 return false;
             }
@@ -16341,7 +17403,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _nl: function(value) {
+        _nl: function (value) {
             if (!/^NL[0-9]{9}B[0-9]{2}$/.test(value)) {
                 return false;
             }
@@ -16366,7 +17428,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _no: function(value) {
+        _no: function (value) {
             if (!/^NO[0-9]{9}$/.test(value)) {
                 return false;
             }
@@ -16393,7 +17455,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _pl: function(value) {
+        _pl: function (value) {
             if (!/^PL[0-9]{10}$/.test(value)) {
                 return false;
             }
@@ -16418,7 +17480,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _pt: function(value) {
+        _pt: function (value) {
             if (!/^PT[0-9]{9}$/.test(value)) {
                 return false;
             }
@@ -16446,7 +17508,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _ro: function(value) {
+        _ro: function (value) {
             if (!/^RO[1-9][0-9]{1,9}$/.test(value)) {
                 return false;
             }
@@ -16469,7 +17531,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _ru: function(value) {
+        _ru: function (value) {
             if (!/^RU([0-9]{9}|[0-9]{12})$/.test(value)) {
                 return false;
             }
@@ -16518,7 +17580,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _rs: function(value) {
+        _rs: function (value) {
             if (!/^RS[0-9]{9}$/.test(value)) {
                 return false;
             }
@@ -16546,7 +17608,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _se: function(value) {
+        _se: function (value) {
             if (!/^SE[0-9]{10}01$/.test(value)) {
                 return false;
             }
@@ -16564,7 +17626,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _si: function(value) {
+        _si: function (value) {
             if (!/^SI[0-9]{8}$/.test(value)) {
                 return false;
             }
@@ -16592,7 +17654,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value VAT number
          * @returns {Boolean}
          */
-        _sk: function(value) {
+        _sk: function (value) {
             if (!/^SK[1-9][0-9][(2-4)|(6-9)][0-9]{7}$/.test(value)) {
                 return false;
             }
@@ -16601,8 +17663,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return (value % 11 == 0);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.vin = {
         /**
          * Validate an US VIN (Vehicle Identification Number)
@@ -16613,7 +17676,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - message: The invalid message
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -16626,40 +17689,40 @@ the specific language governing permissions and limitations under the Apache Lic
 
             value = value.toUpperCase();
             var chars = {
-                A: 1,
-                B: 2,
-                C: 3,
-                D: 4,
-                E: 5,
-                F: 6,
-                G: 7,
-                H: 8,
-                J: 1,
-                K: 2,
-                L: 3,
-                M: 4,
-                N: 5,
-                P: 7,
-                R: 9,
-                S: 2,
-                T: 3,
-                U: 4,
-                V: 5,
-                W: 6,
-                X: 7,
-                Y: 8,
-                Z: 9,
-                '1': 1,
-                '2': 2,
-                '3': 3,
-                '4': 4,
-                '5': 5,
-                '6': 6,
-                '7': 7,
-                '8': 8,
-                '9': 9,
-                '0': 0
-            },
+                    A: 1,
+                    B: 2,
+                    C: 3,
+                    D: 4,
+                    E: 5,
+                    F: 6,
+                    G: 7,
+                    H: 8,
+                    J: 1,
+                    K: 2,
+                    L: 3,
+                    M: 4,
+                    N: 5,
+                    P: 7,
+                    R: 9,
+                    S: 2,
+                    T: 3,
+                    U: 4,
+                    V: 5,
+                    W: 6,
+                    X: 7,
+                    Y: 8,
+                    Z: 9,
+                    '1': 1,
+                    '2': 2,
+                    '3': 3,
+                    '4': 4,
+                    '5': 5,
+                    '6': 6,
+                    '7': 7,
+                    '8': 8,
+                    '9': 9,
+                    '0': 0
+                },
                 weights = [8, 7, 6, 5, 4, 3, 2, 10, 0, 9, 8, 7, 6, 5, 4, 3, 2],
                 sum = 0,
                 length = value.length;
@@ -16675,8 +17738,9 @@ the specific language governing permissions and limitations under the Apache Lic
             return reminder == value.charAt(8);
         }
     };
-}(window.jQuery));;
-(function($) {
+}(window.jQuery));
+;
+(function ($) {
     $.fn.bootstrapValidator.validators.zipCode = {
         html5Attributes: {
             message: 'message',
@@ -16700,7 +17764,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * - SE (Sweden)
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '' || !options.country) {
                 return true;
@@ -16733,7 +17797,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {String} value The postcode
          * @returns {Boolean}
          */
-        _gb: function(value) {
+        _gb: function (value) {
             var firstChar = '[ABCDEFGHIJKLMNOPRSTUWYZ]', // Does not accept QVX
                 secondChar = '[ABCDEFGHKLMNOPQRSTUVWXY]', // Does not accept IJZ
                 thirdChar = '[ABCDEFGHJKPMNRSTUVWXY]',
@@ -16765,7 +17829,7 @@ the specific language governing permissions and limitations under the Apache Lic
     };
 }(window.jQuery));
 // add by zhufeng
-(function($) {
+(function ($) {
     $.fn.bootstrapValidator.validators.floatNumber = {
         /**
          * Return true if the input value contains digits only
@@ -16775,7 +17839,7 @@ the specific language governing permissions and limitations under the Apache Lic
          * @param {Object} options
          * @returns {Boolean}
          */
-        validate: function(validator, $field, options) {
+        validate: function (validator, $field, options) {
             var value = $field.val();
             if (value == '') {
                 return true;
@@ -16784,7 +17848,8 @@ the specific language governing permissions and limitations under the Apache Lic
             return /^[+-]?\d+(\.\d+)?$/.test(value);
         }
     }
-}(window.jQuery));;
+}(window.jQuery));
+;
 ///<jscompress sourcefile="pageination.js" />
 /*
  * pagination.js 2.0.5
@@ -16797,7 +17862,7 @@ the specific language governing permissions and limitations under the Apache Lic
  * Released under the MIT license.
  */
 
-(function(global, $) {
+(function (global, $) {
 
     if (typeof $ === 'undefined') {
         throwError('Pagination requires jQuery.');
@@ -16814,7 +17879,7 @@ the specific language governing permissions and limitations under the Apache Lic
         pluginName = 'pagination2';
     }
 
-    $.fn[pluginName] = function(options) {
+    $.fn[pluginName] = function (options) {
 
         if (typeof options === 'undefined') {
             return this;
@@ -16824,7 +17889,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
         var pagination = {
 
-            initialize: function() {
+            initialize: function () {
                 var self = this;
 
                 // Save attributes of current instance
@@ -16842,8 +17907,8 @@ the specific language governing permissions and limitations under the Apache Lic
 
                 // Inline style
                 /*if (attributes.inlineStyle === true) {
-                    addStyle();
-                }*/
+                 addStyle();
+                 }*/
 
                 // Passed to the callback function
                 var model = self.model = {
@@ -16852,7 +17917,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 };
 
                 // "dataSource"`s type is unknown, parse it to find true data
-                self.parseDataSource(attributes.dataSource, function(dataSource) {
+                self.parseDataSource(attributes.dataSource, function (dataSource) {
 
                     // Whether simulated pagination
                     self.sync = Helpers.isArray(dataSource);
@@ -16893,7 +17958,7 @@ the specific language governing permissions and limitations under the Apache Lic
 
             },
 
-            render: function(isBoot) {
+            render: function (isBoot) {
 
                 var self = this;
                 var model = self.model;
@@ -16937,7 +18002,7 @@ the specific language governing permissions and limitations under the Apache Lic
             },
 
             // Create template
-            createTemplate: function(args) {
+            createTemplate: function (args) {
 
                 var self = this;
                 var currentPage = args.currentPage;
@@ -17130,7 +18195,7 @@ the specific language governing permissions and limitations under the Apache Lic
             },
 
             // Go to the specified page
-            go: function(number, callback) {
+            go: function (number, callback) {
 
                 var self = this;
                 var model = self.model;
@@ -17171,10 +18236,10 @@ the specific language governing permissions and limitations under the Apache Lic
                 $.extend(formatAjaxParams.data || {}, postData);
 
                 formatAjaxParams.url = attributes.dataSource;
-                formatAjaxParams.success = function(response) {
+                formatAjaxParams.success = function (response) {
                     render(self.filterDataByLocator(response));
                 };
-                formatAjaxParams.error = function(jqXHR, textStatus, errorThrown) {
+                formatAjaxParams.error = function (jqXHR, textStatus, errorThrown) {
                     attributes.formatAjaxError && attributes.formatAjaxError(jqXHR, textStatus, errorThrown);
                     self.enable();
                 };
@@ -17231,7 +18296,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             },
 
-            doCallback: function(data, customCallback) {
+            doCallback: function (data, customCallback) {
                 var self = this;
                 var model = self.model;
 
@@ -17242,7 +18307,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             },
 
-            destroy: function() {
+            destroy: function () {
 
                 // Before destroy
                 if (this.callHook('beforeDestroy') === false) return;
@@ -17257,15 +18322,15 @@ the specific language governing permissions and limitations under the Apache Lic
                 this.callHook('afterDestroy');
             },
 
-            previous: function(callback) {
+            previous: function (callback) {
                 this.go(this.model.pageNumber - 1, callback);
             },
 
-            next: function(callback) {
+            next: function (callback) {
                 this.go(this.model.pageNumber + 1, callback);
             },
 
-            disable: function() {
+            disable: function () {
                 var self = this;
                 var source = self.sync ? 'sync' : 'async';
 
@@ -17279,7 +18344,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 self.callHook('afterDisable', source);
             },
 
-            enable: function() {
+            enable: function () {
                 var self = this;
                 var source = self.sync ? 'sync' : 'async';
 
@@ -17293,7 +18358,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 self.callHook('afterEnable', source);
             },
 
-            show: function() {
+            show: function () {
                 var self = this;
 
                 if (self.model.el.is(':visible')) return;
@@ -17301,7 +18366,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 self.model.el.show();
             },
 
-            hide: function() {
+            hide: function () {
                 var self = this;
 
                 if (!self.model.el.is(':visible')) return;
@@ -17310,7 +18375,7 @@ the specific language governing permissions and limitations under the Apache Lic
             },
 
             // Replace the variables of template
-            replaceVariables: function(template, variables) {
+            replaceVariables: function (template, variables) {
 
                 var formattedString;
 
@@ -17325,7 +18390,7 @@ the specific language governing permissions and limitations under the Apache Lic
             },
 
             // Get data segments
-            getDataSegment: function(number) {
+            getDataSegment: function (number) {
                 var pageSize = attributes.pageSize;
                 var dataSource = attributes.dataSource;
                 var totalNumber = attributes.totalNumber;
@@ -17337,12 +18402,12 @@ the specific language governing permissions and limitations under the Apache Lic
             },
 
             // Get total page
-            getTotalPage: function() {
+            getTotalPage: function () {
                 return Math.ceil(attributes.totalNumber / attributes.pageSize);
             },
 
             // Get locator
-            getLocator: function(locator) {
+            getLocator: function (locator) {
                 var result;
 
                 if (typeof locator === 'string') {
@@ -17357,7 +18422,7 @@ the specific language governing permissions and limitations under the Apache Lic
             },
 
             // Filter data by "locator"
-            filterDataByLocator: function(dataSource) {
+            filterDataByLocator: function (dataSource) {
 
                 var locator = this.getLocator(attributes.locator);
                 var filteredData;
@@ -17365,10 +18430,11 @@ the specific language governing permissions and limitations under the Apache Lic
                 // Data source is an Object, use "locator" to locate the true data
                 if (Helpers.isObject(dataSource)) {
                     try {
-                        $.each(locator.split('.'), function(index, item) {
+                        $.each(locator.split('.'), function (index, item) {
                             filteredData = (filteredData ? filteredData : dataSource)[item];
                         });
-                    } catch (e) {}
+                    } catch (e) {
+                    }
 
                     if (!filteredData) {
                         throwError('dataSource.' + locator + ' is undefined.');
@@ -17381,7 +18447,7 @@ the specific language governing permissions and limitations under the Apache Lic
             },
 
             // Parse dataSource
-            parseDataSource: function(dataSource, callback) {
+            parseDataSource: function (dataSource, callback) {
 
                 var self = this;
                 var args = arguments;
@@ -17391,7 +18457,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 } else if (Helpers.isArray(dataSource)) {
                     callback(attributes.dataSource = dataSource);
                 } else if ($.isFunction(dataSource)) {
-                    attributes.dataSource(function(data) {
+                    attributes.dataSource(function (data) {
                         if ($.isFunction(data)) {
                             throwError('Unexpect parameter of the "done" Function.');
                         }
@@ -17409,7 +18475,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
             },
 
-            callHook: function(hook) {
+            callHook: function (hook) {
                 var paginationData = container.data('pagination');
                 var result;
 
@@ -17423,7 +18489,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 }
 
                 if (paginationData.hooks && paginationData.hooks[hook]) {
-                    $.each(paginationData.hooks[hook], function(index, item) {
+                    $.each(paginationData.hooks[hook], function (index, item) {
                         if (item.apply(global, args) === false) {
                             result = false;
                         }
@@ -17433,13 +18499,13 @@ the specific language governing permissions and limitations under the Apache Lic
                 return result !== false;
             },
 
-            observer: function() {
+            observer: function () {
 
                 var self = this;
                 var el = self.model.el;
 
                 // Go to page
-                container.on(eventPrefix + 'go', function(event, pageNumber, done) {
+                container.on(eventPrefix + 'go', function (event, pageNumber, done) {
 
                     pageNumber = parseInt($.trim(pageNumber));
 
@@ -17453,7 +18519,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 });
 
                 // Page click
-                el.delegate('.J-paginationjs-page', 'click', function(event) {
+                el.delegate('.J-paginationjs-page', 'click', function (event) {
                     var current = $(event.currentTarget);
                     var pageNumber = $.trim(current.attr('data-num'));
 
@@ -17471,7 +18537,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 });
 
                 // Previous click
-                el.delegate('.J-paginationjs-previous', 'click', function(event) {
+                el.delegate('.J-paginationjs-previous', 'click', function (event) {
                     var current = $(event.currentTarget);
                     var pageNumber = $.trim(current.attr('data-num'));
 
@@ -17489,7 +18555,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 });
 
                 // Next click
-                el.delegate('.J-paginationjs-next', 'click', function(event) {
+                el.delegate('.J-paginationjs-next', 'click', function (event) {
                     var current = $(event.currentTarget);
                     var pageNumber = $.trim(current.attr('data-num'));
 
@@ -17507,7 +18573,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 });
 
                 // Go button click
-                el.delegate('.J-paginationjs-go-button', 'click', function() {
+                el.delegate('.J-paginationjs-go-button', 'click', function () {
                     var pageNumber = $('.J-paginationjs-go-pagenumber', el).val();
 
                     // Before Go button clicked
@@ -17520,7 +18586,7 @@ the specific language governing permissions and limitations under the Apache Lic
                 });
 
                 // go input enter
-                el.delegate('.J-paginationjs-go-pagenumber', 'keyup', function(event) {
+                el.delegate('.J-paginationjs-go-pagenumber', 'keyup', function (event) {
                     if (event.which === 13) {
                         var pageNumber = $(event.currentTarget).val();
 
@@ -17538,37 +18604,37 @@ the specific language governing permissions and limitations under the Apache Lic
                 });
 
                 // Previous page
-                container.on(eventPrefix + 'previous', function(event, done) {
+                container.on(eventPrefix + 'previous', function (event, done) {
                     self.previous(done);
                 });
 
                 // Next page
-                container.on(eventPrefix + 'next', function(event, done) {
+                container.on(eventPrefix + 'next', function (event, done) {
                     self.next(done);
                 });
 
                 // Disable
-                container.on(eventPrefix + 'disable', function() {
+                container.on(eventPrefix + 'disable', function () {
                     self.disable();
                 });
 
                 // Enable
-                container.on(eventPrefix + 'enable', function() {
+                container.on(eventPrefix + 'enable', function () {
                     self.enable();
                 });
 
                 // Show
-                container.on(eventPrefix + 'show', function() {
+                container.on(eventPrefix + 'show', function () {
                     self.show();
                 });
 
                 // Hide
-                container.on(eventPrefix + 'hide', function() {
+                container.on(eventPrefix + 'hide', function () {
                     self.hide();
                 });
 
                 // Destroy
-                container.on(eventPrefix + 'destroy', function() {
+                container.on(eventPrefix + 'destroy', function () {
                     self.destroy();
                 });
 
@@ -17605,7 +18671,7 @@ the specific language governing permissions and limitations under the Apache Lic
                         container.trigger.apply(this, args);
                         break;
 
-                        // Get selected page number
+                    // Get selected page number
                     case 'getSelectedPageNum':
                         if (container.data('pagination').model) {
                             return container.data('pagination').model.pageNumber;
@@ -17613,15 +18679,15 @@ the specific language governing permissions and limitations under the Apache Lic
                             return container.data('pagination').attributes.pageNumber;
                         }
 
-                        // Get total page
+                    // Get total page
                     case 'getTotalPage':
                         return container.data('pagination').model.totalPage;
 
-                        // Get selected page data
+                    // Get selected page data
                     case 'getSelectedPageData':
                         return container.data('pagination').currentPageData;
 
-                        // Whether pagination was be disabled
+                    // Whether pagination was be disabled
                     case 'isDisabled':
                         return container.data('pagination').model.disabled === true;
 
@@ -17755,11 +18821,12 @@ the specific language governing permissions and limitations under the Apache Lic
         showLastOnEllipsisShow: true,
 
         // Pagging callback
-        callback: function() {}
+        callback: function () {
+        }
     };
 
     // Hook register
-    $.fn[pluginHookMethod] = function(hook, callback) {
+    $.fn[pluginHookMethod] = function (hook, callback) {
 
         if (arguments.length < 2) {
             throwError('Missing argument.');
@@ -17786,7 +18853,7 @@ the specific language governing permissions and limitations under the Apache Lic
     };
 
     // Static method
-    $[pluginName] = function(selector, options) {
+    $[pluginName] = function (selector, options) {
 
         if (arguments.length < 2) {
             throwError('Requires two parameters.');
@@ -17850,8 +18917,9 @@ the specific language governing permissions and limitations under the Apache Lic
         var tmp;
         return ((tmp = typeof(object)) == "object" ? object == null && "null" || Object.prototype.toString.call(object).slice(8, -1) : tmp).toLowerCase();
     }
-    $.each(['Object', 'Array'], function(index, name) {
-        Helpers['is' + name] = function(object) {
+
+    $.each(['Object', 'Array'], function (index, name) {
+        Helpers['is' + name] = function (object) {
             return getObjectType(object) === name.toLowerCase();
         };
     });
@@ -17859,20 +18927,20 @@ the specific language governing permissions and limitations under the Apache Lic
     // Inline style
 
     /*function addStyle() {
-        var styleElement = $('#paginationjs-style');
+     var styleElement = $('#paginationjs-style');
 
-        if (styleElement.length) return;
+     if (styleElement.length) return;
 
-        var cssText = '.paginationjs{line-height:1.6;font-family:"Marmelad","Lucida Grande","Arial","Hiragino Sans GB",Georgia,sans-serif;font-size:14px;box-sizing:initial}.paginationjs:after{display:table;content:" ";clear:both}.paginationjs .paginationjs-pages{float:left}.paginationjs .paginationjs-pages ul{float:left;margin:0;padding:0}.paginationjs .paginationjs-pages li{float:left;border:1px solid #aaa;border-right:0;list-style:none}.paginationjs .paginationjs-pages li>a{min-width:38px;height:38px;line-height:38px;display:block;background:#fff;font-size:14px;color:#333;text-decoration:none;text-align:center}.paginationjs .paginationjs-pages li>a:hover{background:#eee}.paginationjs .paginationjs-pages li.active{border:0}.paginationjs .paginationjs-pages li.active>a{height:40px;width:40px;line-height:40px;background:#2381c5;color:#fff}.paginationjs .paginationjs-pages li.disabled>a{opacity:.3}.paginationjs .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs .paginationjs-pages li:first-child{border-radius:3px 0 0 3px;}.paginationjs .paginationjs-pages li:first-child>a{border-radius:3px 0 0 3px;font-size:15px;}.paginationjs .paginationjs-pages li:last-child{border-right:1px solid #aaa;border-radius:0 3px 3px 0}.paginationjs .paginationjs-pages li:last-child>a{border-radius:0 3px 3px 0;font-size:15px;}.paginationjs .paginationjs-go-input{float:left;margin-left:10px;font-size:14px}.paginationjs .paginationjs-go-input>input[type="text"]{width:30px;height:38px;background:#fff;border-radius:3px;border:1px solid #aaa;padding:0;font-size:14px;text-align:center;vertical-align:baseline;outline:0;box-shadow:none;box-sizing:initial}.paginationjs .paginationjs-go-button{float:left;margin-left:10px;font-size:14px}.paginationjs .paginationjs-go-button>input[type="button"]{min-width:40px;height:40px;line-height:28px;background:#fff;border-radius:3px;border:1px solid #aaa;text-align:center;padding:0 8px;font-size:14px;vertical-align:baseline;outline:0;box-shadow:none;color:#333;cursor:pointer}.paginationjs .paginationjs-go-button>input[type="button"]:hover{background-color:#f8f8f8}.paginationjs .paginationjs-nav{float:left;height:30px;line-height:30px;margin-left:10px;font-size:14px}.paginationjs.paginationjs-small{font-size:12px}.paginationjs.paginationjs-small .paginationjs-pages li>a{min-width:26px;height:24px;line-height:24px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-pages li.active>a{height:26px;line-height:26px}.paginationjs.paginationjs-small .paginationjs-go-input{font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-input>input[type="text"]{width:26px;height:24px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-button{font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-button>input[type="button"]{min-width:30px;height:26px;line-height:24px;padding:0 6px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-nav{height:26px;line-height:26px;font-size:12px}.paginationjs.paginationjs-big{font-size:16px}.paginationjs.paginationjs-big .paginationjs-pages li>a{min-width:36px;height:34px;line-height:34px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-pages li.active>a{height:36px;line-height:36px}.paginationjs.paginationjs-big .paginationjs-go-input{font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-input>input[type="text"]{width:36px;height:34px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-button{font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-button>input[type="button"]{min-width:50px;height:36px;line-height:34px;padding:0 12px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-nav{height:36px;line-height:36px;font-size:16px}.paginationjs.paginationjs-theme-blue .paginationjs-pages li{border-color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-pages li>a{color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-pages li>a:hover{background:#e9f4fc}.paginationjs.paginationjs-theme-blue .paginationjs-pages li.active>a{background:#289de9;color:#fff}.paginationjs.paginationjs-theme-blue .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-blue .paginationjs-go-input>input[type="text"]{border-color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-go-button>input[type="button"]{background:#289de9;border-color:#289de9;color:#fff}.paginationjs.paginationjs-theme-blue .paginationjs-go-button>input[type="button"]:hover{background-color:#3ca5ea}.paginationjs.paginationjs-theme-green .paginationjs-pages li{border-color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-pages li>a{color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-pages li>a:hover{background:#ebf4eb}.paginationjs.paginationjs-theme-green .paginationjs-pages li.active>a{background:#449d44;color:#fff}.paginationjs.paginationjs-theme-green .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-green .paginationjs-go-input>input[type="text"]{border-color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-go-button>input[type="button"]{background:#449d44;border-color:#449d44;color:#fff}.paginationjs.paginationjs-theme-green .paginationjs-go-button>input[type="button"]:hover{background-color:#55a555}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li{border-color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li>a{color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li>a:hover{background:#fdf5e9}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li.active>a{background:#ec971f;color:#fff}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-yellow .paginationjs-go-input>input[type="text"]{border-color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-go-button>input[type="button"]{background:#ec971f;border-color:#ec971f;color:#fff}.paginationjs.paginationjs-theme-yellow .paginationjs-go-button>input[type="button"]:hover{background-color:#eea135}.paginationjs.paginationjs-theme-red .paginationjs-pages li{border-color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-pages li>a{color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-pages li>a:hover{background:#faeaea}.paginationjs.paginationjs-theme-red .paginationjs-pages li.active>a{background:#c9302c;color:#fff}.paginationjs.paginationjs-theme-red .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-red .paginationjs-go-input>input[type="text"]{border-color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-go-button>input[type="button"]{background:#c9302c;border-color:#c9302c;color:#fff}.paginationjs.paginationjs-theme-red .paginationjs-go-button>input[type="button"]:hover{background-color:#ce4541}.paginationjs .paginationjs-pages li.paginationjs-next{*border-right:1px solid #aaa;border-right:1px solid #aaa\\0}.paginationjs .paginationjs-go-input{*margin-left:5px;margin-left:5px\\0}.paginationjs .paginationjs-go-input>input[type="text"]{*line-height:28px;line-height:28px\\0;*vertical-align:middle;vertical-align:middle\\0}.paginationjs .paginationjs-go-button{*margin-left:5px;margin-left:5px\\\0}.paginationjs .paginationjs-go-button>input[type="button"]{*vertical-align:middle;vertical-align:middle\\0}.paginationjs.paginationjs-big .paginationjs-pages li>a{line-height:36px\\0}.paginationjs.paginationjs-big .paginationjs-go-input>input[type="text"]{*height:35px;height:36px\\0;*line-height:36px;line-height:36px\\0}';
+     var cssText = '.paginationjs{line-height:1.6;font-family:"Marmelad","Lucida Grande","Arial","Hiragino Sans GB",Georgia,sans-serif;font-size:14px;box-sizing:initial}.paginationjs:after{display:table;content:" ";clear:both}.paginationjs .paginationjs-pages{float:left}.paginationjs .paginationjs-pages ul{float:left;margin:0;padding:0}.paginationjs .paginationjs-pages li{float:left;border:1px solid #aaa;border-right:0;list-style:none}.paginationjs .paginationjs-pages li>a{min-width:38px;height:38px;line-height:38px;display:block;background:#fff;font-size:14px;color:#333;text-decoration:none;text-align:center}.paginationjs .paginationjs-pages li>a:hover{background:#eee}.paginationjs .paginationjs-pages li.active{border:0}.paginationjs .paginationjs-pages li.active>a{height:40px;width:40px;line-height:40px;background:#2381c5;color:#fff}.paginationjs .paginationjs-pages li.disabled>a{opacity:.3}.paginationjs .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs .paginationjs-pages li:first-child{border-radius:3px 0 0 3px;}.paginationjs .paginationjs-pages li:first-child>a{border-radius:3px 0 0 3px;font-size:15px;}.paginationjs .paginationjs-pages li:last-child{border-right:1px solid #aaa;border-radius:0 3px 3px 0}.paginationjs .paginationjs-pages li:last-child>a{border-radius:0 3px 3px 0;font-size:15px;}.paginationjs .paginationjs-go-input{float:left;margin-left:10px;font-size:14px}.paginationjs .paginationjs-go-input>input[type="text"]{width:30px;height:38px;background:#fff;border-radius:3px;border:1px solid #aaa;padding:0;font-size:14px;text-align:center;vertical-align:baseline;outline:0;box-shadow:none;box-sizing:initial}.paginationjs .paginationjs-go-button{float:left;margin-left:10px;font-size:14px}.paginationjs .paginationjs-go-button>input[type="button"]{min-width:40px;height:40px;line-height:28px;background:#fff;border-radius:3px;border:1px solid #aaa;text-align:center;padding:0 8px;font-size:14px;vertical-align:baseline;outline:0;box-shadow:none;color:#333;cursor:pointer}.paginationjs .paginationjs-go-button>input[type="button"]:hover{background-color:#f8f8f8}.paginationjs .paginationjs-nav{float:left;height:30px;line-height:30px;margin-left:10px;font-size:14px}.paginationjs.paginationjs-small{font-size:12px}.paginationjs.paginationjs-small .paginationjs-pages li>a{min-width:26px;height:24px;line-height:24px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-pages li.active>a{height:26px;line-height:26px}.paginationjs.paginationjs-small .paginationjs-go-input{font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-input>input[type="text"]{width:26px;height:24px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-button{font-size:12px}.paginationjs.paginationjs-small .paginationjs-go-button>input[type="button"]{min-width:30px;height:26px;line-height:24px;padding:0 6px;font-size:12px}.paginationjs.paginationjs-small .paginationjs-nav{height:26px;line-height:26px;font-size:12px}.paginationjs.paginationjs-big{font-size:16px}.paginationjs.paginationjs-big .paginationjs-pages li>a{min-width:36px;height:34px;line-height:34px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-pages li.active>a{height:36px;line-height:36px}.paginationjs.paginationjs-big .paginationjs-go-input{font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-input>input[type="text"]{width:36px;height:34px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-button{font-size:16px}.paginationjs.paginationjs-big .paginationjs-go-button>input[type="button"]{min-width:50px;height:36px;line-height:34px;padding:0 12px;font-size:16px}.paginationjs.paginationjs-big .paginationjs-nav{height:36px;line-height:36px;font-size:16px}.paginationjs.paginationjs-theme-blue .paginationjs-pages li{border-color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-pages li>a{color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-pages li>a:hover{background:#e9f4fc}.paginationjs.paginationjs-theme-blue .paginationjs-pages li.active>a{background:#289de9;color:#fff}.paginationjs.paginationjs-theme-blue .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-blue .paginationjs-go-input>input[type="text"]{border-color:#289de9}.paginationjs.paginationjs-theme-blue .paginationjs-go-button>input[type="button"]{background:#289de9;border-color:#289de9;color:#fff}.paginationjs.paginationjs-theme-blue .paginationjs-go-button>input[type="button"]:hover{background-color:#3ca5ea}.paginationjs.paginationjs-theme-green .paginationjs-pages li{border-color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-pages li>a{color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-pages li>a:hover{background:#ebf4eb}.paginationjs.paginationjs-theme-green .paginationjs-pages li.active>a{background:#449d44;color:#fff}.paginationjs.paginationjs-theme-green .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-green .paginationjs-go-input>input[type="text"]{border-color:#449d44}.paginationjs.paginationjs-theme-green .paginationjs-go-button>input[type="button"]{background:#449d44;border-color:#449d44;color:#fff}.paginationjs.paginationjs-theme-green .paginationjs-go-button>input[type="button"]:hover{background-color:#55a555}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li{border-color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li>a{color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li>a:hover{background:#fdf5e9}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li.active>a{background:#ec971f;color:#fff}.paginationjs.paginationjs-theme-yellow .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-yellow .paginationjs-go-input>input[type="text"]{border-color:#ec971f}.paginationjs.paginationjs-theme-yellow .paginationjs-go-button>input[type="button"]{background:#ec971f;border-color:#ec971f;color:#fff}.paginationjs.paginationjs-theme-yellow .paginationjs-go-button>input[type="button"]:hover{background-color:#eea135}.paginationjs.paginationjs-theme-red .paginationjs-pages li{border-color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-pages li>a{color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-pages li>a:hover{background:#faeaea}.paginationjs.paginationjs-theme-red .paginationjs-pages li.active>a{background:#c9302c;color:#fff}.paginationjs.paginationjs-theme-red .paginationjs-pages li.disabled>a:hover{background:0}.paginationjs.paginationjs-theme-red .paginationjs-go-input>input[type="text"]{border-color:#c9302c}.paginationjs.paginationjs-theme-red .paginationjs-go-button>input[type="button"]{background:#c9302c;border-color:#c9302c;color:#fff}.paginationjs.paginationjs-theme-red .paginationjs-go-button>input[type="button"]:hover{background-color:#ce4541}.paginationjs .paginationjs-pages li.paginationjs-next{*border-right:1px solid #aaa;border-right:1px solid #aaa\\0}.paginationjs .paginationjs-go-input{*margin-left:5px;margin-left:5px\\0}.paginationjs .paginationjs-go-input>input[type="text"]{*line-height:28px;line-height:28px\\0;*vertical-align:middle;vertical-align:middle\\0}.paginationjs .paginationjs-go-button{*margin-left:5px;margin-left:5px\\\0}.paginationjs .paginationjs-go-button>input[type="button"]{*vertical-align:middle;vertical-align:middle\\0}.paginationjs.paginationjs-big .paginationjs-pages li>a{line-height:36px\\0}.paginationjs.paginationjs-big .paginationjs-go-input>input[type="text"]{*height:35px;height:36px\\0;*line-height:36px;line-height:36px\\0}';
 
-        $('head').append('<style type="text\/css" id="paginationjs-style">' + cssText + '<\/style>');
-    }*/
+     $('head').append('<style type="text\/css" id="paginationjs-style">' + cssText + '<\/style>');
+     }*/
 
     /*
      * export via AMD or CommonJS
      * */
     if (typeof define === 'function' && (define.amd || define.cmd)) {
-        define(function() {
+        define(function () {
             return $;
         });
     }

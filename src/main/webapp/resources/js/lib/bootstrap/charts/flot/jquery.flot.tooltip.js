@@ -2,14 +2,14 @@
  * jquery.flot.tooltip
  *
  * desc:	create tooltip with values of hovered point on the graph, 
-					support many series, time mode, stacking and pie charts
-					you can set custom tip content (also with use of HTML tags) and precision of values
+ support many series, time mode, stacking and pie charts
+ you can set custom tip content (also with use of HTML tags) and precision of values
  * version:	0.4.4
  * author: 	Krzysztof Urbas @krzysu [myviews.pl] with help of @ismyrnow
  * website:	https://github.com/krzysu/flot.tooltip
  * 
  * released under MIT License, 2012
-*/
+ */
 
 (function ($) {
     var options = {
@@ -27,7 +27,7 @@
 
     var init = function (plot) {
 
-        var tipPosition = { x: 0, y: 0 };
+        var tipPosition = {x: 0, y: 0};
         var opts = plot.getOptions();
 
         var updateTooltipPosition = function (pos) {
@@ -37,7 +37,7 @@
 
         var onMouseMove = function (e) {
 
-            var pos = { x: 0, y: 0 };
+            var pos = {x: 0, y: 0};
 
             pos.x = e.pageX;
             pos.y = e.pageY;
@@ -65,7 +65,7 @@
             }
             else {
                 $tip = $('<div />').attr('id', 'flotTip');
-                $tip.appendTo('body').hide().css({ position: 'absolute' });
+                $tip.appendTo('body').hide().css({position: 'absolute'});
 
                 if (to.defaultTheme) {
                     $tip.css({
@@ -90,7 +90,10 @@
                         tipText = stringFormat(to.content, item);
                     }
 
-                    $tip.html(tipText).css({ left: tipPosition.x + to.shifts.x, top: tipPosition.y + to.shifts.y }).show();
+                    $tip.html(tipText).css({
+                        left: tipPosition.x + to.shifts.x,
+                        top: tipPosition.y + to.shifts.y
+                    }).show();
                 }
                 else {
                     $tip.hide().html('');

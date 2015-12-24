@@ -13,6 +13,7 @@ import java.util.Map;
 /**
  * [一句话功能简述]<p>
  * [功能详细描述]<p>
+ *
  * @author victor
  * @version 1.0, 2015-7-22
  * @see
@@ -22,21 +23,22 @@ import java.util.Map;
 @RequestMapping("/notify")
 public class ZshNotifyInterface {
 
-	@Resource
-	CreateAndPayService createAndPayService;
-	@RequestMapping("/alipayNotify")
-	public String alipayNotify(HttpServletRequest request)  {
-		LogUtil.debug("【支付宝回调】alipayNotify begin：request=" + request);
-		String response="";
-		try {
-			Map<String, String> requestMap = RequestUtil.getRequestParams(request);
-			response = createAndPayService.notifyService(requestMap);
-		}catch (Exception e){
-			LogUtil.debug("【支付宝回调】alipayNotify Exception=" + e.getMessage());
-			e.printStackTrace();
-		}
-		LogUtil.debug("【支付宝回调】alipayNotify end：response=" + response);
-		return response;
-	}
-	
+    @Resource
+    CreateAndPayService createAndPayService;
+
+    @RequestMapping("/alipayNotify")
+    public String alipayNotify(HttpServletRequest request) {
+        LogUtil.debug("【支付宝回调】alipayNotify begin：request=" + request);
+        String response = "";
+        try {
+            Map<String, String> requestMap = RequestUtil.getRequestParams(request);
+            response = createAndPayService.notifyService(requestMap);
+        } catch (Exception e) {
+            LogUtil.debug("【支付宝回调】alipayNotify Exception=" + e.getMessage());
+            e.printStackTrace();
+        }
+        LogUtil.debug("【支付宝回调】alipayNotify end：response=" + response);
+        return response;
+    }
+
 }

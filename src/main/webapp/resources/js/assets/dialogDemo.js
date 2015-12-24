@@ -1,8 +1,8 @@
-$("#bootbox-options").on('click', function() {
+$("#bootbox-options").on('click', function () {
     utils.showDialog($('#myModal'));
 });
 
-$("#bootbox-success").on('click', function() {
+$("#bootbox-success").on('click', function () {
     bootbox.dialog({
         message: $("#modal-success").html(),
         title: "Success",
@@ -10,14 +10,14 @@ $("#bootbox-success").on('click', function() {
     });
 });
 
-$('.btn_tip').click(function() {
+$('.btn_tip').click(function () {
     utils.dialog({
         type: 'tip',
         value: 'haha'
     });
 });
 
-$('.btn_alert').click(function() {
+$('.btn_alert').click(function () {
     utils.dialog({
         type: 'alert',
         title: 'hehe',
@@ -25,13 +25,13 @@ $('.btn_alert').click(function() {
         // size: 'md',
         // size: 'sm',
         // closeButton: true,
-        confirmFunc: function() {
+        confirmFunc: function () {
             alert('confirm');
         }
     });
 });
 
-$('.btn_confirm').click(function() {
+$('.btn_confirm').click(function () {
     utils.dialog({
         type: 'confirm',
         title: 'hehe',
@@ -39,16 +39,16 @@ $('.btn_confirm').click(function() {
         // size: 'md',
         // size: 'sm',
         // closeButton: true,
-        confirmFunc: function() {
+        confirmFunc: function () {
             alert('confirm');
         },
-        cancelFunc: function() {
+        cancelFunc: function () {
             alert('cancel');
         }
     });
 });
 
-$('.btn_prompt').click(function() {
+$('.btn_prompt').click(function () {
     utils.dialog({
         type: 'prompt',
         title: 'hehe',
@@ -56,10 +56,10 @@ $('.btn_prompt').click(function() {
         placeholder: 'lalalalala',
         // size: 'md',
         // size: 'sm',
-        confirmFunc: function() {
+        confirmFunc: function () {
             alert('confirm');
         },
-        cancelFunc: function() {
+        cancelFunc: function () {
             alert('cancel');
         }
     });

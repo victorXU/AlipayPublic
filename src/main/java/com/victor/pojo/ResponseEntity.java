@@ -6,10 +6,10 @@ package com.victor.pojo;
 public class ResponseEntity extends Entity {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private String status;
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private String status;
     private String error;
     private String msg;
     private Object bean;
@@ -46,9 +46,9 @@ public class ResponseEntity extends Entity {
         this.bean = bean;
     }
 
-	@Override
-	public String toString() {
-		return "ResponseEntity [status=" + status + ", error=" + error + ", msg=" + msg + ", bean=" + bean + "]";
-	}
-    
+    @Override
+    public String toString() {
+        return "ResponseEntity [status=" + status + ", error=" + error + ", msg=" + msg + ", bean=" + bean + "]";
+    }
+
 }

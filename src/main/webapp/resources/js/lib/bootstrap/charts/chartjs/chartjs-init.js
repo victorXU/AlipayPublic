@@ -5,26 +5,26 @@ var InitiateChartJS = function () {
         init: function () {
 
             var doughnutData = [
-                    {
-                        value: 30,
-                        color: themeprimary
-                    },
-                    {
-                        value: 50,
-                        color: themesecondary
-                    },
-                    {
-                        value: 100,
-                        color: themethirdcolor
-                    },
-                    {
-                        value: 40,
-                        color: themefourthcolor
-                    },
-                    {
-                        value: 120,
-                        color: themefifthcolor
-                    }
+                {
+                    value: 30,
+                    color: themeprimary
+                },
+                {
+                    value: 50,
+                    color: themesecondary
+                },
+                {
+                    value: 100,
+                    color: themethirdcolor
+                },
+                {
+                    value: 40,
+                    color: themefourthcolor
+                },
+                {
+                    value: 120,
+                    color: themefifthcolor
+                }
 
             ];
             var lineChartData = {
@@ -48,18 +48,18 @@ var InitiateChartJS = function () {
 
             };
             var pieData = [
-                    {
-                        value: 30,
-                        color: themeprimary
-                    },
-                    {
-                        value: 50,
-                        color: themesecondary
-                    },
-                    {
-                        value: 100,
-                        color: themefourthcolor
-                    }
+                {
+                    value: 30,
+                    color: themeprimary
+                },
+                {
+                    value: 50,
+                    color: themesecondary
+                },
+                {
+                    value: 100,
+                    color: themefourthcolor
+                }
 
             ];
             var barChartData = {
@@ -79,30 +79,30 @@ var InitiateChartJS = function () {
 
             };
             var chartData = [
-                    {
-                        value: Math.random(),
-                        color: themeprimary
-                    },
-                    {
-                        value: Math.random(),
-                        color: themesecondary
-                    },
-                    {
-                        value: Math.random(),
-                        color: themethirdcolor
-                    },
-                    {
-                        value: Math.random(),
-                        color: themefourthcolor
-                    },
-                    {
-                        value: Math.random(),
-                        color: themefifthcolor
-                    },
-                    {
-                        value: Math.random(),
-                        color: "#ed4e2a"
-                    }
+                {
+                    value: Math.random(),
+                    color: themeprimary
+                },
+                {
+                    value: Math.random(),
+                    color: themesecondary
+                },
+                {
+                    value: Math.random(),
+                    color: themethirdcolor
+                },
+                {
+                    value: Math.random(),
+                    color: themefourthcolor
+                },
+                {
+                    value: Math.random(),
+                    color: themefifthcolor
+                },
+                {
+                    value: Math.random(),
+                    color: "#ed4e2a"
+                }
             ];
             var radarChartData = {
                 labels: ["", "", "", "", "", "", ""],
