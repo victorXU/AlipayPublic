@@ -54,8 +54,8 @@
             <if test="ouid!=null">
                 AND ouid = #{ouid}
             </if>
-            <if test="brandId!=null">
-                AND brandId = #{brandId}
+            <if test="brandid!=null">
+                AND brandId = #{brandid}
             </if>
             <if test="storecode!=null">
                 AND storecode = #{storecode}
@@ -70,7 +70,7 @@
         select rel_state, remark,partner_key,partnerid,seller_email,brandid,ouid,disabled,createuserid,
         createusername,createusercode,createdatetime,createip,storecode,orgcode,updateUserid,updateUsername,
         updateUserCode,updateDatetime,updateIp
-        from user_info
+        from ESALES_STORES_INFO
         <where>
             1=1
             <if test="id!=null">
@@ -79,8 +79,8 @@
             <if test="ouid!=null">
                 AND ouid = #{ouid}
             </if>
-            <if test="brandId!=null">
-                AND brandId = #{brandId}
+            <if test="brandid!=null">
+                AND brandId = #{brandid}
             </if>
             <if test="storecode!=null">
                 AND storecode = #{storecode}

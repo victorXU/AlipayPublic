@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.crop:crop-ws-base:0.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/crop/crop-ws-base/0.0.1-SNAPSHOT/crop-ws-base-0.0.1-20150923.053206-2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/crop/crop-ws-base/0.0.1-SNAPSHOT/crop-ws-base-0.0.1-20150923.053206-2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/crop/crop-ws-base/0.0.1-SNAPSHOT/crop-ws-base-0.0.1-20150923.053206-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

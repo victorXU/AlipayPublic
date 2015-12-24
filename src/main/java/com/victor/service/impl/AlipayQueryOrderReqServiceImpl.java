@@ -32,7 +32,7 @@ public class AlipayQueryOrderReqServiceImpl implements ZshInterfacePayService {
      * [一句话功能简述]<p>
      * [功能详细描述]<p>
      *
-     * @param requestMap
+     * @param dataMap
      * @param bean
      * @return
      * @author victor
@@ -40,7 +40,7 @@ public class AlipayQueryOrderReqServiceImpl implements ZshInterfacePayService {
      * @see
      * @since V1.0
      */
-    public String execute(Map<String, String> dataMap, AlipayOrderEntity bean) {
+    public String execute(Map<String, Object> dataMap, AlipayOrderEntity bean) {
         try {
             //----------------------------排序开始----------------------------
             String dataSend = RequestUtil.orderSendBefore(dataMap).toString();
@@ -78,8 +78,8 @@ public class AlipayQueryOrderReqServiceImpl implements ZshInterfacePayService {
      * @see
      * @since V1.0
      */
-    public boolean validateRequest(Map<String, String> requestMap, AlipayOrderEntity bean, Map<String, String> dataMap) {
-        String out_trade_no = requestMap.get("out_trade_no");
+    public boolean validateRequest(Map<String, Object> requestMap, AlipayOrderEntity bean, Map<String, Object> dataMap) {
+        String out_trade_no = requestMap.get("out_trade_no").toString();
         if (StringTools.isEmpty(out_trade_no)) {
             LogUtil.debug("【支付宝查询接口】out_trade_no参数为空！");
             bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean, "0004", "关键数据为空", "out_trade_no参数为空").outputXMLStr());

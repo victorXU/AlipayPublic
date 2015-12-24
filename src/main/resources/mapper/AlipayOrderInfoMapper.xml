@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatiorg//DTD Mapper 3.0//EN" "http://mybatiorg/dtd/mybatis-3-mapper.dtd" >
+<!DOCTYPE mapper PUBLIC "-//mybatiorg//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.victor.mapper.AlipayOrderInfoMapper">
 
     <select id="queryAlipayOrderInfo" resultType="com.victor.pojo.AlipayOrderEntity"
@@ -70,8 +70,8 @@
             <if test="ouid!=null">
                 AND ouid = #{ouid}
             </if>
-            <if test="brandId!=null">
-                AND brandId = #{brandId}
+            <if test="brandid!=null">
+                AND brandId = #{brandid}
             </if>
             <if test="storecode!=null">
                 AND storecode = #{storecode}
@@ -146,8 +146,8 @@
             <if test="ouid!=null">
                 AND ouid = #{ouid}
             </if>
-            <if test="brandId!=null">
-                AND brandId = #{brandId}
+            <if test="brandid!=null">
+                AND brandId = #{brandid}
             </if>
             <if test="storecode!=null">
                 AND storecode = #{storecode}

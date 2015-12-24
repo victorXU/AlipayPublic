@@ -7,5 +7,5 @@ import java.util.Map;
  */
 public interface CreateAndPayService {
 
-    String notifyService(Map<String, String> requestMap) throws Exception;
+    String notifyService(Map<String, Object> requestMap) throws Exception;
 }

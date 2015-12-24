@@ -33,14 +33,14 @@ public class CommonServiceImpl implements CommonService {
     @Resource
     private UigXmlMgr uigXmlMgr;
 
-    public boolean validateRequest(Map<String, String> requestMap, AlipayOrderEntity entity) {
+    public boolean validateRequest(Map<String, Object> requestMap, AlipayOrderEntity entity) {
         try {
             // 信息:
             // 127.0.0.1发送的URL请求串内容是：/JsZshService.uig?version=1.0.1&instId=1000203&type=QGGReq&msgId=&msgTime=20090601010101&billKey=65429345&commodityId=10040125002501&sign=06ddfd8f956e4b7f78d2841614882ece
             // 得到请求MAP对
             LogUtil.debug("【支付宝接口请求验证】validateRequest begin：requestMap=" + requestMap);
             AlipayStoreInfo alipayStoreInfo = new AlipayStoreInfo();
-            String brandid = requestMap.get("brandid");
+            String brandid = String.valueOf(requestMap.get("brandid"));
             if (StringTools.isNotEmpty(brandid)) {
                 entity.setBrandid(brandid);
                 alipayStoreInfo.setBrandid(brandid);
@@ -48,8 +48,9 @@ public class CommonServiceImpl implements CommonService {
                 LogUtil.debug("【支付宝接口请求验证】brandid参数为空");
                 entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004",
                         "关键数据为空", "brandid参数为空").outputXMLStr());
+                return false;
             }
-            String ouid = requestMap.get("ouid");
+            String ouid =String.valueOf(requestMap.get("ouid"));
             if (StringTools.isNotEmpty(ouid)) {
                 entity.setOuid(ouid);
                 alipayStoreInfo.setOuid(ouid);
@@ -57,9 +58,10 @@ public class CommonServiceImpl implements CommonService {
                 LogUtil.debug("【支付宝接口请求验证】ouid参数为空");
                 entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "关键数据为空",
                         "ouid参数为空").outputXMLStr());
+                return false;
             }
 
-            String orgcode = requestMap.get("orgcode");
+            String orgcode = String.valueOf(requestMap.get("orgcode"));
             if (StringTools.isNotEmpty(orgcode)) {
                 entity.setOrgcode(orgcode);
                 alipayStoreInfo.setOrgcode(orgcode);
@@ -67,9 +69,10 @@ public class CommonServiceImpl implements CommonService {
                 LogUtil.debug("【支付宝接口请求验证】orgcode参数为空");
                 entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "关键数据为空",
                         "orgcode参数为空").outputXMLStr());
+                return false;
             }
-            entity.setStorecode(requestMap.get("storecode"));
-            alipayStoreInfo.setStorecode(requestMap.get("storecode"));
+            entity.setStorecode(String.valueOf(requestMap.get("storecode")));
+            alipayStoreInfo.setStorecode(String.valueOf(requestMap.get("storecode")));
 
             List<AlipayStoreInfo> alipayStoreInfos = alipayStoreInfoMapper.queryAlipayOrderInfo(alipayStoreInfo);
             if (alipayStoreInfos == null || alipayStoreInfos.size() != 1) {

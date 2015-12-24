@@ -31,7 +31,7 @@ public class ZshNotifyInterface {
         LogUtil.debug("【支付宝回调】alipayNotify begin：request=" + request);
         String response = "";
         try {
-            Map<String, String> requestMap = RequestUtil.getRequestParams(request);
+            Map<String, Object> requestMap = RequestUtil.getRequestParams(request);
             response = createAndPayService.notifyService(requestMap);
         } catch (Exception e) {
             LogUtil.debug("【支付宝回调】alipayNotify Exception=" + e.getMessage());

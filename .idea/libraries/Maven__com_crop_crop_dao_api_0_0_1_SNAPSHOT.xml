@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.crop:crop-dao-api:0.0.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/crop/crop-dao-api/0.0.1-SNAPSHOT/crop-dao-api-0.0.1-20150923.053147-41.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/crop/crop-dao-api/0.0.1-SNAPSHOT/crop-dao-api-0.0.1-20150923.053147-41-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/crop/crop-dao-api/0.0.1-SNAPSHOT/crop-dao-api-0.0.1-20150923.053147-41-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

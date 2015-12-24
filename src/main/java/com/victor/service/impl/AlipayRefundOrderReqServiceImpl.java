@@ -47,7 +47,7 @@ public class AlipayRefundOrderReqServiceImpl implements ZshInterfacePayService {
      * @see
      * @since V1.0
      */
-    public String execute(Map<String, String> dataMap, AlipayOrderEntity bean) {
+    public String execute(Map<String, Object> dataMap, AlipayOrderEntity bean) {
         LogUtil.debug("【支付宝退款接口】退款开始");
         try {
             // ----------------------------验证传入参数结束----------------------------
@@ -103,9 +103,9 @@ public class AlipayRefundOrderReqServiceImpl implements ZshInterfacePayService {
      * @see
      * @since V1.0
      */
-    public boolean validateRequest(Map<String, String> requestMap, AlipayOrderEntity bean, Map<String, String> dataMap) {
+    public boolean validateRequest(Map<String, Object> requestMap, AlipayOrderEntity bean, Map<String, Object> dataMap) {
 
-        String out_trade_no = requestMap.get("out_trade_no");
+        String out_trade_no = requestMap.get("out_trade_no").toString();
         if (StringTools.isNotEmpty(out_trade_no)) {
             dataMap.put("out_trade_no", out_trade_no);
             bean.setOut_trade_no(out_trade_no);
@@ -114,7 +114,7 @@ public class AlipayRefundOrderReqServiceImpl implements ZshInterfacePayService {
             bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean, "0004", "关键数据为空", "out_trade_no参数为空").outputXMLStr());
         }
 
-        String refund_fee = requestMap.get("refund_fee");
+        String refund_fee = requestMap.get("refund_fee").toString();
         if (StringTools.isEmpty(refund_fee)) {
             LogUtil.debug("【支付宝退款接口】refund_amount");
             bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean, "0004", "关键数据为空", "refund_fee参数为空").outputXMLStr());

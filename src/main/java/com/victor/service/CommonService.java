@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public interface CommonService {
 
-    public boolean validateRequest(Map<String, String> requestMap, AlipayOrderEntity entity);
+    public boolean validateRequest(Map<String, Object> requestMap, AlipayOrderEntity entity);
 
     public UigXmlMgr returnResponseXml(UigXmlMgr headXml, UigXmlMgr zshResponse, AlipayOrderEntity entity);
 }

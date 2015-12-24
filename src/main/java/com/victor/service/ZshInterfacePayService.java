@@ -17,7 +17,7 @@ public interface ZshInterfacePayService {
      * @see
      * @since V1.0
      */
-    String execute(Map<String, String> dataMap, AlipayOrderEntity entity);
+    String execute(Map<String, Object> dataMap, AlipayOrderEntity entity);
 
-    boolean validateRequest(Map<String, String> requestMap, AlipayOrderEntity bean, Map<String, String> dataMap);
+    boolean validateRequest(Map<String, Object> requestMap, AlipayOrderEntity bean, Map<String, Object> dataMap);
 }

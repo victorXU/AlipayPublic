@@ -30,7 +30,7 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
      * [功能详细描述]
      * <p/>
      *
-     * @param requestMap
+     * @param dataMap
      * @param entity
      * @return
      * @author victor
@@ -38,7 +38,7 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
      * @see
      * @since V1.0
      */
-    public String execute(Map<String, String> dataMap, AlipayOrderEntity entity) {
+    public String execute(Map<String, Object> dataMap, AlipayOrderEntity entity) {
         LogUtil.debug("【支付宝统一支付接口】支付开始");
         try {
             // ----------------------------排序开始----------------------------
@@ -51,8 +51,7 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
             // ----------------------------加密结束----------------------------
 
             // ----------------------------处理中文开始----------------------------
-            dataMap.put("subject",
-                    URLEncoder.encode(entity.getSubject(), ZshConfig.GBK));
+            dataMap.put("subject",URLEncoder.encode(entity.getSubject(), ZshConfig.GBK));
             dataMap.put("sign", mysign);
             dataMap.put("sign_type", "MD5");
             dataSend = RequestUtil.orderSendBefore(dataMap).toString();
@@ -92,8 +91,8 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
      * @see
      * @since V1.0
      */
-    public boolean validateRequest(Map<String, String> requestMap,
-                                   AlipayOrderEntity entity, Map<String, String> dataMap) {
+    public boolean validateRequest(Map<String, Object> requestMap,
+                                   AlipayOrderEntity entity, Map<String, Object> dataMap) {
         List<String> emptyList = new ArrayList<String>() {
 
             private static final long serialVersionUID = 1L;
@@ -119,12 +118,12 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
         };
         String param = "";
         for (String s : emptyList) {
-            param = requestMap.get(s);
+            param = requestMap.get(s).toString();
             if (StringTools.isNotEmpty(param)) {
                 dataMap.put(s, param);
             }
         }
-        String total_fee = requestMap.get("total_fee");
+        String total_fee = requestMap.get("total_fee").toString();
         if (StringTools.isEmpty(total_fee)) {
             entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity,
                     "0004", "【支付宝统一支付接口】关键数据为空", "total_fee参数为空").outputXMLStr());
@@ -132,7 +131,7 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
         } else {
             dataMap.put("total_fee", total_fee);
         }
-        String product_code = requestMap.get("product_code");
+        String product_code = requestMap.get("product_code").toString();
         if (StringTools.isEmpty(product_code)) {
             entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity,
                     "0004", "【支付宝统一支付接口】关键数据为空", "product_code参数为空").outputXMLStr());
@@ -141,7 +140,7 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
             dataMap.put("product_code", product_code);
         }
 
-        String notify_url = requestMap.get("notify_url");
+        String notify_url = requestMap.get("notify_url").toString();
         if (StringTools.isNotEmpty(notify_url)) {
             entity.setNotify_url(notify_url);
         }
@@ -154,7 +153,7 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
          完整的订单号：25MH1S005119915122200001，共21位；
          建议订单号的规则简化，只取店员编码+日期+序列号；
          */
-        String out_trade_no = requestMap.get("out_trade_no");
+        String out_trade_no = requestMap.get("out_trade_no").toString();
         if (StringTools.isNotEmpty(out_trade_no)) {
             entity.setOut_trade_no(out_trade_no);
             ;

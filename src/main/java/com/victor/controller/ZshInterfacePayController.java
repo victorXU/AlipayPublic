@@ -7,6 +7,7 @@ import com.victor.util.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
@@ -38,15 +39,15 @@ public class ZshInterfacePayController {
 
     private ZshInterfacePayService service;// 接口
 
-    @RequestMapping(value = "/interface", produces = "text/html;charset=UTF-8")
+    @RequestMapping(value = "/interface",  method = RequestMethod.POST, produces = "application/json")
     @ResponseBody
-    public String unifiedOrder(HttpServletRequest request, Model model) {
+    public String unifiedOrder(HttpServletRequest request) {
         AlipayOrderEntity entity = new AlipayOrderEntity();
         try {
             request.setCharacterEncoding(ZshConfig.UTF_8);
             LogUtil.debug("【调用支付宝接口】开始，" + request.getRemoteHost() + "发送的URL请求串内容是：" + request.getRequestURI() + "?" + request.getQueryString());
 
-            Map<String, String> requestMap = RequestUtil.getRequestParams(request);
+            Map<String, Object> requestMap =request.getParameterMap();
             // 解析串的合法性。
             if (!commonService.validateRequest(requestMap, entity)) {
                 return entity.getValidateResult();
@@ -63,11 +64,11 @@ public class ZshInterfacePayController {
     }
 
 
-    public String doAction(Map<String, String> requestMap, AlipayOrderEntity entity) {
-        String type = requestMap.get("type");
+    public String doAction(Map<String, Object> requestMap, AlipayOrderEntity entity) {
+        String type = requestMap.get("type").toString();
         this.service = (ZshInterfacePayService) SpringContextUtils.getBeanById(type);
         if (this.service != null) {
-            Map<String, String> dataMap = new HashMap<String, String>();
+            Map<String, Object> dataMap = new HashMap<String, Object>();
             // ----------------------------验证传入参数----------------------------
             if (!this.service.validateRequest(requestMap, entity, dataMap)) {
                 return entity.getValidateResult();

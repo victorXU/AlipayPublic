@@ -39,35 +39,35 @@ public class RequestUtil {
      * @param request
      * @return
      */
-    public static Map<String, String> getRequestParams(HttpServletRequest request) {
+    public static Map<String, Object> getRequestParams(HttpServletRequest request) {
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, Object> params = new HashMap<String, Object>();
         if (null != request) {
             Set<String> paramsKey = request.getParameterMap().keySet();
-            System.out.println("--->>>--str-<<<--->>" + request.getParameterMap().toString());
+            System.out.println("--->>>--str-<<<--->>" + request.getParameterMap().values());
             if (paramsKey != null)
                 System.out.println("count of params :" + paramsKey.size());
             for (String key : paramsKey) {
-                params.put(key, String.valueOf(request.getParameterMap().get(key)));
+                params.put(key, request.getParameterMap().get(key));
             }
         }
         return params;
     }
 
-    public static Map<String, String> orderSendBefore(Map<String, String> map) {
+    public static Map<String, Object> orderSendBefore(Map<String, Object> map) {
 
-        Map<String, String> treeMap = new TreeMap<String, String>() {
+        Map<String, Object> treeMap = new TreeMap<String, Object>() {
 
             private static final long serialVersionUID = 1L;
 
             public String toString() {
 
-                Iterator<Entry<String, String>> iterator = this.entrySet().iterator();
+                Iterator<Entry<String, Object>> iterator = this.entrySet().iterator();
                 StringBuffer sb = new StringBuffer();
                 while (iterator.hasNext()) {
-                    Entry<String, String> entry = iterator.next();
+                    Entry<String, Object> entry = iterator.next();
                     String key = entry.getKey();
-                    String value = entry.getValue();
+                    Object value = entry.getValue();
                     sb.append(key + '=' + value + '&');
                 }
 
@@ -126,7 +126,7 @@ public class RequestUtil {
                 //解决中文乱码问题
                 StringEntity entity = new StringEntity(param, "utf-8");
                 entity.setContentEncoding("UTF-8");
-                entity.setContentType("application/json");
+//                entity.setContentType("application/json");
                 method.setEntity(entity);
             }
             HttpResponse result = client.execute(method);
@@ -207,15 +207,19 @@ public class RequestUtil {
         return uuStr;
     }
 
-    public static Map<String, String> getParamData() {
-        return new HashMap<String, String>() {
+    public static Map<String, Object> getParamData() {
+        return new HashMap<String, Object>() {
             private static final long serialVersionUID = 1L;
 
             {
-                put("brandid", UserUtils.getBrandId() + "");
+               /* put("brandid", UserUtils.getBrandId() + "");
                 put("ouid", UserUtils.getOuId() + "");
                 put("orgcode", UserUtils.getUserOrgId() + "");
-                put("storecode", UserUtils.getCurrentStoreCode());
+                put("storecode", UserUtils.getCurrentStoreCode());*/
+                put("brandid",  "111");
+                put("ouid", "222");
+                put("orgcode", "333");
+                put("storecode", "444");
             }
         };
     }

@@ -37,7 +37,7 @@ public class AlipayServiceImpl implements AliPayService {
         logger.info("【支付宝查询接口】查询开始");
         ResponseEntity entity = new ResponseEntity();
         try {
-            Map<String, String> dataMap = new HashMap<String, String>();
+            Map<String, Object> dataMap = new HashMap<String, Object>();
             // ----------------------------传入参数开始----------------------------
             dataMap.put("out_trade_no", dt.getOut_trade_no());
             dataMap.put("_input_charset", "GBK");
@@ -81,7 +81,7 @@ public class AlipayServiceImpl implements AliPayService {
         logger.info("【支付宝统一预支付接口】获取二维码开始");
         ResponseEntity entity = new ResponseEntity();
         try {
-            Map<String, String> dataMap = new HashMap<String, String>();
+            Map<String, Object> dataMap = new HashMap<String, Object>();
             dataMap.put("service", "alipay.acquire.precreate");
             dataMap.put("partner", dt.getPartner());
             dataMap.put("_input_charset", "utf-8");
@@ -163,7 +163,7 @@ public class AlipayServiceImpl implements AliPayService {
         ResponseEntity entity = new ResponseEntity();
         try {
 
-            Map<String, String> data = new HashMap<String, String>();
+            Map<String, Object> data = new HashMap<String, Object>();
 
             //必选
             data.put("service", "alipay.acquire.refund");

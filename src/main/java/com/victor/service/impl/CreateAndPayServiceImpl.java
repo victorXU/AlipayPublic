@@ -30,7 +30,7 @@ public class CreateAndPayServiceImpl implements CreateAndPayService {
      * &trade_status=TRADE_SUCCESS&out_trade_no=20140113170651382
      * &seller_email=zhaishenghuo.hr@aliyun.com&total_fee=0.01
      */
-    public String notifyService(Map<String, String> requestMap) throws Exception {
+    public String notifyService(Map<String, Object> requestMap) throws Exception {
         // TODO Auto-generated method stub
         LogUtil.debug("【支付宝回调】开始：dt=" + requestMap);
         Thread.sleep(1000);
@@ -38,7 +38,7 @@ public class CreateAndPayServiceImpl implements CreateAndPayService {
         // ----------------------------根据支付宝流水号更新表中支付状态开始-----------------------
 
         AlipayOrderEntity entity = new AlipayOrderEntity();
-        String out_trade_no = requestMap.get("out_trade_no");
+        String out_trade_no = requestMap.get("out_trade_no").toString();
         entity.setOut_trade_no(out_trade_no);
         List<AlipayOrderEntity> alipayOrderEntities = alipayOrderInfoMapper.queryAlipayOrderInfo(entity);
         if (alipayOrderEntities == null
@@ -46,12 +46,12 @@ public class CreateAndPayServiceImpl implements CreateAndPayService {
             throw new DBException("查询移动支付表信息报错，支付宝流水条数不应大于1条");
         }
         entity = alipayOrderEntities.get(0);
-        entity.setTrade_no(requestMap.get("trade_no"));
-        entity.setTrade_status(requestMap.get("trade_status"));
-        String notify_action_type = requestMap.get("notify_action_type");
+        entity.setTrade_no(requestMap.get("trade_no").toString());
+        entity.setTrade_status(requestMap.get("trade_status").toString());
+        String notify_action_type = requestMap.get("notify_action_type").toString();
         if ("refundFPAction".equalsIgnoreCase(notify_action_type)
                 || "reverseAction".equalsIgnoreCase(notify_action_type)) {
-            entity.setRefund_fee(requestMap.get("refund_fee"));
+            entity.setRefund_fee(requestMap.get("refund_fee").toString());
         }
 
         int updateResult = alipayOrderInfoMapper.updateAlipayOrderInfo(entity);
