@@ -111,7 +111,7 @@ public class Page implements Serializable {
 	 * @return
 	 */
 	public int getLimit() {
-		return pageSize;
+		return page*pageSize;
 	}
 
 	@Override

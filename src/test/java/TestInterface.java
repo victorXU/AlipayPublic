@@ -17,6 +17,7 @@ public class TestInterface {
     @Test
     public void orderPayTest() {
         Map<String,Object> paramMap = RequestUtil.getParamData();
+        paramMap.put("type","alipayPayOrderReqServiceReq");
         paramMap.put("product_code","BARCODE_PAY_OFFLINE");
         paramMap.put("notify_url", ZshConfig.CREATE_AND_PAY_NOTIFY_URL);
         paramMap.put("out_trade_no", "3402304823034812");
@@ -25,6 +26,7 @@ public class TestInterface {
         paramMap.put("price", "0.01");
         paramMap.put("quantity", "1");
         paramMap.put("dynamic_id", "a13734956c7ff649");
+//        paramMap.put("dynamic_type", "barcode");
         String dataSend = RequestUtil.orderSendBefore(paramMap).toString();
         LogUtil.debug("【支付宝统一支付接口】请求内容：dataSend=" + dataSend);
         // ----------------------------发送到支付宝开始----------------------------
@@ -37,7 +39,15 @@ public class TestInterface {
 
     @Test
     public void orderQueryTest() {
-
+        Map<String,Object> paramMap = RequestUtil.getParamData();
+        paramMap.put("out_trade_no", "3402304823034812");
+        paramMap.put("type","alipayQueryOrderReq");
+        UigXmlPost post = new UigXmlPost();
+        HttpClient httpclient = new HttpClient();
+        HttpClientChacterUtil.setChacterIsUTF(httpclient);
+        String dataSend = RequestUtil.orderSendBefore(paramMap).toString();
+        String response = post.post(ZshConfig.INTERFACE_URL, dataSend, "application/x-www-form-urlencoded;text/html;charset=UTF-8", httpclient);
+        LogUtil.debug("【支付宝统一支付接口】返回结果：response=" + response);
     }
 
     @Test

@@ -1,20 +1,25 @@
 package com.victor.controller;
 
-import com.victor.pojo.AlipayOrderEntity;
-import com.victor.service.CommonService;
-import com.victor.service.ZshInterfacePayService;
-import com.victor.util.*;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
+import com.victor.pojo.AlipayOrderEntity;
+import com.victor.service.CommonService;
+import com.victor.service.ZshInterfacePayService;
+import com.victor.util.LogUtil;
+import com.victor.util.RequestUtil;
+import com.victor.util.SpringContextUtils;
+import com.victor.util.UigXmlMgr;
+import com.victor.util.ZshConfig;
 
 
 /**
@@ -47,7 +52,7 @@ public class ZshInterfacePayController {
             request.setCharacterEncoding(ZshConfig.UTF_8);
             LogUtil.debug("【调用支付宝接口】开始，" + request.getRemoteHost() + "发送的URL请求串内容是：" + request.getRequestURI() + "?" + request.getQueryString());
 
-            Map<String, Object> requestMap =request.getParameterMap();
+            Map<String, Object> requestMap =RequestUtil.getRequestParams(request);
             // 解析串的合法性。
             if (!commonService.validateRequest(requestMap, entity)) {
                 return entity.getValidateResult();

@@ -5,6 +5,7 @@ import com.victor.mapper.AlipayOrderInfoMapper;
 import com.victor.pojo.AlipayOrderEntity;
 import com.victor.service.ZshInterfacePayService;
 import com.victor.util.*;
+import org.apache.commons.httpclient.HttpClient;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -46,18 +47,24 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
             // ----------------------------排序结束----------------------------
 
             // ----------------------------加密开始----------------------------
-            String mysign = MD5.encode(dataSend + entity.getPartner(),
+            String mysign = MD5.encode(dataSend + entity.getPartner_key(),
                     ZshConfig.GBK);
             // ----------------------------加密结束----------------------------
 
             // ----------------------------处理中文开始----------------------------
-            dataMap.put("subject",URLEncoder.encode(entity.getSubject(), ZshConfig.GBK));
+            Object subject = dataMap.get("subject");
+            if (subject!=null){
+                dataMap.put("subject",URLEncoder.encode(subject.toString(), ZshConfig.GBK));
+            }
             dataMap.put("sign", mysign);
             dataMap.put("sign_type", "MD5");
             dataSend = RequestUtil.orderSendBefore(dataMap).toString();
             LogUtil.debug("【支付宝统一支付接口】请求内容：dataSend=" + dataSend);
             // ----------------------------发送到支付宝开始----------------------------
-            String response = RequestUtil.post("https://mapi.alipay.com/gateway.do", dataSend);
+            UigXmlPost post = new UigXmlPost();
+            HttpClient httpclient = new HttpClient();
+            HttpClientChacterUtil.setChacterIsUTF(httpclient);
+            String response = post.post("https://mapi.alipay.com/gateway.do", dataSend,"application/x-www-form-urlencoded;text/html;charset=UTF-8",httpclient);
             LogUtil.debug("【支付宝统一支付接口】返回结果：response=" + response);
             // ----------------------------发送到支付宝结束----------------------------
             // 更新支付宝返回结果
@@ -116,34 +123,60 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
                 add("dynamic_id ");
             }
         };
-        String param = "";
-        for (String s : emptyList) {
-            param = requestMap.get(s).toString();
-            if (StringTools.isNotEmpty(param)) {
-                dataMap.put(s, param);
-            }
+        Object subject = requestMap.get("subject");
+        if (subject!=null) {
+            dataMap.put("subject", subject);
+            entity.setSubject(subject.toString());
         }
-        String total_fee = requestMap.get("total_fee").toString();
-        if (StringTools.isEmpty(total_fee)) {
+        Object dynamic_id = requestMap.get("dynamic_id");
+        if (dynamic_id!=null) {
+            dataMap.put("dynamic_id", dynamic_id);
+            entity.setDynamic_id(dynamic_id.toString());
+        }
+        Object goods_detail = requestMap.get("goods_detail");
+        if (goods_detail!=null) {
+            dataMap.put("goods_detail", goods_detail);
+            entity.setGoods_detail(goods_detail.toString());
+        }
+        Object quantity = requestMap.get("quantity");
+        if (quantity!=null) {
+            dataMap.put("quantity", quantity);
+            entity.setQuantity(quantity.toString());
+        }
+        Object price = requestMap.get("price");
+        if (price!=null) {
+            dataMap.put("price", price);
+            entity.setPrice(price.toString());
+        }
+        Object body = requestMap.get("body");
+        if (body!=null) {
+            dataMap.put("body", body);
+            entity.setBody(body.toString());
+        }
+        Object notify_url = requestMap.get("notify_url");
+        if (notify_url!=null) {
+            dataMap.put("notify_url", notify_url);
+            entity.setNotify_url(notify_url.toString());
+        }
+        Object total_fee = requestMap.get("total_fee");
+        if (total_fee==null) {
             entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity,
                     "0004", "【支付宝统一支付接口】关键数据为空", "total_fee参数为空").outputXMLStr());
             return false;
         } else {
             dataMap.put("total_fee", total_fee);
+            entity.setTotal_fee(total_fee.toString());
         }
-        String product_code = requestMap.get("product_code").toString();
-        if (StringTools.isEmpty(product_code)) {
+        Object product_code = requestMap.get("product_code");
+        if (product_code==null) {
             entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity,
                     "0004", "【支付宝统一支付接口】关键数据为空", "product_code参数为空").outputXMLStr());
             return false;
         } else {
             dataMap.put("product_code", product_code);
+            entity.setProduct_code(product_code.toString());
         }
 
-        String notify_url = requestMap.get("notify_url").toString();
-        if (StringTools.isNotEmpty(notify_url)) {
-            entity.setNotify_url(notify_url);
-        }
         /**
          * 订单号自动生成规则（暂定）：门店编码+收银员帐号+日期+序列号；
          例如：门店编码（storecode，10位）：25MH1S0051；
@@ -153,19 +186,20 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
          完整的订单号：25MH1S005119915122200001，共21位；
          建议订单号的规则简化，只取店员编码+日期+序列号；
          */
-        String out_trade_no = requestMap.get("out_trade_no").toString();
-        if (StringTools.isNotEmpty(out_trade_no)) {
-            entity.setOut_trade_no(out_trade_no);
+        Object out_trade_no = requestMap.get("out_trade_no");
+        if (out_trade_no!=null) {
+            entity.setOut_trade_no(out_trade_no.toString());
             ;
         } else {
-            out_trade_no = UserUtils.getBrandId() + UserUtils.getAccount();
-            dataMap.put("out_trade_no", out_trade_no);
-            entity.setOut_trade_no(out_trade_no);
+            String out_trade_no_s = UserUtils.getBrandId() + UserUtils.getAccount();
+            dataMap.put("out_trade_no", out_trade_no_s);
+            entity.setOut_trade_no(out_trade_no_s);
         }
         dataMap.put("service", "alipay.acquire.createandpay ");
         dataMap.put("partner", entity.getPartner());
         dataMap.put("_input_charset", "utf-8");
         dataMap.put("product_code", "QR_CODE_OFFLINE");
+        entity.setProduct_code("QR_CODE_OFFLINE");
         dataMap.put("seller_email", entity.getSeller_email());
 
 

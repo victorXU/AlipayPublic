@@ -28,30 +28,30 @@ Purchase: http://wrapbootstrap.com
     <meta name='viewport' content='width=device-width,initail-scale=1.0'/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
-    <link rel="shortcut icon" href="../img/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="/resources/img/favicon.png" type="image/x-icon">
 
     <!--Basic Styles-->
-    <link href="../css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/resources/css/bootstrap.min.css" rel="stylesheet"/>
     <link id="bootstrap-rtl-link" href="" rel="stylesheet"/>
 
-    <link href="../css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="/resources/css/font-awesome.min.css" rel="stylesheet"/>
 
     <!--Fonts-->
     <!-- <link href="http://fonts.useso.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300" rel="stylesheet" type="text/css"> -->
 
     <!--Beyond styles-->
-    <link id="beyond-link" href="../css/beyond.min.css" rel="stylesheet"/>
-    <link href="../css/typicons.min.css" rel="stylesheet"/>
-    <link href="../css/animate.min.css" rel="stylesheet"/>
-    <link class="skin-link" href="../css/53A93F/skins/skin.css" rel="stylesheet" type="text/css"/>
-    <link href="../css/dataTables.bootstrap.css" rel="stylesheet"/>
+    <link id="beyond-link" href="/resources/css/beyond.min.css" rel="stylesheet"/>
+    <link href="/css/typicons.min.css" rel="stylesheet"/>
+    <link href="/resources/css/animate.min.css" rel="stylesheet"/>
+    <link class="skin-link" href="/resources/css/53A93F/skins/skin.css" rel="stylesheet" type="text/css"/>
+    <link href="/resources/css/dataTables.bootstrap.css" rel="stylesheet"/>
 
     <!-- 分页组件样式表 -->
-    <link rel="stylesheet" href="../css/pageination.css"/>
+    <link rel="stylesheet" href="/resources/css/pageination.css"/>
 
     <!-- 个人样式表 -->
-    <link class="skin-link" rel="stylesheet" href="../css/53A93F/personalStyle/commonStyle.css"/>
-    <link class="skin-link" rel="stylesheet" href="../css/53A93F/personalStyle/materialControl.css"/>
+    <link class="skin-link" rel="stylesheet" href="/resources/css/53A93F/personalStyle/commonStyle.css"/>
+    <link class="skin-link" rel="stylesheet" href="/resources/css/53A93F/personalStyle/materialControl.css"/>
 </head>
 <!-- /Head -->
 <!-- Body -->
@@ -88,7 +88,7 @@ Purchase: http://wrapbootstrap.com
             <div class="navbar-header pull-left">
                 <a href="#" class="navbar-brand">
                     <small>
-                        <img src="../img/semirlogo.png" alt=""/>
+                        <img src="/resources/img/semirlogo.png" alt=""/>
                     </small>
                 </a>
             </div>
@@ -108,7 +108,7 @@ Purchase: http://wrapbootstrap.com
                         <li>
                             <a class="login-area dropdown-toggle">
                                 <div class="avatar" title="View your public profile">
-                                    <img src="../img/avatars/adam-jansen.jpg">
+                                    <img src="/resources/img/avatars/adam-jansen.jpg">
                                 </div>
                                 <section>
                                     <h2><span class="profile"><span>坏人一枚</span></span></h2>
@@ -156,14 +156,14 @@ Purchase: http://wrapbootstrap.com
             <ul class="nav sidebar-menu">
                 <!--支付宝收银-->
                 <li class="active">
-                    <a href="支付宝收银.html">
+                    <a href="<%=basePath%>/orderAndPay/initPay">
                         <i class="menu-icon fa fa-credit-card"></i>
                         <span class="menu-text"> 支付宝收银 </span>
                     </a>
                 </li>
                 <!--流水查询-->
                 <li>
-                    <a href="流水查询.html">
+                    <a href="<%=basePath%>/orderAndPay/initQueryOrder">
                         <i class="menu-icon fa fa-bar-chart"></i>
                         <span class="menu-text"> 流水查询 </span>
                     </a>
@@ -179,7 +179,7 @@ Purchase: http://wrapbootstrap.com
 
                     <ul class="submenu">
                         <li>
-                            <a href="支付宝配置.html">
+                            <a href="<%=basePath%>/orderAndPay/initAlipayConfig">
                                 <span class="menu-text">支付宝配置</span>
                             </a>
                         </li>
@@ -284,26 +284,26 @@ Purchase: http://wrapbootstrap.com
 
 
 <!--Basic Scripts-->
-<script src="../js/lib/bootstrap/jquery-2.0.3.min.js"></script>
-<script src="../js/lib/underscore/underscore-min.js"></script>
-<script src="../js/lib/bootstrap/bootstrap.min.js"></script>
+<script src="/resources/js/lib/bootstrap/jquery-2.0.3.min.js"></script>
+<script src="/resources/js/lib/underscore/underscore-min.js"></script>
+<script src="/resources/js/lib/bootstrap/bootstrap.min.js"></script>
 
 <!--Bootstrap Date Range Picker-->
-<script src="../js/lib/bootstrap/datetime/moment.js"></script>
-<script src="../js/lib/bootstrap/datetime/daterangepicker.js"></script>
-<script src="../js/lib/bootstrap/datetime/bootstrap-datepicker.js"></script>
+<script src="/resources/js/lib/bootstrap/datetime/moment.js"></script>
+<script src="/resources/js/lib/bootstrap/datetime/daterangepicker.js"></script>
+<script src="/resources/js/lib/bootstrap/datetime/bootstrap-datepicker.js"></script>
 
 <!--Jquery Select2-->
-<script src="../js/lib/bootstrap/select2/select2.js"></script>
+<script src="/resources/js/lib/bootstrap/select2/select2.js"></script>
 
-<script src="../js/lib/bootstrap/validation/bootstrapValidator.js"></script>
+<script src="/resources/js/lib/bootstrap/validation/bootstrapValidator.js"></script>
 
 <!--Beyond Scripts-->
-<script src="../js/lib/bootstrap/beyond.min.js"></script>
+<script src="/resources/js/lib/bootstrap/beyond.min.js"></script>
 
 <!-- 自定义加载部分 -->
-<script src='../js/utils/utils.js'></script>
-<script src='../js/assets/formDemo1.js'></script>
+<script src='/resources/js/utils/utils.js'></script>
+<script src='/resources/js/assets/formDemo1.js'></script>
 <script>
     $("#paybtn").on("click",function(){
         var total_fee = $("#total_fee").val();

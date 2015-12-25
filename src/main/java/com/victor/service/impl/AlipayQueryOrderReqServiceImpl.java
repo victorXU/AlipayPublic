@@ -5,6 +5,7 @@ import com.victor.pojo.AlipayOrderEntity;
 import com.victor.service.CommonService;
 import com.victor.service.ZshInterfacePayService;
 import com.victor.util.*;
+import org.apache.commons.httpclient.HttpClient;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -46,14 +47,17 @@ public class AlipayQueryOrderReqServiceImpl implements ZshInterfacePayService {
             String dataSend = RequestUtil.orderSendBefore(dataMap).toString();
             //----------------------------排序结束----------------------------
             //----------------------------加密开始----------------------------
-            String mysign = MD5.encode(dataSend + bean.getPartner(), ZshConfig.GBK);
+            String mysign = MD5.encode(dataSend + bean.getPartner_key(), ZshConfig.GBK);
             //----------------------------加密结束----------------------------
             //----------------------------处理中文开始----------------------------
             dataMap.put("sign_type", "MD5");
             dataMap.put("sign", mysign);
             dataSend = RequestUtil.orderSendBefore(dataMap).toString();
             // ----------------------------发送到支付宝开始----------------------------
-            String response = RequestUtil.post("https://mapi.alipay.com/gateway.do", dataSend);
+            UigXmlPost post = new UigXmlPost();
+            HttpClient httpclient = new HttpClient();
+            HttpClientChacterUtil.setChacterIsUTF(httpclient);
+            String response = post.post("https://mapi.alipay.com/gateway.do", dataSend,"application/x-www-form-urlencoded;text/html;charset=UTF-8",httpclient);
             // ----------------------------发送到支付宝结束----------------------------
             return response;
 

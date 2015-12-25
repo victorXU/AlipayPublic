@@ -1,5 +1,8 @@
 package com.victor.service;
 
+import com.victor.pojo.AlipayOrderEntity;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,9 +13,11 @@ import java.util.Map;
  * Time: 20:15
  */
 public interface OrderAndQueryService {
-    public String orderPay(String total_fee, String dynamic_id);
+    String orderPay(String total_fee, String dynamic_id);
 
-    public String alipayQuery(Map<String, String> paramMap);
+    String alipayQuery(String out_trade_no);
 
-    public String refundService(Map<String, String> paramMap);
+    String refundService(Map<String, String> paramMap);
+
+    Map<String,Object> queryOrder(Map<String,String> ParamMap);
 }

@@ -47,8 +47,9 @@ public class RequestUtil {
             System.out.println("--->>>--str-<<<--->>" + request.getParameterMap().values());
             if (paramsKey != null)
                 System.out.println("count of params :" + paramsKey.size());
-            for (String key : paramsKey) {
-                params.put(key, request.getParameterMap().get(key));
+            Map<String,Object[]> paramMap = request.getParameterMap();
+            for (String key : paramMap.keySet()) {
+                params.put(key, paramMap.get(key)[0]);
             }
         }
         return params;

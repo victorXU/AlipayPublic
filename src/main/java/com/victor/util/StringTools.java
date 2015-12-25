@@ -311,7 +311,7 @@ public class StringTools {
     }
 
     public static boolean isNotEmpty(String str) {
-        if (str == null || str.trim().length() == 0) {
+        if (str == null || str.trim().length() == 0||"null".equals(str)) {
             return false;
         } else {
             return true;

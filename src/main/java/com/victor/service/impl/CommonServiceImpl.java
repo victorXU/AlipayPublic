@@ -40,6 +40,15 @@ public class CommonServiceImpl implements CommonService {
             // 得到请求MAP对
             LogUtil.debug("【支付宝接口请求验证】validateRequest begin：requestMap=" + requestMap);
             AlipayStoreInfo alipayStoreInfo = new AlipayStoreInfo();
+            String type = String.valueOf(requestMap.get("type"));
+            if (StringTools.isNotEmpty(type)) {
+                entity.setType(type);
+            } else {
+                LogUtil.debug("【支付宝接口请求验证】type参数为空");
+                entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004",
+                        "关键数据为空", "type参数为空").outputXMLStr());
+                return false;
+            }
             String brandid = String.valueOf(requestMap.get("brandid"));
             if (StringTools.isNotEmpty(brandid)) {
                 entity.setBrandid(brandid);
