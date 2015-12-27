@@ -64,7 +64,7 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
             UigXmlPost post = new UigXmlPost();
             HttpClient httpclient = new HttpClient();
             HttpClientChacterUtil.setChacterIsUTF(httpclient);
-            String response = post.post("https://mapi.alipay.com/gateway.do", dataSend,"application/x-www-form-urlencoded;text/html;charset=UTF-8",httpclient);
+            String response = post.post("https://mapi.alipay.com/gateway.do", dataSend,"application/x-www-form-urlencoded;text/html;charset=GBK",httpclient);
             LogUtil.debug("【支付宝统一支付接口】返回结果：response=" + response);
             // ----------------------------发送到支付宝结束----------------------------
             // 更新支付宝返回结果
@@ -143,11 +143,6 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
             dataMap.put("quantity", quantity);
             entity.setQuantity(quantity.toString());
         }
-        Object price = requestMap.get("price");
-        if (price!=null) {
-            dataMap.put("price", price);
-            entity.setPrice(price.toString());
-        }
         Object body = requestMap.get("body");
         if (body!=null) {
             dataMap.put("body", body);
@@ -166,6 +161,13 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
         } else {
             dataMap.put("total_fee", total_fee);
             entity.setTotal_fee(total_fee.toString());
+            dataMap.put("price", total_fee);
+            entity.setPrice(total_fee.toString());
+        }
+        Object price = requestMap.get("price");
+        if (price!=null) {
+            dataMap.put("price", price);
+            entity.setPrice(price.toString());
         }
         Object product_code = requestMap.get("product_code");
         if (product_code==null) {
@@ -175,6 +177,28 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
         } else {
             dataMap.put("product_code", product_code);
             entity.setProduct_code(product_code.toString());
+            //声波、指纹、条码、淘宝声波支付判断
+            String dynamic_id_type="";
+            String agent_id="";
+            if("SOUNDWAVE_PAY_OFFLINE".equalsIgnoreCase((product_code.toString()))
+                    ||
+                    "TB_SOUNDWAVE_OFFLINE".equalsIgnoreCase((product_code.toString()))){
+
+                dynamic_id_type = "wave_code";  //声波
+                agent_id = "AGENT_ID_A";
+
+            }else if("FINGERPRINT_FAST_PAY".equalsIgnoreCase((product_code.toString()))){
+
+                dynamic_id_type = ""; //指纹
+                agent_id = "AGENT_ID_B";
+            }else if("BARCODE_PAY_OFFLINE".equalsIgnoreCase((product_code.toString()))){
+
+                dynamic_id_type = "barcode"; //条码
+                agent_id = "AGENT_ID_C";
+            }
+            dataMap.put("dynamicId_type", dynamic_id_type);
+//            dataMap.put("agent_id", agent_id);
+            entity.setDynamicid_type(dynamic_id_type);
         }
 
         /**
@@ -189,17 +213,15 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
         Object out_trade_no = requestMap.get("out_trade_no");
         if (out_trade_no!=null) {
             entity.setOut_trade_no(out_trade_no.toString());
-            ;
+            dataMap.put("out_trade_no", out_trade_no);
         } else {
             String out_trade_no_s = UserUtils.getBrandId() + UserUtils.getAccount();
             dataMap.put("out_trade_no", out_trade_no_s);
             entity.setOut_trade_no(out_trade_no_s);
         }
-        dataMap.put("service", "alipay.acquire.createandpay ");
+        dataMap.put("service", "alipay.acquire.createandpay");
         dataMap.put("partner", entity.getPartner());
         dataMap.put("_input_charset", "utf-8");
-        dataMap.put("product_code", "QR_CODE_OFFLINE");
-        entity.setProduct_code("QR_CODE_OFFLINE");
         dataMap.put("seller_email", entity.getSeller_email());
 
 

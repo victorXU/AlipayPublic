@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author linjian 支付宝回调服务类
+ * @author xuweidong 支付宝回调服务类
  */
 @Service("createAndPayService")
 public class CreateAndPayServiceImpl implements CreateAndPayService {

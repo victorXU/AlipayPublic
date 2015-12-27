@@ -19,5 +19,5 @@ public interface OrderAndQueryService {
 
     String refundService(Map<String, String> paramMap);
 
-    Map<String,Object> queryOrder(Map<String,String> ParamMap);
+    Map<String,Object> queryOrder(Map<String,Object> ParamMap);
 }

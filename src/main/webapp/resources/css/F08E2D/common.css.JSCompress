@@ -1,8 +1,0 @@
-﻿<jscompress public="http://www.jscompress.cn/" command="import-combineset">
-<combinefile path="common.css">
-<sourcefile path=".\skins\skin.css" />
-<sourcefile path=".\personalStyle\commonStyle.css" />
-<sourcefile path=".\personalStyle\addModel.css" />
-<sourcefile path=".\personalStyle\materialControl.css" />
-</combinefile>
-</jscompress>

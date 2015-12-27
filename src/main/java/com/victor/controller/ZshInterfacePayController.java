@@ -44,7 +44,7 @@ public class ZshInterfacePayController {
 
     private ZshInterfacePayService service;// 接口
 
-    @RequestMapping(value = "/interface",  method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/interface",produces = "application/xml;charset=UTF-8")
     @ResponseBody
     public String unifiedOrder(HttpServletRequest request) {
         AlipayOrderEntity entity = new AlipayOrderEntity();

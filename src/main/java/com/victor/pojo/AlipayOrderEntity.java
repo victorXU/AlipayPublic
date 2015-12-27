@@ -72,4 +72,5 @@ public class AlipayOrderEntity extends AlipayBaseEntity {
 
     private String validateResult;
     private String storeName;
+    private String payMehod;
 }

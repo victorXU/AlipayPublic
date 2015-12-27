@@ -16,7 +16,9 @@
         <slf4j.version>1.6.6</slf4j.version>
         <log4j.version>1.2.12</log4j.version>
         <jackson.version>2.5.0</jackson.version>
+        <sitemesh.version>2.4.2</sitemesh.version>
         <crop.version>0.0.1-SNAPSHOT</crop.version>
+        <shiro.version>1.2.1</shiro.version>
     </properties>
     <repositories>
         <repository>
@@ -309,11 +311,50 @@
             <artifactId>crop-ws-api</artifactId>
             <version>${crop.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.crop</groupId>
+            <artifactId>crop-web-listener</artifactId>
+            <version>${crop.version}</version>
+        </dependency>
+
         <!-- crop begin -->
         <dependency>
             <groupId>com.crop</groupId>
             <artifactId>crop-web-converter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>opensymphony</groupId>
+            <artifactId>sitemesh</artifactId>
+            <version>${sitemesh.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- SECURITY begin -->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-ehcache</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-cas</artifactId>
+            <version>${shiro.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

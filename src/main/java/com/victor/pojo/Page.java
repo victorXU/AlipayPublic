@@ -97,7 +97,7 @@ public class Page implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getOffset() {
+	public Integer getOffset() {
 		if (page < 1) {
 			return 0;
 		}
@@ -110,8 +110,8 @@ public class Page implements Serializable {
 	 * 
 	 * @return
 	 */
-	public int getLimit() {
-		return page*pageSize;
+	public Integer getLimit() {
+		return pageSize;
 	}
 
 	@Override

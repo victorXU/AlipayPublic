@@ -76,6 +76,13 @@
           <element id="library" level="project" name="Maven: com.crop:crop-dao-api:0.0.1-SNAPSHOT" />
           <element id="library" level="project" name="Maven: com.crop:crop-domain:0.0.1-SNAPSHOT" />
           <element id="library" level="project" name="Maven: com.crop:crop-web-converter:0.0.1-SNAPSHOT" />
+          <element id="library" level="project" name="Maven: opensymphony:sitemesh:2.4.2" />
+          <element id="library" level="project" name="Maven: org.apache.shiro:shiro-spring:1.2.1" />
+          <element id="library" level="project" name="Maven: org.apache.shiro:shiro-web:1.2.1" />
+          <element id="library" level="project" name="Maven: org.apache.shiro:shiro-ehcache:1.2.1" />
+          <element id="library" level="project" name="Maven: net.sf.ehcache:ehcache-core:2.5.0" />
+          <element id="library" level="project" name="Maven: org.apache.shiro:shiro-cas:1.2.1" />
+          <element id="library" level="project" name="Maven: org.jasig.cas.client:cas-client-core:3.2.1" />
         </element>
       </element>
       <element id="directory" name="META-INF">

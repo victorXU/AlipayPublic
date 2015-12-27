@@ -50,9 +50,9 @@
         createusercode,
         createdatetime,
         createip,
-        updateuserid,
+        /*updateuserid,
         updateusername,
-        updateusercode,
+        updateusercode,*/
         updatedatetime,
         updateip,
         id,
@@ -183,19 +183,19 @@
         SELECT
                 o.OUT_TRADE_NO,
                 o.TRADE_NO,
-                o.createDatetime,
+                o.createDatetime createdatetime,
                 o.CASHIER,
                 o.TOTAL_FEE,
                 '支付宝支付' as payMehod,
                 s.storename as storeName,
-                case when o.TRADE_STATUS then 'ORDER_FAIL' then '下单失败'
-                                                              then 'ORDER_SUCCESS_PAY_SUCCESS' then '下单成功并且支付成功'
-                                                              then 'ORDER_SUCCESS_PAY_FAIL' then '下单成功支付失败'
-                                                              then 'ORDER_SUCCESS_PAY_INPROCESS' then '下单成功支付处理中'
-                                                              then 'SUCCESS' then '预下单成功'
-                                                              then 'FAIL' then '预下单失败'
-                                                              then 'UNKNOWN' then '处理结果未知'
-                                                              else '异常订单' end as TRADE_STATUS
+                case o.TRADE_STATUS when 'ORDER_FAIL' then '下单失败'
+                                    when 'ORDER_SUCCESS_PAY_SUCCESS' then '下单成功并且支付成功'
+                                    when 'ORDER_SUCCESS_PAY_FAIL' then '下单成功支付失败'
+                                    when 'ORDER_SUCCESS_PAY_INPROCESS' then '下单成功支付处理中'
+                                    when 'SUCCESS' then '预下单成功'
+                                    when 'FAIL' then '预下单失败'
+                                    when 'UNKNOWN' then '处理结果未知'
+                                          else '异常订单' end as TRADE_STATUS
 
 
         FROM
@@ -206,58 +206,88 @@
         AND s.ORGCODE = o.ORGCODE
         <where>
             1=1
-            <if test="out_trade_no!=null">
-              o.out_trade_no=#{out_trade_no}
+            <if test="out_trade_no!=null and out_trade_no!=''">
+                and o.out_trade_no=#{out_trade_no}
             </if>
-            <if test="trade_no!=null">
-                o.trade_no=#{trade_no}
+            <if test="trade_no!=null and trade_no!=''">
+                and  o.trade_no=#{trade_no}
             </if>
-            <if test="casher!=null">
-                o.casher=#{casher}
+            <if test="casher!=null and casher!=''">
+                and o.casher=#{casher}
             </if>
-            <if test="store!=null">
-                o.store=#{store}
+            <if test="store!=null and store!=''">
+                and o.store=#{store}
             </if>
-            <if test="begin_time!=null">
-              o.createDatetime>=to_days(#{begin_time})
+            <if test="begin_time!=null and begin_time!=''">
+                and o.createDatetime>=to_days(#{begin_time})
             </if>
-            <if test="end_time!=null">
-                <![CDATA[o.createDatetime<to_days(#{end_time}) ]]>
+            <if test="end_time!=null and end_time!=''">
+                and  <![CDATA[o.createDatetime<to_days(#{end_time}) ]]>
             </if>
-            limit #{offset},#{limit}
         </where>
       order by  o.createDatetime desc
+      limit #{offset} , #{limit}
     </select>
     <select id="queryOrderNum" resultType="int" parameterType="java.util.Map">
+    SELECT
+    count(1) as totalNum
+    FROM
+    ESALE_MOBILEPAY_ORDER o
+    LEFT JOIN ESALES_STORES_INFO s ON o.ouId = s.OUID
+    AND o.brandId = s.brandId
+    AND s.STORECODE = o.STORECODE
+    AND s.ORGCODE = o.ORGCODE
+    <where>
+        1=1
+        <if test="out_trade_no!=null and out_trade_no!=''">
+            and o.out_trade_no=#{out_trade_no}
+        </if>
+        <if test="trade_no!=null and trade_no!=''">
+            and  o.trade_no=#{trade_no}
+        </if>
+        <if test="casher!=null and casher!=''">
+            and o.casher=#{casher}
+        </if>
+        <if test="store!=null and store!=''">
+            and o.store=#{store}
+        </if>
+        <if test="begin_time!=null and begin_time!=''">
+            and o.createDatetime>=to_days(#{begin_time})
+        </if>
+        <if test="end_time!=null and end_time!=''">
+            and  <![CDATA[o.createDatetime<to_days(#{end_time}) ]]>
+        </if>
+    </where>
+</select>
+    <select id="queryOrderMoney" resultType="int" parameterType="java.util.Map">
         SELECT
-                count(1)
+        SUM(o.TOTAL_FEE) as totalFee
         FROM
-            ESALE_MOBILEPAY_ORDER o
+        ESALE_MOBILEPAY_ORDER o
         LEFT JOIN ESALES_STORES_INFO s ON o.ouId = s.OUID
         AND o.brandId = s.brandId
         AND s.STORECODE = o.STORECODE
         AND s.ORGCODE = o.ORGCODE
         <where>
-            1=1
-            <if test="out_trade_no!=null">
-              o.out_trade_no=#{out_trade_no}
+            o.trade_status ='TRADE_SUCCESS'
+            <if test="out_trade_no!=null and out_trade_no!=''">
+                and o.out_trade_no=#{out_trade_no}
             </if>
-            <if test="trade_no!=null">
-                o.trade_no=#{trade_no}
+            <if test="trade_no!=null and trade_no!=''">
+                and  o.trade_no=#{trade_no}
             </if>
-            <if test="casher!=null">
-                o.casher=#{casher}
+            <if test="casher!=null and casher!=''">
+                and o.casher=#{casher}
             </if>
-            <if test="store!=null">
-                o.store=#{store}
+            <if test="store!=null and store!=''">
+                and o.store=#{store}
             </if>
-            <if test="begin_time!=null">
-              o.createDatetime>=to_days(#{begin_time})
+            <if test="begin_time!=null and begin_time!=''">
+                and o.createDatetime>=to_days(#{begin_time})
             </if>
-            <if test="end_time!=null">
-                <![CDATA[o.createDatetime<to_days(#{end_time}) ]]>
+            <if test="end_time!=null and end_time!=''">
+                and  <![CDATA[o.createDatetime<to_days(#{end_time}) ]]>
             </if>
         </where>
-      order by  o.createDatetime desc
     </select>
 </mapper>

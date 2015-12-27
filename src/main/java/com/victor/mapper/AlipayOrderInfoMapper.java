@@ -18,7 +18,9 @@ public interface AlipayOrderInfoMapper {
 
     List<AlipayOrderEntity> queryAlipayOrderInfo(AlipayOrderEntity entity);
 
-    List<AlipayOrderEntity> queryOrder(Map<String, String> paramMap);
+    List<AlipayOrderEntity> queryOrder(Map<String, Object> paramMap);
 
-    int queryOrderNum(Map<String, String> paramMap);
+    int queryOrderNum(Map<String, Object> paramMap);
+
+    Integer queryOrderMoney(Map<String, Object> paramMap);
 }

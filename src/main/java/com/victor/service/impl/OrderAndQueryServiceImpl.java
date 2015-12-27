@@ -12,10 +12,8 @@ import org.dom4j.Element;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by Administrator on 2015/12/24.
@@ -26,11 +24,11 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
     private AlipayOrderInfoMapper alipayOrderInfoMapper;
 
     private Map<String, String> tradeStatusMap = new HashMap<String, String>(){{
-        put("WAIT_BUYER_PAY", "½»Ò×´´½¨£¬µÈ´ıÂò¼Ò¸¶¿î");
-        put("TRADE_CLOSED", "¹Ø±ÕµÄ½»Ò×");
-        put("TRADE_FINISHED", "½»Ò×³É¹¦ÇÒ½áÊø");
-        put("TRADE_PENDING", "µÈ´ıÂô¼ÒÊÕ¿î");
-        put("TRADE_SUCCESS", "½»Ò×³É¹¦");
+        put("WAIT_BUYER_PAY", "äº¤æ˜“åˆ›å»ºï¼Œç­‰å¾…ä¹°å®¶ä»˜æ¬¾");
+        put("TRADE_CLOSED", "å…³é—­çš„äº¤æ˜“");
+        put("TRADE_FINISHED", "äº¤æ˜“æˆåŠŸä¸”ç»“æŸ");
+        put("TRADE_PENDING", "ç­‰å¾…å–å®¶æ”¶æ¬¾");
+        put("TRADE_SUCCESS", "äº¤æ˜“æˆåŠŸ");
     }};
 	private ArrayList<String> errorMap = new ArrayList<String>(){{
 		add("ILLEGAL_SIGN");
@@ -61,21 +59,21 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
         paramMap.put("type","alipayPayOrderReqServiceReq");
         paramMap.put("product_code","BARCODE_PAY_OFFLINE");
         paramMap.put("notify_url", ZshConfig.CREATE_AND_PAY_NOTIFY_URL);
-        paramMap.put("out_trade_no", "3402304823034812");
-        paramMap.put("subject", "Õ¬Éú»îÍ³Ò»Ö§¸¶¶©µ¥");
+        paramMap.put("out_trade_no", new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+        paramMap.put("subject", "å®…ç”Ÿæ´»ç»Ÿä¸€æ”¯ä»˜è®¢å•");
         paramMap.put("total_fee", total_fee);
         paramMap.put("price", total_fee);
         paramMap.put("quantity", "1");
         paramMap.put("dynamic_id", dynamic_id);
 //        paramMap.put("dynamic_type", "barcode");
         String dataSend = RequestUtil.orderSendBefore(paramMap).toString();
-        LogUtil.debug("¡¾Ö§¸¶±¦Í³Ò»Ö§¸¶½Ó¿Ú¡¿ÇëÇóÄÚÈİ£ºdataSend=" + dataSend);
-        // ----------------------------·¢ËÍµ½Ö§¸¶±¦¿ªÊ¼----------------------------
+        LogUtil.debug("ã€æ”¯ä»˜å®ç»Ÿä¸€æ”¯ä»˜æ¥å£ã€‘è¯·æ±‚å†…å®¹ï¼šdataSend=" + dataSend);
+        // ----------------------------å‘é€åˆ°æ”¯ä»˜å®å¼€å§‹----------------------------
         UigXmlPost post = new UigXmlPost();
         HttpClient httpclient = new HttpClient();
         HttpClientChacterUtil.setChacterIsUTF(httpclient);
         String response = post.post(ZshConfig.INTERFACE_URL, dataSend,"application/x-www-form-urlencoded;text/html;charset=UTF-8",httpclient);
-        LogUtil.debug("¡¾Ö§¸¶±¦Í³Ò»Ö§¸¶½Ó¿Ú¡¿·µ»Ø½á¹û£ºresponse=" + response);
+        LogUtil.debug("ã€æ”¯ä»˜å®ç»Ÿä¸€æ”¯ä»˜æ¥å£ã€‘è¿”å›ç»“æœï¼šresponse=" + response);
         try {
             String responseStr = "";
             if (response != null && response.indexOf("\n") != -1) {
@@ -83,11 +81,17 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
                 Document doc = DocumentHelper.parseText(response);
                 Element root = doc.getRootElement();
                 Element alipay = (Element) root.selectSingleNode("/message/body/alipay");
+                if (alipay==null){
+                    alipay = (Element) root.selectSingleNode("/alipay");
+                }
                 String is_success = alipay.elementText("is_success");
                 String error = alipay.elementText("error");
 
                 if (is_success != null&& ("T".equalsIgnoreCase(is_success)||"success".equalsIgnoreCase(is_success))) {
                     Element response_alipay = (Element) root.selectSingleNode("/message/body/alipay/response/alipay");
+                    if (response_alipay==null){
+                        response_alipay = (Element) root.selectSingleNode("/alipay/response/alipay");
+                    }
                     String trade_no = response_alipay.elementText("trade_no");
                     String detail_error_des = response_alipay.elementText("detail_error_des");
                     String result_code = response_alipay.elementText("result_code");
@@ -104,35 +108,35 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
                             jsonObject.put("trade_status", trade_status);
                             responseStr = "";
                         }else {
-                            responseStr = "Ö§¸¶Ê§°Ü,ÇëÖØĞÂÖ§¸¶";
+                            responseStr = "æ”¯ä»˜å¤±è´¥,è¯·é‡æ–°æ”¯ä»˜";
                         }
                     }
 
 
                 }else {
                     Element response_alipay = (Element) root.selectSingleNode("/message/body/alipay/response/alipay");
+                    if (response_alipay==null){
+                        response_alipay = (Element) root.selectSingleNode("/alipay/response/alipay");
+                    }
                     String detail_error_des = response_alipay.elementText("detail_error_des");
                     String result_code = response_alipay.elementText("result_code");
                     if (errorMap.contains(error)) {
-                        responseStr = "ÏµÍ³Ö§¸¶Òì³££¬ÇëÁªÏµ¼¼ÊõÖ§³Ö²¿ÃÅ";
+                        responseStr = "ç³»ç»Ÿæ”¯ä»˜å¼‚å¸¸ï¼Œè¯·è”ç³»æŠ€æœ¯æ”¯æŒéƒ¨é—¨";
                     }else if(result_code!=null&&result_code.equals("ORDER_FAIL")){
                         responseStr = detail_error_des;
                     }else {
-                        responseStr = "ÏÂµ¥Ö§¸¶Òì³£";
+                        responseStr = "ä¸‹å•æ”¯ä»˜å¼‚å¸¸";
                     }
 
                 }
 
                 jsonObject.put("responseStr", responseStr);
             }else {
-                jsonObject.put("responseStr", "Ö§¸¶Òì³££º" +
-                        "1¡¢Èç¹ûÂò¼ÒÖ§¸¶±¦Ç®°üÌáÊ¾ÒÑ¸¶¿î³É¹¦£¬ÇëÓÃ»§Ìá¹©Ö§¸¶±¦¶©µ¥ºÅÖØĞÂ²éÑ¯¡£" +
-                        "2¡¢Èç¹ûÂò¼ÒÎ´¸¶¿î³É¹¦£¬ÇëÖØĞÂÖ§¸¶" +
-                        "3¡¢Èç¹ûÖØĞÂ¶à´ÎÖ§¸¶Ê§°Ü£¬ÇëÁªÏµ¼¼ÊõÖ§³Ö²¿ÃÅ");
+                jsonObject.put("responseStr", "æ”¯ä»˜å¼‚å¸¸");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            jsonObject.put("responseStr", "ÏÂµ¥Ö§¸¶Òì³£");
+            jsonObject.put("responseStr", "ä¸‹å•æ”¯ä»˜å¼‚å¸¸");
         }
         return jsonObject.toString();
     }
@@ -147,7 +151,7 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
         HttpClientChacterUtil.setChacterIsUTF(httpclient);
         String dataSend = RequestUtil.orderSendBefore(paramMap).toString();
         String response = post.post(ZshConfig.INTERFACE_URL, dataSend, "application/x-www-form-urlencoded;text/html;charset=UTF-8", httpclient);
-        LogUtil.debug("¡¾Ö§¸¶±¦Í³Ò»Ö§¸¶½Ó¿Ú¡¿·µ»Ø½á¹û£ºresponse=" + response);
+        LogUtil.debug("ã€æ”¯ä»˜å®æŸ¥è¯¢æ¥å£ã€‘è¿”å›ç»“æœï¼šresponse=" + response);
 	/*	<alipay>
 			<is_success>T</is_success>
 		<request>
@@ -182,37 +186,42 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
 			Document doc = DocumentHelper.parseText(response);
 			Element root = doc.getRootElement();
 
-			Element response_alipay = (Element) root.selectSingleNode("/alipay/response/alipay");
-			String trade_status = response_alipay.elementText("trade_status");
-			String total_fee = response_alipay.elementText("total_fee");
-			String send_pay_date = response_alipay.elementText("send_pay_date");
-			
-			jsonObject.put("result", "");
-			jsonObject.put("trade_status", tradeStatusMap.get(trade_status));
-			jsonObject.put("total_fee", total_fee);
-			jsonObject.put("send_pay_date", send_pay_date);
-			jsonObject.put("out_trade_no", out_trade_no);
-			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			jsonObject.put("result", "è®¢å•æŸ¥è¯¢å¼‚å¸¸ï¼?");
-			return jsonObject.toString();
-		}
-		return jsonObject.toString();
-	}
+            Element response_alipay = (Element) root.selectSingleNode("/alipay/response/alipay");
+            if (response_alipay==null){
+                response_alipay = (Element) root.selectSingleNode("/message/body//alipay/response/alipay");
+            }
+            String trade_status = response_alipay.elementText("trade_status");
+            String total_fee = response_alipay.elementText("total_fee");
+            String send_pay_date = response_alipay.elementText("send_pay_date");
+
+            jsonObject.put("result", "");
+            jsonObject.put("trade_status", tradeStatusMap.get(trade_status));
+            jsonObject.put("total_fee", total_fee);
+            jsonObject.put("send_pay_date", send_pay_date);
+            jsonObject.put("out_trade_no", out_trade_no);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("result", "ã€æ”¯ä»˜å®æŸ¥è¯¢æ¥å£ã€‘å¼‚å¸¸"+e.getMessage());
+            return jsonObject.toString();
+        }
+        return jsonObject.toString();
+    }
 
 
     public String refundService(Map<String, String> paramMap) {
         return null;
     }
 
-    public Map<String, Object> queryOrder(Map<String, String> ParamMap) {
+    public Map<String, Object> queryOrder(Map<String, Object> ParamMap) {
         final List<AlipayOrderEntity> alipayOrderEntities = alipayOrderInfoMapper.queryOrder(ParamMap);
-        final int total = alipayOrderInfoMapper.queryOrderNum(ParamMap);
+        final int totalNum = alipayOrderInfoMapper.queryOrderNum(ParamMap);
+        final Integer totalFee = alipayOrderInfoMapper.queryOrderMoney(ParamMap);
         return new HashMap<String, Object>(){{
             put("alipayOrderEntities",alipayOrderEntities);
-            put("total",total);
+            put("totalNum",totalNum);
+            put("totalFee",totalFee==null?0:totalFee);
         }};
     }
 }
