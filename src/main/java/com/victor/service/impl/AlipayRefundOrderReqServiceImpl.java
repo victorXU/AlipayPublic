@@ -40,7 +40,7 @@ public class AlipayRefundOrderReqServiceImpl implements ZshInterfacePayService {
      * [一句话功能简述]<p>
      * [功能详细描述]<p>
      *
-     * @param requestMap
+     * @param dataMap
      * @param bean
      * @return
      * @author victor
@@ -126,6 +126,30 @@ public class AlipayRefundOrderReqServiceImpl implements ZshInterfacePayService {
         } else {
             dataMap.put("refund_amount", refund_fee);
             bean.setRefund_fee(refund_fee);
+        }
+        Object userid = requestMap.get("userid");
+        if (userid==null) {
+            bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean,
+                    "0004", "【支付宝统一支付接口】关键数据为空", "userid参数为空").outputXMLStr());
+            return false;
+        } else {
+            bean.setUpdateuserid(userid.toString());
+        }
+        Object username = requestMap.get("username");
+        if (username==null) {
+            bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean,
+                    "0004", "【支付宝统一支付接口】关键数据为空", "username参数为空").outputXMLStr());
+            return false;
+        } else {
+            bean.setUpdateusername(username.toString());
+        }
+        Object usercode = requestMap.get("usercode");
+        if (userid==null) {
+            bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean,
+                    "0004", "【支付宝统一支付接口】关键数据为空", "usercode参数为空").outputXMLStr());
+            return false;
+        } else {
+            bean.setUpdateusercode(usercode.toString());
         }
         dataMap.put("service", "alipay.acquire.refund");
         dataMap.put("partner", bean.getPartner());

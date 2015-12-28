@@ -3,6 +3,7 @@ package com.victor.mapper;
 import com.victor.pojo.AlipayOrderEntity;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -22,5 +23,5 @@ public interface AlipayOrderInfoMapper {
 
     int queryOrderNum(Map<String, Object> paramMap);
 
-    Integer queryOrderMoney(Map<String, Object> paramMap);
+    Double queryOrderMoney(Map<String, Object> paramMap);
 }

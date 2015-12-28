@@ -131,19 +131,11 @@
 
                             <div class="dataTables_wrapper form-inline no-footer">
                                 <div class="toolbar_padd_bot">
-                                    <b>当前收款总额：${totalMoney}元</b>
+                                    <b>当前收款总额：${totalFee}元</b>
                                 </div>
                                 <table class="table common_table common_style_table" cellspacing="0" cellpadding="0">
                                     <thead>
                                     <tr role="row">
-                                        <th class='align_center' style="width: 35px;">
-                                            <div class="common_table_checkbox inline_block">
-                                                <label>
-                                                    <input type="checkbox" class="colored-common" id="checkAll">
-                                                    <span class="text common_color_checkbox"></span>
-                                                </label>
-                                            </div>
-                                        </th>
                                         <th>订单号</th>
                                         <th>流水号</th>
                                         <th>支付方式</th>
@@ -152,30 +144,22 @@
                                         <th>总金额(元)</th>
                                         <th>收银员</th>
                                         <th>收银门店</th>
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
 
                                     <tbody>
                                     <c:forEach var="item" items="${alipayOrderEntities}" varStatus="status">
                                         <tr>
-                                            <td class='align_center'>
-                                                <div class="common_table_checkbox inline_block">
-                                                    <label>
-                                                        <input type="checkbox" value='${item.out_trade_no}'
-                                                               data-tabel-control='child'
-                                                               class="colored-common" name="subBox">
-                                                        <span class="text common_color_checkbox"></span>
-                                                    </label>
-                                                </div>
-                                            </td>
                                             <td>${item.out_trade_no}</td>
                                             <td>${item.trade_no}</td>
                                             <td>${item.payMehod}</td>
                                             <td>${item.createdatetime}</td>
-                                            <td>${item.trade_status}</td>
+                                            <td>${item.result_code}</td>
                                             <td>${item.total_fee}</td>
                                             <td>${item.cashier}</td>
                                             <td>${item.storeName}</td>
+                                            <td> <button type="button" class="btn btn_common_color" onclick="doRefund(${item.out_trade_no},${item.total_fee})">退款</button></td>
                                         </tr>
                                     </c:forEach>
 
@@ -189,8 +173,9 @@
                                                 <div class="paginationjs-pages">
                                                     <ul class="paginationjs-page J-paginationjs-page" id="pagination1"></ul>
                                                 </div>
+                                                <div class="paginationjs-go-input">共计${totalNum}条
                                             </div>
-                                            <div class="paginationjs-go-input">共计${totalNum}条
+
                                             </div>
                                         </div>
                                     </div>
@@ -208,22 +193,45 @@
     <!-- Main Container -->
 
 </div>
+<!-- / 弹窗 -->
+<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true" style="display: none;">
+    <!-- <div>123123123123</div> -->
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myLargeModalLabel">退款结果</h4>
+            </div>
+            <div class="modal-body" id="showMessage">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn_default" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- /main container -->
 <%@include file="/resources/common/jsp/footer.jsp"%>
 <!--Basic Scripts-->
 <%@include file="/resources/common/jsp/libsJs.jsp"%>
 <script src="${ctx}/resources/common/js/jqPaginator.js"></script>
-
+<!-- 自定义加载部分 -->
+<script src='${ctx}/resources/common/js/utils/utils.js'></script>
+<script src='${ctx}/resources/common/js/assets/formDemo1.js'></script>
 <script>
-    $(function() {
-        $("#checkAll").click(function() {
-            $('input[name="subBox"]').attr("checked",this.checked);
-        });
-        var $subBox = $("input[name='subBox']");
-        $subBox.click(function(){
-            $("#checkAll").attr("checked",$subBox.length == $("input[name='subBox']:checked").length ? true : false);
-        });
-    });
+    function doRefund(out_trade_no,total_fee){
+        $.post("${ctx}/orderAndPay/alipayRefund",
+                {
+                    "total_fee":total_fee,
+                    "out_trade_no":out_trade_no
+                },
+                function(data){
+                    $("#showMessage").text(data.result);
+                    $('.bs-example-modal-sm').modal({keyboard: false});
+                },'json');
+    }
     $(".search_more").click(function(){
         if($(".table-toolbar").css('display')!='none'){
             $(".table-toolbar").css('display','none');

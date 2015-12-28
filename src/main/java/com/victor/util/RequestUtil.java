@@ -216,11 +216,17 @@ public class RequestUtil {
                /* put("brandid", UserUtils.getBrandId() + "");
                 put("ouid", UserUtils.getOuId() + "");
                 put("orgcode", UserUtils.getUserOrgId() + "");
-                put("storecode", UserUtils.getCurrentStoreCode());*/
+                put("storecode", UserUtils.getCurrentStoreCode());
+                put("userid", UserUtils.getLoginId());
+                put("username", UserUtils.getUserName());
+                put("usercode", UserUtils.getUserCode());*/
                 put("brandid",  "111");
                 put("ouid", "222");
                 put("orgcode", "333");
                 put("storecode", "444");
+                put("userid", "2");
+                put("username", "naca");
+                put("usercode", "433");
             }
         };
     }

@@ -146,7 +146,7 @@
         $.post("${ctx}/orderAndPay/alipayOrderPay",
                 {
                     "total_fee":total_fee,
-                    "dynamic_id":dynamicId,
+                    "dynamic_id":dynamicId
                 },
                 function(data){
 //                    $('#myModal').modal('hide');

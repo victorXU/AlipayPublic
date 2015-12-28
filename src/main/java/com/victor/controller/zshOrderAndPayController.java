@@ -128,4 +128,12 @@ public class zshOrderAndPayController{
         model.addAttribute("alipayOrderEntities",paramMap.get("alipayOrderEntities"));
         return "payOrder";
     }
+
+    @RequestMapping(value = "/alipayRefund", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String alipayRefund(HttpServletRequest request){
+        final String out_trade_no = request.getParameter("out_trade_no");
+        final String totalmoeny = request.getParameter("total_fee");
+        return orderAndQueryService.refundService(out_trade_no, totalmoeny);
+    }
 }

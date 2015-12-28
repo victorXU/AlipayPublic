@@ -1,6 +1,7 @@
 package com.victor.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.crop.web.util.UserUtils;
 import com.victor.mapper.AlipayOrderInfoMapper;
 import com.victor.pojo.AlipayOrderEntity;
 import com.victor.service.OrderAndQueryService;
@@ -12,6 +13,7 @@ import org.dom4j.Element;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -53,6 +55,20 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
 		add("EXTERFACE_IS_CLOSED");
 	}};
 
+    private Map<String,String> refundDetailErrorCode = new HashMap<String, String>(){{
+        put("INVALID_PARAMETER ", "参数无效");
+        put("TRADE_ROLE_ERROR", "没有该笔交易的退款或撤销权限");
+        put("DISCORDANT_REPEAT_REQUEST", "同一笔退款或撤销单号金额不一致");
+        put("TRADE_HAS_CLOSE", "交易已经关闭");
+        put("REASON_TRADE_BEEN_FREEZEN", "交易已经被冻结");
+        put("BUYER_ERROR", "买家不存在");
+        put("SELLER_ERROR", "卖家不存在");
+        put("TRADE_NOT_EXIST", "交易不存在");
+        put("TRADE_STATUS_ERROR", "交易不存在");
+        put("TRADE_HAS_FINISHED ", "交易已结束");
+        put("REFUND_AMT_NOT_EQUAL_TOTAL", "撤销或退款金额与订单金额不一致");
+        put("", "");
+    }};
 	public String orderPay(String total_fee, String dynamic_id) {
 		JSONObject jsonObject = new JSONObject();
         Map<String,Object> paramMap = RequestUtil.getParamData();
@@ -188,7 +204,7 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
 
             Element response_alipay = (Element) root.selectSingleNode("/alipay/response/alipay");
             if (response_alipay==null){
-                response_alipay = (Element) root.selectSingleNode("/message/body//alipay/response/alipay");
+                response_alipay = (Element) root.selectSingleNode("/message/body/alipay/response/alipay");
             }
             String trade_status = response_alipay.elementText("trade_status");
             String total_fee = response_alipay.elementText("total_fee");
@@ -210,18 +226,59 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
     }
 
 
-    public String refundService(Map<String, String> paramMap) {
-        return null;
+    public String refundService(String out_trade_no,String totalmoeny) {
+        JSONObject jsonObject = new JSONObject();
+        Map<String,Object> paramMap = RequestUtil.getParamData();
+        paramMap.put("out_trade_no", out_trade_no);
+        paramMap.put("refund_fee", totalmoeny);
+        paramMap.put("type", "alipayRefundOrderReqServiceReq");
+        UigXmlPost post = new UigXmlPost();
+        HttpClient httpclient = new HttpClient();
+        HttpClientChacterUtil.setChacterIsUTF(httpclient);
+        String dataSend = RequestUtil.orderSendBefore(paramMap).toString();
+        String response = post.post(ZshConfig.INTERFACE_URL, dataSend, "application/x-www-form-urlencoded;text/html;charset=UTF-8", httpclient);
+//        String response ="";
+        LogUtil.debug("【支付宝退款接口】返回结果：response=" + response);
+        try {
+            if (response==null||"".equals(response)){
+                jsonObject.put("result", "【支付宝退款接口】请求结果为空");
+                return jsonObject.toString();
+            }
+            if (response.indexOf("\n") != -1) {
+                response = response.replace('\n', ' ');
+            }
+            Document doc = DocumentHelper.parseText(response);
+            Element root = doc.getRootElement();
+
+            Element response_alipay = (Element) root.selectSingleNode("/alipay/response/alipay");
+            if (response_alipay==null){
+                response_alipay = (Element) root.selectSingleNode("/message/body/alipay/response/alipay");
+            }
+            String result_code = response_alipay.elementText("result_code");
+
+            if ("SUCCESS".equalsIgnoreCase(result_code)){
+                jsonObject.put("result", "成功退款"+totalmoeny+"元");
+            }else{
+                String detail_error_code = response_alipay.elementText("detail_error_code");
+                jsonObject.put("result", "退款失败:"+refundDetailErrorCode.get(detail_error_code));
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("result", "【支付宝退款接口】异常"+e.getMessage());
+            return jsonObject.toString();
+        }
+        return jsonObject.toString();
     }
 
     public Map<String, Object> queryOrder(Map<String, Object> ParamMap) {
         final List<AlipayOrderEntity> alipayOrderEntities = alipayOrderInfoMapper.queryOrder(ParamMap);
         final int totalNum = alipayOrderInfoMapper.queryOrderNum(ParamMap);
-        final Integer totalFee = alipayOrderInfoMapper.queryOrderMoney(ParamMap);
+        final Double totalFee = alipayOrderInfoMapper.queryOrderMoney(ParamMap);
         return new HashMap<String, Object>(){{
             put("alipayOrderEntities",alipayOrderEntities);
             put("totalNum",totalNum);
-            put("totalFee",totalFee==null?0:totalFee);
+            put("totalFee",totalFee==null?0:totalFee.toString());
         }};
     }
 }

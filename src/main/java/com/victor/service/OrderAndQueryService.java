@@ -17,7 +17,7 @@ public interface OrderAndQueryService {
 
     String alipayQuery(String out_trade_no);
 
-    String refundService(Map<String, String> paramMap);
+    String refundService(String out_trade_no,String totalmoeny);
 
     Map<String,Object> queryOrder(Map<String,Object> ParamMap);
 }
