@@ -220,6 +220,7 @@ public class RequestUtil {
 //                put("userid", UserUtils.getLoginId());
 //                put("username", UserUtils.getUserName());
 //                put("usercode", UserUtils.getUserCode());
+//                put("userip", UserUtils.getCurrentUserIp());
                 put("brandid",  "111");
                 put("ouid", "222");
                 put("orgcode", "333");
@@ -227,6 +228,7 @@ public class RequestUtil {
                 put("userid", "2");
                 put("username", "naca");
                 put("usercode", "433");
+                put("userip", "10.172.10.11");
             }
         };
     }

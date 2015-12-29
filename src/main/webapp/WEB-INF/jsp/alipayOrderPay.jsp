@@ -119,27 +119,38 @@
 <%@include file="/resources/common/jsp/libsJs.jsp"%>
 <script>
     $("#paybtn").on("click",function(){
+        $("#paybtn").hide();
         var total_fee = $("#total_fee").val();
         var dynamicId = $("#dynamic_id").val();
         if(total_fee==""){
             alert("金额不能为空");
             $("#total_fee").focus();
+            $("#paybtn").show();
             return;
         }else{
             if(!isNumeric(total_fee)){
                 alert("金额只能输入数字");
                 $("#total_fee").focus();
+                $("#paybtn").show();
+                return;
+            }
+            if(total_fee.length>=10){
+                alert("订单金额超过限额");
+                $("#total_fee").focus();
+                $("#paybtn").show();
                 return;
             }
         }
         if(dynamicId==""){
             alert("支付宝条码不能为空");
             $("#dynamic_id").focus();
+            $("#paybtn").show();
             return;
         }else{
             if(!isNumeric(dynamicId)){
                 alert("支付宝条码只能输入数字");
                 $("#dynamic_id").focus();
+                $("#paybtn").show();
                 return;
             }
         }
@@ -156,6 +167,7 @@
                         $("#showMessage").text(data.responseStr);
                     }
                     $('.bs-example-modal-sm').modal({keyboard: false});
+                    $("#paybtn").show();
                 },'json');
     });
 
