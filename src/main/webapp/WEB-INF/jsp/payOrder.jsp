@@ -41,7 +41,7 @@
                                 <form class="form-horizontal" role="form" action="${ctx}/orderAndPay/orderQuery">
                                     <div class="col-xs-5 col-md-5">
                                         <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control" name="out_trade_no" value="${out_trade_no}">
+                                            <input type="text" class="form-control" name="out_trade_no" value="${out_trade_no}"  placeholder="请输入订单号">
 												<span class="input-group-btn">
                                            <button class="btn btn_common_color" type="submit">搜索</button>
                                            </span>
@@ -159,7 +159,11 @@
                                             <td>${item.total_fee}</td>
                                             <td>${item.cashier}</td>
                                             <td>${item.storeName}</td>
-                                            <td> <button type="button" class="btn btn_common_color" onclick="doRefund(${item.out_trade_no},${item.total_fee})">退款</button></td>
+                                            <td>
+                                                <c:if test="${'交易成功'==item.result_code || '下单成功并且支付成功'==item.result_code}">
+                                                    <button type="button" class="btn btn_common_color" onclick="doRefund(${item.out_trade_no},${item.total_fee})">退款</button></td>
+                                                </c:if>
+
                                         </tr>
                                     </c:forEach>
 
@@ -207,7 +211,7 @@
 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn_default" data-dismiss="modal">确定</button>
+                <button type="button" class="btn btn_default" id="refundedBtn" data-dismiss="modal">确定</button>
             </div>
         </div>
     </div>
@@ -244,6 +248,15 @@
             $(".search_more i").addClass('fa-angle-up');
         }
     });
+
+    $("#refundedBtn").click(function(){
+        var type='';
+
+        if($("#showMessage").text().indexOf('成功退款')>=0){
+            type='change';
+        }
+        orderQuery(type,${currentPage});
+    });
     $.jqPaginator('#pagination1', {
         totalPages: ${totalPages},
         visiblePages: 3,
@@ -252,24 +265,30 @@
         next: '<li class="next"><a href="javascript:;">Next</a></li>',
         page: '<li class="page"><a href="javascript:;">{{page}}</a></li>',
         onPageChange: function (num, type) {
-            if(type=='change'){
-                var out_trade_no = $("#out_trade_no_hi").val();
-                var trade_no = $("#trade_no_hi").val();
-                var casher = $("#casher_hi").val();
-                var store = $("#store_hi").val();
-                var begin_time = $("#begin_time_hi").val();
-                var end_time = $("#end_time_hi").val();
-                window.location.href = "${ctx}/orderAndPay/orderQuery?out_trade_no="+out_trade_no
-                        +"&trade_no="+trade_no
-                        +"&casher="+casher
-                        +"&store="+store
-                        +"&begin_time="+begin_time
-                        +"&end_time="+end_time
-                        +"&page="+num;
-            }
-
+            orderQuery(type,num);
         }
     });
+    function orderQuery(type,num){
+        if(type=='change'){
+            var out_trade_no = $("#out_trade_no_hi").val().trim();
+            var trade_no = $("#trade_no_hi").val().trim();
+            var casher = $("#casher_hi").val().trim();
+            var store = $("#store_hi").val().trim();
+            var begin_time = $("#begin_time_hi").val().trim();
+            var end_time = $("#end_time_hi").val().trim();
+            window.location.href = "${ctx}/orderAndPay/orderQuery?out_trade_no="+out_trade_no
+                    +"&trade_no="+trade_no
+                    +"&casher="+casher
+                    +"&store="+store
+                    +"&begin_time="+begin_time
+                    +"&end_time="+end_time
+                    +"&page="+num;
+        }
+    }
+
+    String.prototype.trim=function(){
+        return this.replace(/(^\s*)|(\s*$)/g, "");
+    }
 </script>
 </body>
 

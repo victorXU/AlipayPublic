@@ -213,13 +213,13 @@ public class RequestUtil {
             private static final long serialVersionUID = 1L;
 
             {
-               /* put("brandid", UserUtils.getBrandId() + "");
-                put("ouid", UserUtils.getOuId() + "");
-                put("orgcode", UserUtils.getUserOrgId() + "");
-                put("storecode", UserUtils.getCurrentStoreCode());
-                put("userid", UserUtils.getLoginId());
-                put("username", UserUtils.getUserName());
-                put("usercode", UserUtils.getUserCode());*/
+//                put("brandid", UserUtils.getBrandId() + "");
+//                put("ouid", UserUtils.getOuId() + "");
+//                put("orgcode", UserUtils.getUserOrgId() + "");
+//                put("storecode", UserUtils.getCurrentStoreCode());
+//                put("userid", UserUtils.getLoginId());
+//                put("username", UserUtils.getUserName());
+//                put("usercode", UserUtils.getUserCode());
                 put("brandid",  "111");
                 put("ouid", "222");
                 put("orgcode", "333");

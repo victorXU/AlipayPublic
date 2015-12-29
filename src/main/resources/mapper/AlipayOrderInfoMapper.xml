@@ -188,14 +188,18 @@
                 o.TOTAL_FEE,
                 '支付宝支付' as payMehod,
                 s.storename as storeName,
-                case o.result_code when 'ORDER_FAIL' then '下单失败'
-                                    when 'ORDER_SUCCESS_PAY_SUCCESS' then '下单成功并且支付成功'
-                                    when 'ORDER_SUCCESS_PAY_FAIL' then '下单成功支付失败'
-                                    when 'ORDER_SUCCESS_PAY_INPROCESS' then '下单成功支付处理中'
-                                    when 'SUCCESS' then '预下单成功'
-                                    when 'FAIL' then '预下单失败'
-                                    when 'UNKNOWN' then '处理结果未知'
-                                          else '异常订单' end as result_code
+                case when o.refund_code = 'SUCCESS' then '退款成功'
+                      when o.trade_status = 'TRADE_SUCCESS' then '交易成功'
+                      when o.trade_status = 'TRADE_CLOSED' then '交易关闭'
+                      when o.trade_status = 'TRADE_FINISHED' then '交易成功且关闭'
+                     when o.result_code = 'ORDER_FAIL' then '下单失败'
+                     when o.result_code ='ORDER_SUCCESS_PAY_SUCCESS' then '下单成功并且支付成功'
+                     when o.result_code ='ORDER_SUCCESS_PAY_FAIL' then '下单成功支付失败'
+                     when o.result_code ='ORDER_SUCCESS_PAY_INPROCESS' then '下单成功支付处理中'
+                     when o.result_code ='SUCCESS' then '预下单成功'
+                     when o.result_code ='FAIL' then '预下单失败'
+                     when o.result_code ='UNKNOWN' then '处理结果未知'
+                     else o.result_code ='异常订单' end as result_code
 
 
         FROM

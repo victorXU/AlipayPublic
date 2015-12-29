@@ -100,6 +100,15 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
                 if (alipay==null){
                     alipay = (Element) root.selectSingleNode("/alipay");
                 }
+                if (alipay==null){
+                    alipay = (Element) root.selectSingleNode("/message/head");
+                    if (alipay!=null&&"Error".equals(alipay.elementText("type"))){
+                        Element response_alipay = (Element) root.selectSingleNode("/message/body");
+                        responseStr = response_alipay.elementText("errorDetails");
+                        jsonObject.put("responseStr", responseStr);
+                        return jsonObject.toString();
+                    }
+                }
                 String is_success = alipay.elementText("is_success");
                 String error = alipay.elementText("error");
 
@@ -206,6 +215,14 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
             if (response_alipay==null){
                 response_alipay = (Element) root.selectSingleNode("/message/body/alipay/response/alipay");
             }
+            if (response_alipay==null){
+                response_alipay = (Element) root.selectSingleNode("/message/head");
+                if (response_alipay!=null&&"Error".equals(response_alipay.elementText("type"))){
+                    Element alipay = (Element) root.selectSingleNode("/message/body");
+                    jsonObject.put("responseStr", alipay.elementText("errorDetails"));
+                    return jsonObject.toString();
+                }
+            }
             String trade_status = response_alipay.elementText("trade_status");
             String total_fee = response_alipay.elementText("total_fee");
             String send_pay_date = response_alipay.elementText("send_pay_date");
@@ -253,6 +270,14 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
             Element response_alipay = (Element) root.selectSingleNode("/alipay/response/alipay");
             if (response_alipay==null){
                 response_alipay = (Element) root.selectSingleNode("/message/body/alipay/response/alipay");
+            }
+            if (response_alipay==null){
+                response_alipay = (Element) root.selectSingleNode("/message/head");
+                if (response_alipay!=null&&"Error".equals(response_alipay.elementText("type"))){
+                    Element alipay = (Element) root.selectSingleNode("/message/body");
+                    jsonObject.put("result", alipay.elementText("errorDetails"));
+                    return jsonObject.toString();
+                }
             }
             String result_code = response_alipay.elementText("result_code");
 
