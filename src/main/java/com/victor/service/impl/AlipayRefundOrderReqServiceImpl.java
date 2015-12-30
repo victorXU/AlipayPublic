@@ -151,6 +151,14 @@ public class AlipayRefundOrderReqServiceImpl implements ZshInterfacePayService {
         } else {
             bean.setUpdateusercode(usercode.toString());
         }
+        Object userip = requestMap.get("userip");
+        if (userip==null) {
+            bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean,
+                    "0004", "【支付宝统一支付接口】关键数据为空", "userip参数为空").outputXMLStr());
+            return false;
+        } else {
+            bean.setUpdateip(userip.toString());
+        }
         dataMap.put("service", "alipay.acquire.refund");
         dataMap.put("partner", bean.getPartner());
         dataMap.put("_input_charset", "utf-8");

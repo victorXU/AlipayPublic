@@ -194,7 +194,14 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
         } else {
             entity.setCreateusercode(usercode.toString());
         }
-
+        Object userip = requestMap.get("userip");
+        if (userip==null) {
+            entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity,
+                    "0004", "【支付宝统一支付接口】关键数据为空", "userip参数为空").outputXMLStr());
+            return false;
+        } else {
+            entity.setCreateuserid(userip.toString());
+        }
         Object product_code = requestMap.get("product_code");
         if (product_code==null) {
             entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity,

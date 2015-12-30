@@ -136,7 +136,7 @@
             <if test="updateip!=null">
                 updateip = #{updateip},
             </if>
-            updatedatetime = #{updatedatetime}
+            updatedatetime = now()
         </set>
         <where>
             1=1
@@ -183,7 +183,7 @@
         SELECT
                 o.OUT_TRADE_NO,
                 o.TRADE_NO,
-                o.createDatetime createdatetime,
+                date_format(o.createDatetime,'%Y-%c-%d %h:%i:%s') createdatetime,
                 o.createUsername as cashier,
                 o.TOTAL_FEE,
                 '支付宝支付' as payMehod,
