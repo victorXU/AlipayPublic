@@ -64,7 +64,7 @@
                                     <div class="col-sm-4">
                                                     <span class="input-icon icon-right">
                                                         <input type="text" class="form-control" style="height: 60px;" id="dynamic_id" name="dynamic_id"
-                                                               placeholder="支付宝条形码">
+                                                               placeholder="支付宝条形码" onkeydown="keydown(event)">
                                                         <i class="fa fa-barcode success" style="padding-top:4%"></i>
                                                     </span>
                                     </div>
@@ -93,7 +93,7 @@
 </div>
 
 <!-- / 弹窗 -->
-<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="payResult"
      aria-hidden="true" style="display: none;">
     <!-- <div>123123123123</div> -->
     <div class="modal-dialog modal-sm">
@@ -112,48 +112,75 @@
     </div>
 </div>
 
+<!-- / 弹窗 -->
+<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" id="payConfirm"
+     aria-hidden="true" style="display: none;">
+    <!-- <div>123123123123</div> -->
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" >支付结果</h4>
+            </div>
+            <div class="modal-body" id="confirmMessage">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn_default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn_common" id="toPay">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- /main container -->
 <%@include file="/resources/common/jsp/footer.jsp"%>
 <!--Basic Scripts-->
 <%@include file="/resources/common/jsp/libsJs.jsp"%>
 <script>
+    $('#payConfirm').on('shown.bs.modal',function(e){
+
+        $('#toPay').focus();
+
+    });
+    function keydown(e) {
+        var ev= window.event||e;
+        if (ev.keyCode == 13) {
+            var total_fee = $("#total_fee").val();
+            var dynamicId = $("#dynamic_id").val();
+            if(!validateParam(total_fee,dynamicId)) {
+                return;
+            }
+            $("#confirmMessage").text("付款金额"+total_fee+"元");
+            $('#payConfirm').modal({keyboard: false});
+        }
+    }
+
+    $("#toPay").on("click",function(){
+        $('#payConfirm').modal('hide');
+        var total_fee = $("#total_fee").val();
+        var dynamicId = $("#dynamic_id").val();
+        pay(total_fee,dynamicId);
+    });
+
     $("#paybtn").on("click",function(){
+
         $("#paybtn").hide();
         var total_fee = $("#total_fee").val();
         var dynamicId = $("#dynamic_id").val();
-        if(total_fee==""){
-            alert("金额不能为空");
-            $("#total_fee").focus();
-            $("#paybtn").show();
+        if(!validateParam(total_fee,dynamicId)) {
             return;
-        }else{
-            if(!isNumeric(total_fee)){
-                alert("金额只能输入数字");
-                $("#total_fee").focus();
-                $("#paybtn").show();
-                return;
-            }
-            if(total_fee.length>=10){
-                alert("订单金额超过限额");
-                $("#total_fee").focus();
-                $("#paybtn").show();
-                return;
-            }
         }
-        if(dynamicId==""){
-            alert("支付宝条码不能为空");
-            $("#dynamic_id").focus();
-            $("#paybtn").show();
-            return;
-        }else{
-            if(!isNumeric(dynamicId)){
-                alert("支付宝条码只能输入数字");
-                $("#dynamic_id").focus();
-                $("#paybtn").show();
-                return;
-            }
-        }
+        pay(total_fee,dynamicId);
+    });
+
+    function enableOrNoInput(flag){
+        $("#total_fee").attr("disabled",flag);
+        $("#dynamic_id").attr("disabled",flag);
+    }
+
+    function pay(total_fee,dynamicId){
+        enableOrNoInput(true);
         $.post("${ctx}/orderAndPay/alipayOrderPay",
                 {
                     "total_fee":total_fee,
@@ -166,10 +193,49 @@
                     }else{
                         $("#showMessage").text(data.responseStr);
                     }
-                    $('.bs-example-modal-sm').modal({keyboard: false});
+                    $('#payResult').modal({keyboard: false});
                     $("#paybtn").show();
+                    enableOrNoInput(false);
+                    $("#total_fee").val("");
+                    $("#dynamic_id").val("");
                 },'json');
-    });
+    }
+
+    function validateParam(total_fee,dynamicId){
+        if(total_fee==""){
+            alert("金额不能为空");
+            $("#total_fee").focus();
+            $("#paybtn").show();
+            return false;
+        }else{
+            if(!isNumeric(total_fee)){
+                alert("金额只能输入数字");
+                $("#total_fee").focus();
+                $("#paybtn").show();
+                return false;
+            }
+            if(total_fee.length>=10){
+                alert("订单金额超过限额");
+                $("#total_fee").focus();
+                $("#paybtn").show();
+                return false;
+            }
+        }
+        if(dynamicId==""){
+            alert("支付宝条码不能为空");
+            $("#dynamic_id").focus();
+            $("#paybtn").show();
+            return false;
+        }else{
+            if(!isNumeric(dynamicId)){
+                alert("支付宝条码只能输入数字");
+                $("#dynamic_id").focus();
+                $("#paybtn").show();
+                return false;
+            }
+        }
+        return true;
+    }
 
     function isNumeric(a)
     {
