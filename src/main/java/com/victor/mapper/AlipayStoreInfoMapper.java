@@ -15,4 +15,5 @@ public interface AlipayStoreInfoMapper {
     int updateAlipayOrderInfo(AlipayStoreInfo entity);
 
     List<AlipayStoreInfo> queryAlipayOrderInfo(AlipayStoreInfo entity);
+    List<AlipayStoreInfo> queryAlipayPayInfo(AlipayStoreInfo entity);
 }

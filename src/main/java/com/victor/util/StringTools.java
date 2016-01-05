@@ -1,5 +1,10 @@
 package com.victor.util;
 
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -317,7 +322,17 @@ public class StringTools {
             return true;
         }
     }
-
+    /**
+     * 判断是否是xml结构
+     */
+    public static boolean isXML(String value) {
+        try {
+            DocumentHelper.parseText(value);
+        } catch (DocumentException e) {
+            return false;
+        }
+        return true;
+    }
 
     public static void main(String[] args) {
 

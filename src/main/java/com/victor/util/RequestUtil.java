@@ -13,6 +13,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -232,6 +233,34 @@ public class RequestUtil {
             }
         };
     }
+
+//    public String getOut_trade_no(){
+//        BrandNoRule bnr = brandNoRuleService.findByBrandIdAndBusNoType(UserUtils.getBrandId(), BusNoType.ALIPAYORDER);
+//        // 前缀
+//        String prefix = UserUtils.getUserOrgCode();
+//        // 是否有日期
+//        boolean hasDate = bnr.isHasDate();
+//        // 序号位数
+//        int size = bnr.getSize();
+//
+//        NumberSenderRequest nrquest = new NumberSenderRequest();
+//        nrquest.setBelongKey(bnr.getBrandId().toString());
+//        nrquest.setSeqLength(size);
+//        nrquest.setPrefixStr(prefix);
+//        NumberSenderResponse resp = null;
+//        String eventCode = "";
+//        if (hasDate) {
+//            resp = unifiedCodeGenerator.createCodeByDaily(nrquest);
+//        } else {
+//            resp = unifiedCodeGenerator.createCodeWithNoDate(nrquest);
+//        }
+//        if (resp != null && resp.getResultNoList() != null
+//                && resp.getResultNoList().size() != 0) {
+//            eventCode = resp.getResultNoList().get(0);
+//        }
+//        return eventCode;
+//    }
+
 
     public static void main(String[] args) {
         getGUID();

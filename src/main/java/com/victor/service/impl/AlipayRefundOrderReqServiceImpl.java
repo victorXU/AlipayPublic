@@ -81,7 +81,7 @@ public class AlipayRefundOrderReqServiceImpl implements ZshInterfacePayService {
             int result = updateMobilePayOrder(bean, response);
             LogUtil.debug("【支付宝退款接口】退款结束");
             if (result == 0) {
-                return uigXmlMgr.initErrorXML(bean, "0009", "销账机构处理的时候出现异常。", "更新微信返回结果失败!").outputXMLStr();
+                return uigXmlMgr.initErrorXML(bean, "0009", "【支付宝退款接口】异常。", "更新支付宝退款返回结果失败!").outputXMLStr();
             } else {
                 return returnXml.outputXMLStr();
             }
@@ -89,7 +89,7 @@ public class AlipayRefundOrderReqServiceImpl implements ZshInterfacePayService {
         } catch (Exception e) {
             e.printStackTrace();
             LogUtil.debug("【支付宝退款接口】" + e.fillInStackTrace());
-            return uigXmlMgr.initErrorXML(bean, "0009", "销账机构处理的时候出现异常。", e.getMessage()).outputXMLStr();
+            return uigXmlMgr.initErrorXML(bean, "0009", "【支付宝退款接口】异常。", e.getMessage()).outputXMLStr();
         }
     }
 
@@ -181,7 +181,6 @@ public class AlipayRefundOrderReqServiceImpl implements ZshInterfacePayService {
             bean.setRefund_code(result_code);
             bean.setDetail_error_code(response_alipay.elementText("detail_error_code"));
             bean.setDetail_error_des(response_alipay.elementText("detail_error_des"));
-            bean.setRefund_fee(bean.getTotal_fee());
             result = alipayOrderInfoMapper.updateAlipayOrderInfo(bean);
         }
 

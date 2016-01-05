@@ -1,5 +1,13 @@
 package com.victor.service.impl;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.dom4j.Element;
+import org.springframework.stereotype.Service;
+
 import com.victor.mapper.AlipayStoreInfoMapper;
 import com.victor.pojo.AlipayOrderEntity;
 import com.victor.pojo.AlipayStoreInfo;
@@ -7,12 +15,6 @@ import com.victor.service.CommonService;
 import com.victor.util.LogUtil;
 import com.victor.util.StringTools;
 import com.victor.util.UigXmlMgr;
-import org.dom4j.Element;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -46,7 +48,7 @@ public class CommonServiceImpl implements CommonService {
             } else {
                 LogUtil.debug("【支付宝接口请求验证】type参数为空");
                 entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004",
-                        "关键数据为空", "type参数为空").outputXMLStr());
+                        "【支付宝接口请求验证】关键数据为空", "type参数为空").outputXMLStr());
                 return false;
             }
             String brandid = String.valueOf(requestMap.get("brandid"));
@@ -56,7 +58,7 @@ public class CommonServiceImpl implements CommonService {
             } else {
                 LogUtil.debug("【支付宝接口请求验证】brandid参数为空");
                 entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004",
-                        "关键数据为空", "brandid参数为空").outputXMLStr());
+                        "【支付宝接口请求验证】关键数据为空", "brandid参数为空").outputXMLStr());
                 return false;
             }
             String ouid =String.valueOf(requestMap.get("ouid"));
@@ -65,7 +67,7 @@ public class CommonServiceImpl implements CommonService {
                 alipayStoreInfo.setOuid(ouid);
             } else {
                 LogUtil.debug("【支付宝接口请求验证】ouid参数为空");
-                entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "关键数据为空",
+                entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "【支付宝接口请求验证】关键数据为空",
                         "ouid参数为空").outputXMLStr());
                 return false;
             }
@@ -76,28 +78,31 @@ public class CommonServiceImpl implements CommonService {
                 alipayStoreInfo.setOrgcode(orgcode);
             } else {
                 LogUtil.debug("【支付宝接口请求验证】orgcode参数为空");
-                entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "关键数据为空",
+                entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0004", "【支付宝接口请求验证】关键数据为空",
                         "orgcode参数为空").outputXMLStr());
                 return false;
             }
             entity.setStorecode(String.valueOf(requestMap.get("storecode")));
             alipayStoreInfo.setStorecode(String.valueOf(requestMap.get("storecode")));
 
-            List<AlipayStoreInfo> alipayStoreInfos = alipayStoreInfoMapper.queryAlipayOrderInfo(alipayStoreInfo);
+            List<AlipayStoreInfo> alipayStoreInfos = alipayStoreInfoMapper.queryAlipayPayInfo(alipayStoreInfo);
             if (alipayStoreInfos == null || alipayStoreInfos.size() != 1) {
                 LogUtil.debug("【支付宝接口请求验证】请求对应的支付宝配置不唯一");
                 entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
-                        "配置异常", "请求对应的支付宝配置不唯一！").outputXMLStr());
+                        "【支付宝接口请求验证】配置异常", "请求对应的支付宝配置不唯一！").outputXMLStr());
                 return false;
             }
             alipayStoreInfo = alipayStoreInfos.get(0);
             String partner_key = alipayStoreInfo.getPartner_key();
             String partnerid = alipayStoreInfo.getPartnerid();
             String seller_email = alipayStoreInfo.getSeller_email();
+            String actversion = alipayStoreInfo.getActversion();
+            String act_name = alipayStoreInfo.getAct_name();
+            String agentid = alipayStoreInfo.getAgentid();
             if (StringTools.isEmpty(partner_key)) {
                 LogUtil.debug("【支付宝接口请求验证】支付宝对应的partner_key不存在");
                 entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
-                        "partner_key不存在", "支付宝对应的partner_key不存在！").outputXMLStr());
+                        "【支付宝接口请求验证】关键数据为空", "支付宝对应的partner_key不存在！").outputXMLStr());
                 return false;
             } else {
                 entity.setPartner_key(partner_key);
@@ -106,7 +111,7 @@ public class CommonServiceImpl implements CommonService {
             if (StringTools.isEmpty(partnerid)) {
                 LogUtil.debug("【支付宝接口请求验证】支付宝对应的partnerid不存在");
                 entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
-                        "partnerid不存在", "支付宝对应的partnerid不存在！").outputXMLStr());
+                        "【支付宝接口请求验证】关键数据为空", "支付宝对应的partnerid不存在！").outputXMLStr());
                 return false;
             } else {
                 entity.setPartner(partnerid);
@@ -114,12 +119,36 @@ public class CommonServiceImpl implements CommonService {
             if (StringTools.isEmpty(seller_email)) {
                 LogUtil.debug("【支付宝接口请求验证】支付宝对应的seller_email不存在");
                 entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
-                        "seller_email不存在", "支付宝对应的seller_email不存在！").outputXMLStr());
+                        "【支付宝接口请求验证】关键数据为空", "支付宝对应的seller_email不存在！").outputXMLStr());
                 return false;
             } else {
                 entity.setSeller_email(seller_email);
             }
-
+            if (StringTools.isEmpty(act_name)) {
+                LogUtil.debug("【支付宝接口请求验证】act_name");
+                entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
+                        "【支付宝接口请求验证】关键数据为空", "支付宝对应的act_name不存在！").outputXMLStr());
+                return false;
+            } else {
+                entity.setAct_name(act_name);
+                entity.setAgentid(agentid);
+            }
+            if (StringTools.isEmpty(actversion)) {
+                LogUtil.debug("【支付宝接口请求验证】actversion不存在");
+                entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
+                        "【支付宝接口请求验证】关键数据为空", "支付宝对应的actversion不存在！").outputXMLStr());
+                return false;
+            } else {
+                String newType = getMethodByVersion(actversion,type);
+                if (newType==null){
+                    LogUtil.debug("【支付宝接口请求验证】type字段传入错误！");
+                    entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
+                            "【支付宝接口请求验证】传入参数异常", "type字段传入错误！").outputXMLStr());
+                    return false;
+                }else {
+                    entity.setType(newType);
+                }
+            }
             return true;
 
         } catch (Exception e) {
@@ -149,6 +178,22 @@ public class CommonServiceImpl implements CommonService {
             return uigXmlMgr.initErrorXML(entity, "0009", "系统异常", "销账机构处理的时候出现异常。");
 
         }
+
+    }
+
+    public String getMethodByVersion(String actversion,String type){
+        if ("V2.0".equals(actversion)){
+            if ("alipayPayOrderReqServiceReq".equals(type)){
+                return "alipayPayOrderReqServiceReqV2";
+            }else if ("alipayQueryOrderReq".equals(type)){
+                return "alipayQueryOrderReqV2";
+            }else if ("alipayRefundOrderReqServiceReq".equals(type)){
+                return "alipayRefundOrderReqServiceReqV2";
+            }
+        }else {
+            return type;
+        }
+		return null;
 
     }
 

@@ -1,6 +1,8 @@
 package com.victor.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alipay.api.response.AlipayTradePayResponse;
+import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.crop.web.util.UserUtils;
 import com.victor.mapper.AlipayOrderInfoMapper;
 import com.victor.pojo.AlipayOrderEntity;
@@ -75,7 +77,8 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
         paramMap.put("type","alipayPayOrderReqServiceReq");
         paramMap.put("product_code","BARCODE_PAY_OFFLINE");
         paramMap.put("notify_url", ZshConfig.CREATE_AND_PAY_NOTIFY_URL);
-        paramMap.put("out_trade_no", new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
+//        paramMap.put("out_trade_no", RequestUtil.getOut_trade_no());
+        paramMap.put("out_trade_no",  new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
         paramMap.put("subject", "宅生活统一支付订单");
         paramMap.put("total_fee", total_fee);
         paramMap.put("price", total_fee);
@@ -93,6 +96,10 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
         try {
             String responseStr = "";
             if (response != null && response.indexOf("\n") != -1) {
+                if(!StringTools.isXML(response)){
+                    AlipayTradePayResponse alipayTradePayResponse  = JSONObject.parseObject(response,AlipayTradePayResponse.class);
+                   return alipayTradePayResponse.getSubMsg();
+                }
                 response = response.replace('\n', ' ');
                 Document doc = DocumentHelper.parseText(response);
                 Element root = doc.getRootElement();
@@ -260,6 +267,10 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
             if (response==null||"".equals(response)){
                 jsonObject.put("result", "【支付宝退款接口】请求结果为空");
                 return jsonObject.toString();
+            }
+            if(!StringTools.isXML(response)){
+                AlipayTradeRefundResponse alipayTradeRefundResponse  = JSONObject.parseObject(response,AlipayTradeRefundResponse.class);
+                return alipayTradeRefundResponse.getSubMsg();
             }
             if (response.indexOf("\n") != -1) {
                 response = response.replace('\n', ' ');

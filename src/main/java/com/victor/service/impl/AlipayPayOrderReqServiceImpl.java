@@ -3,6 +3,7 @@ package com.victor.service.impl;
 import com.crop.web.util.UserUtils;
 import com.victor.mapper.AlipayOrderInfoMapper;
 import com.victor.pojo.AlipayOrderEntity;
+import com.victor.service.CommonService;
 import com.victor.service.ZshInterfacePayService;
 import com.victor.util.*;
 import org.apache.commons.httpclient.HttpClient;
@@ -13,7 +14,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +24,9 @@ import java.util.Map;
 public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
     @Resource
     private UigXmlMgr uigXmlMgr;
+
+    @Resource
+    private CommonService commonService;
 
     @Resource
     private AlipayOrderInfoMapper alipayOrderInfoMapper;
@@ -67,6 +73,14 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
             String response = post.post("https://mapi.alipay.com/gateway.do", dataSend,"application/x-www-form-urlencoded;text/html;charset=GBK",httpclient);
             LogUtil.debug("【支付宝统一支付接口】返回结果：response=" + response);
             // ----------------------------发送到支付宝结束----------------------------
+            // 支付宝返回报文对象。
+            UigXmlMgr zshResponse = uigXmlMgr.parseXmlForAlipay(response);
+
+            // 封装第三方返回报文头信息。
+            UigXmlMgr headXml = uigXmlMgr.headResponseXml(entity);
+
+            // 返回报文头和根据协议组装的报文数据
+            UigXmlMgr returnXml = commonService.returnResponseXml(headXml, zshResponse, entity);
             // 更新支付宝返回结果
             int result = createMobilePayOrder(entity, response);
             if (result == 0) {
@@ -248,7 +262,7 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
             entity.setOut_trade_no(out_trade_no.toString());
             dataMap.put("out_trade_no", out_trade_no);
         } else {
-            String out_trade_no_s = UserUtils.getBrandId() + UserUtils.getAccount();
+            String out_trade_no_s = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
             dataMap.put("out_trade_no", out_trade_no_s);
             entity.setOut_trade_no(out_trade_no_s);
         }
@@ -277,7 +291,6 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
                     .selectSingleNode("/alipay/response/alipay");
             entity.setResult_code(response_alipay.elementText("result_code"));
             entity.setError(response_alipay.elementText("detail_error_code"));
-            entity.setShow_url(response_alipay.elementText("small_pic_url"));
             if ("SUCCESS".equals(entity.getResult_code())) {
                 entity.setTrade_status("WAIT_BUYER_PAY");
             }

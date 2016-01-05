@@ -26,8 +26,8 @@ public class AlipayQueryOrderReqServiceImpl implements ZshInterfacePayService {
     @Resource
     private UigXmlMgr uigXmlMgr;
 
-    @Resource
-    private CommonService commonService;
+/*    @Resource
+    private CommonService commonService;*/
 
     /**
      * [一句话功能简述]<p>

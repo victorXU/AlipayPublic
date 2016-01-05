@@ -91,4 +91,30 @@
         </where>
 
     </select>
+    
+    <select id="queryAlipayPayInfo" parameterType="com.victor.pojo.AlipayStoreInfo"
+            resultType="com.victor.pojo.AlipayStoreInfo">
+        select partner_key,partnerid,seller_email,actversion,s.act_name,s.agentid
+        from ESALES_STORES_INFO s
+        left join ESALES_STORE_ACOUNT_RELATION r on s.id=r.ACTID
+        <where>
+            1=1
+            <if test="id!=null">
+                AND r.id = #{id}
+            </if>
+            <if test="ouid!=null">
+                AND r.ouid = #{ouid}
+            </if>
+            <if test="brandid!=null">
+                AND r.brandId = #{brandid}
+            </if>
+            <if test="storecode!=null">
+                AND r.storecode = #{storecode}
+            </if>
+            <if test="orgcode!=null">
+                AND r.orgcode = #{orgcode}
+            </if>
+        </where>
+
+    </select>
 </mapper>

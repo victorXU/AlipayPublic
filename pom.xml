@@ -285,6 +285,11 @@
             <artifactId>szwx855</artifactId>
             <version>1.6</version>
         </dependency>
+        <!--<dependency>
+            <groupId>com.alipay</groupId>
+            <artifactId>alipay-sdk</artifactId>
+            <version>java</version>
+        </dependency>-->
         <!-- 基础jar引入 配置开始 -->
         <dependency>
             <groupId>com.crop</groupId>
@@ -356,6 +361,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.alipay</groupId>
+            <artifactId>sdk</artifactId>
+            <version>1.0</version>
+            <!--<scope>test</scope>-->
+        </dependency>
     </dependencies>
 
     <build>
@@ -364,21 +375,21 @@
 
 
             <!-- 部署至本机 -->
-            <!-- <plugin>
+             <plugin>
                <groupId>org.codehaus.cargo</groupId>
                <artifactId>cargo-maven2-plugin</artifactId>
                <version>1.0</version>
                <configuration>
                  <container>
                    <containerId>tomcat7x</containerId>
-                   <home>D:\Enviroment\apache-tomcat-8.0.29</home>
+                   <home>D:\Environment\apache-tomcat-7.0.53</home>
                  </container>
                  <configuration>
                    <type>existing</type>
-                   <home>D:\Enviroment\apache-tomcat-8.0.29</home>
+                   <home>D:\Environment\apache-tomcat-7.0.53</home>
                  </configuration>
                </configuration>
-             </plugin>-->
+             </plugin>
 
         </plugins>
 
