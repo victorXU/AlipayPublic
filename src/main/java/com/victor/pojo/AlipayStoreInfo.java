@@ -35,5 +35,6 @@ public class AlipayStoreInfo extends Entity {
     private String actversion;
     private String act_name;
     private String agentid;
-
+    private String private_key;
+    private String appid;
 }

@@ -16,4 +16,6 @@ public class AlipayBaseEntity extends Entity {
     private String type;
     private String msgId;
     private String msgTime;
+    private String private_key;
+    private String appid;
 }

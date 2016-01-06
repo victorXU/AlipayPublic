@@ -46,7 +46,7 @@ public class AlipayQueryOrderReqServiceV2Impl implements ZshInterfacePayService 
      * @since V1.0
      */
     public String execute(Map<String, Object> dataMap, AlipayOrderEntity bean) {
-        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient();
+        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient(bean);
         AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
         request.setBizContent(dataMap.get("biz_content").toString());
         AlipayTradeQueryResponse response = null;

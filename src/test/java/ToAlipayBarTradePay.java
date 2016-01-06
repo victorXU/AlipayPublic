@@ -11,6 +11,7 @@ import com.alipay.api.response.AlipayTradePayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.victor.factory.AlipayAPIClientFactory;
+import com.victor.pojo.AlipayOrderEntity;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -76,7 +77,7 @@ public class ToAlipayBarTradePay {
         paramJson.put("subject",subject);
         paramJson.put("auth_code",auth_code);
 
-        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient();
+        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient(new AlipayOrderEntity());
 
         // 使用SDK，构建群发请求模型
         AlipayTradePayRequest request = new AlipayTradePayRequest();
@@ -154,7 +155,7 @@ public class ToAlipayBarTradePay {
      * @version 1.0
      */
     public static AlipayTradeQueryResponse query(final String out_trade_no) {
-        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient();
+        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient(new AlipayOrderEntity());
         AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
         String biz_content = "{\"out_trade_no\":\"" + out_trade_no + "\"}";
         request.setBizContent(biz_content);
@@ -229,7 +230,7 @@ public class ToAlipayBarTradePay {
                 if (++i <= n) {
                     System.out.println("重试查询第 " +i+ " 次");
                     AlipayClient alipayClient = AlipayAPIClientFactory
-                            .getAlipayClient();
+                            .getAlipayClient(new AlipayOrderEntity());
                     AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
                     String biz_content = "{\"out_trade_no\":\"" + out_trade_no
                             + "\"}";
@@ -305,7 +306,7 @@ public class ToAlipayBarTradePay {
      */
     public static AlipayTradeCancelResponse cancelOrder(
             final String out_trade_no) {
-        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient();
+        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient(new AlipayOrderEntity());
         AlipayTradeCancelRequest request = new AlipayTradeCancelRequest();
         String biz_content = "{\"out_trade_no\":\"" + out_trade_no + "\"}";
         request.setBizContent(biz_content);
@@ -356,7 +357,7 @@ public class ToAlipayBarTradePay {
      * @version 1.0
      */
     public static void cancelOrderRetry(final String out_trade_no) {
-        final AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient();
+        final AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient(new AlipayOrderEntity());
         final AlipayTradeCancelRequest request = new AlipayTradeCancelRequest();
         String biz_content = "{\"out_trade_no\":\"" + out_trade_no + "\"}";
         request.setBizContent(biz_content);
@@ -417,7 +418,7 @@ public class ToAlipayBarTradePay {
      */
     public static AlipayTradeRefundResponse refundOrder(String trade_no,
                                                         String refund_amount, String out_request_no) {
-        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient();
+        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient(new AlipayOrderEntity());
         AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
 
         String biz_content = "{\"trade_no\":\""
@@ -481,7 +482,7 @@ public class ToAlipayBarTradePay {
      */
     public static void refundOrderRetry(String trade_no, String refund_amount,
                                         String out_request_no, int retryTimes) {
-        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient();
+        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient(new AlipayOrderEntity());
         AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
         String biz_content = "{\"trade_no\":\""
                 + trade_no

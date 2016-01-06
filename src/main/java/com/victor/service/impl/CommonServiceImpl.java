@@ -139,6 +139,26 @@ public class CommonServiceImpl implements CommonService {
                         "【支付宝接口请求验证】关键数据为空", "支付宝对应的actversion不存在！").outputXMLStr());
                 return false;
             } else {
+                if ("V2.0".equals(actversion)){
+                    String appid = alipayStoreInfo.getAppid();
+                    if (StringTools.isEmpty(appid)) {
+                        LogUtil.debug("【支付宝接口请求验证】appid为空");
+                        entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
+                                "【支付宝接口请求验证】关键数据为空", "支付宝对应的appid不存在！").outputXMLStr());
+                        return false;
+                    } else {
+                        entity.setAppid(appid);
+                    }
+                    String private_key = alipayStoreInfo.getPrivate_key();
+                    if (StringTools.isEmpty(private_key)) {
+                        LogUtil.debug("【支付宝接口请求验证】private_key为空");
+                        entity.setValidateResult(uigXmlMgr.initErrorXMLNoKey(entity, "0007",
+                                "【支付宝接口请求验证】关键数据为空", "支付宝对应的private_key不存在！").outputXMLStr());
+                        return false;
+                    } else {
+                        entity.setPrivate_key(private_key);
+                    }
+                }
                 String newType = getMethodByVersion(actversion,type);
                 if (newType==null){
                     LogUtil.debug("【支付宝接口请求验证】type字段传入错误！");

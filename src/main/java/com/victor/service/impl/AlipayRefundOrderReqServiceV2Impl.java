@@ -52,7 +52,7 @@ public class AlipayRefundOrderReqServiceV2Impl implements ZshInterfacePayService
      */
     public String execute(Map<String, Object> dataMap, AlipayOrderEntity bean) {
         LogUtil.debug("【支付宝退款接口V2】退款开始");
-        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient();
+        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient(bean);
         AlipayTradeRefundRequest request = new AlipayTradeRefundRequest();
         request.setBizContent(dataMap.get("biz_content").toString());
         AlipayTradeRefundResponse response = null;

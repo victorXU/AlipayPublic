@@ -50,7 +50,7 @@ public class AlipayPayOrderReqServiceV2Impl implements ZshInterfacePayService {
     public String execute(Map<String, Object> dataMap, AlipayOrderEntity entity) {
         LogUtil.debug("【支付宝统一支付接口V2】支付开始");
 
-        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient();
+        AlipayClient alipayClient = AlipayAPIClientFactory.getAlipayClient(entity);
 
         // 使用SDK，构建群发请求模型
         AlipayTradePayRequest request = new AlipayTradePayRequest();

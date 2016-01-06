@@ -94,7 +94,7 @@
     
     <select id="queryAlipayPayInfo" parameterType="com.victor.pojo.AlipayStoreInfo"
             resultType="com.victor.pojo.AlipayStoreInfo">
-        select partner_key,partnerid,seller_email,actversion,s.act_name,s.agentid
+        select partner_key,partnerid,seller_email,actversion,s.act_name,s.agentid,s.appid,s.private_key
         from ESALES_STORES_INFO s
         left join ESALES_STORE_ACOUNT_RELATION r on s.id=r.ACTID
         <where>

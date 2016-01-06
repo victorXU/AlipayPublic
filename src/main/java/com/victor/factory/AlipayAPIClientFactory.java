@@ -2,6 +2,7 @@ package com.victor.factory;
 
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
+import com.victor.pojo.AlipayOrderEntity;
 import com.victor.util.AlipayServiceEnvConstants;
 
 /**
@@ -20,11 +21,11 @@ public class AlipayAPIClientFactory {
      *
      * @return
      */
-    public static AlipayClient getAlipayClient(){
+    public static AlipayClient getAlipayClient(AlipayOrderEntity entity){
 
         if(null == alipayClient){
-            alipayClient = new DefaultAlipayClient(AlipayServiceEnvConstants.ALIPAY_GATEWAY, AlipayServiceEnvConstants.APP_ID,
-                    AlipayServiceEnvConstants.PRIVATE_KEY, "json", AlipayServiceEnvConstants.CHARSET,AlipayServiceEnvConstants.ALIPAY_PUBLIC_KEY);
+            alipayClient = new DefaultAlipayClient(AlipayServiceEnvConstants.ALIPAY_GATEWAY, entity.getAppid(),
+                    entity.getPrivate_key(), "json", AlipayServiceEnvConstants.CHARSET);
         }
         return alipayClient;
     }
