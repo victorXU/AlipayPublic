@@ -70,7 +70,7 @@ public class ZshInterfacePayController {
 
 
     public String doAction(Map<String, Object> requestMap, AlipayOrderEntity entity) {
-        String type = requestMap.get("type").toString();
+        String type = entity.getType();
         this.service = (ZshInterfacePayService) SpringContextUtils.getBeanById(type);
         if (this.service != null) {
             Map<String, Object> dataMap = new HashMap<String, Object>();

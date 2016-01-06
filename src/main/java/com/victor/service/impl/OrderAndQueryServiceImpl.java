@@ -95,11 +95,10 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
         LogUtil.debug("【支付宝统一支付接口】返回结果：response=" + response);
         try {
             String responseStr = "";
-            if (response != null && response.indexOf("\n") != -1) {
                 if(!StringTools.isXML(response)){
-                    AlipayTradePayResponse alipayTradePayResponse  = JSONObject.parseObject(response,AlipayTradePayResponse.class);
-                   return alipayTradePayResponse.getSubMsg();
+                    return response;
                 }
+            if (response != null && response.indexOf("\n") != -1) {
                 response = response.replace('\n', ' ');
                 Document doc = DocumentHelper.parseText(response);
                 Element root = doc.getRootElement();
@@ -269,8 +268,9 @@ public class OrderAndQueryServiceImpl implements OrderAndQueryService {
                 return jsonObject.toString();
             }
             if(!StringTools.isXML(response)){
-                AlipayTradeRefundResponse alipayTradeRefundResponse  = JSONObject.parseObject(response,AlipayTradeRefundResponse.class);
-                return alipayTradeRefundResponse.getSubMsg();
+                if(!StringTools.isXML(response)){
+                    return response;
+                }
             }
             if (response.indexOf("\n") != -1) {
                 response = response.replace('\n', ' ');

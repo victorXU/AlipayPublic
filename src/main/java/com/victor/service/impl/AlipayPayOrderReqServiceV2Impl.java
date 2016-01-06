@@ -59,16 +59,7 @@ public class AlipayPayOrderReqServiceV2Impl implements ZshInterfacePayService {
         try {
             // 使用SDK，调用交易下单接口
             response = alipayClient.execute(request);
-            System.out.println(response.getBody());
-            System.out.println(response.getCode());
-            System.out.println(response.isSuccess());
-            System.out.println(response.getMsg());
             // 这里只是简单的打印，请开发者根据实际情况自行进行处理
-            if (null != response && response.isSuccess()) {
-                if (response.getCode().equals("10000")) {
-                    createMobilePayOrder(entity,response);
-                } else if (response.getCode().equals(
-                        "10003")) {
 //                    System.out.println("买家账号：" + response.getBuyerLogonId());
 //                    System.out.println("商户订单号：" + response.getOutTradeNo());
 //                    System.out.println("支付宝交易号：" + response.getTradeNo());
@@ -76,20 +67,16 @@ public class AlipayPayOrderReqServiceV2Impl implements ZshInterfacePayService {
 
                     // 对于返回付款中状态，需要调用收单查询接口查询订单付款状态
                     //TODO 根据查询结果更新数据库
-                }
-            } else {
-                LogUtil.debug("【支付宝统一支付接口V2】返回为空！" );
-                return uigXmlMgr.initErrorXML(entity, response.getSubCode(), "【支付宝统一支付接口V2】异常。",
-                        "【支付宝统一支付接口V2】"+response.getSubMsg()).outputXMLStr();
                 // 打印错误码
-            }
         } catch (Exception e) {
             e.printStackTrace();
             LogUtil.debug("【支付宝统一支付接口V2】异常！" + e.getMessage());
             return uigXmlMgr.initErrorXML(entity, "0009", "【支付宝支付接口V2】异常。",
                     e.getMessage()).outputXMLStr();
         }
-        return response.toString();
+        JSONObject jsonObject =  new JSONObject();
+        jsonObject.put("responseStr",response.getSubMsg());
+        return jsonObject.toString();
     }
 
     /**

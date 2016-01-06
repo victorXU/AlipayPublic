@@ -58,21 +58,16 @@ public class AlipayRefundOrderReqServiceV2Impl implements ZshInterfacePayService
         AlipayTradeRefundResponse response = null;
         try {
             response = alipayClient.execute(request);
-            if (null != response && response.isSuccess()) {
-                if (response.getCode().equals("10000")) {
-                    if (response.getFundChange().equals("Y")) {
                         // 退款成功,资金有变动,做业务及账务处理
-                        updateMobilePayOrder(bean,response);
-                    }
-                }
-            }
         } catch (Exception e) {
             e.printStackTrace();
             LogUtil.debug("【支付宝退款接口V2】" + e.fillInStackTrace());
             return uigXmlMgr.initErrorXML(bean, "0009", "【支付宝退款接口V2】异常。", e.getMessage()).outputXMLStr();
         }
         LogUtil.debug("【支付宝退款接口V2】退款结束");
-        return response.toString();
+        JSONObject jsonObject =  new JSONObject();
+        jsonObject.put("responseStr", response.getSubMsg());
+        return jsonObject.toString();
     }
 
     /**

@@ -204,7 +204,7 @@
 
         FROM
             ESALE_MOBILEPAY_ORDER o
-        LEFT JOIN ESALES_STORES_INFO s ON o.ouId = s.OUID
+        LEFT JOIN ESALES_STORE_ACOUNT_RELATION s ON o.ouId = s.OUID
         AND o.brandId = s.brandId
         AND s.STORECODE = o.STORECODE
         AND s.ORGCODE = o.ORGCODE
@@ -217,10 +217,10 @@
                 and  o.trade_no=#{trade_no}
             </if>
             <if test="casher!=null and casher!=''">
-                and o.createUserCode=#{casher}
+                and o.createusername LIKE CONCAT('%',#{casher},'%')
             </if>
             <if test="store!=null and store!=''">
-                and o.STORECODE=#{store}
+                and s.STORENAME LIKE CONCAT('%',#{store},'%')
             </if>
             <if test="begin_time!=null and begin_time!=''">
                 and to_days(o.createDatetime)>=to_days(#{begin_time})
@@ -237,7 +237,7 @@
     count(1) as totalNum
     FROM
     ESALE_MOBILEPAY_ORDER o
-    LEFT JOIN ESALES_STORES_INFO s ON o.ouId = s.OUID
+    LEFT JOIN ESALES_STORE_ACOUNT_RELATION s ON o.ouId = s.OUID
     AND o.brandId = s.brandId
     AND s.STORECODE = o.STORECODE
     AND s.ORGCODE = o.ORGCODE
@@ -250,10 +250,10 @@
             and  o.trade_no=#{trade_no}
         </if>
         <if test="casher!=null and casher!=''">
-            and o.createUserCode=#{casher}
+            and o.createusername LIKE CONCAT('%',#{casher},'%')
         </if>
         <if test="store!=null and store!=''">
-            and o.STORECODE=#{store}
+            and s.STORENAME LIKE CONCAT('%',#{store},'%')
         </if>
         <if test="begin_time!=null and begin_time!=''">
             and to_days(o.createDatetime)>=to_days(#{begin_time})
