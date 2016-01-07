@@ -59,6 +59,9 @@ public class AlipayPayOrderReqServiceV2Impl implements ZshInterfacePayService {
         try {
             // 使用SDK，调用交易下单接口
             response = alipayClient.execute(request);
+            if (response.isSuccess()){
+                createMobilePayOrder(entity,response);
+            }
             // 这里只是简单的打印，请开发者根据实际情况自行进行处理
 //                    System.out.println("买家账号：" + response.getBuyerLogonId());
 //                    System.out.println("商户订单号：" + response.getOutTradeNo());
@@ -75,7 +78,13 @@ public class AlipayPayOrderReqServiceV2Impl implements ZshInterfacePayService {
                     e.getMessage()).outputXMLStr();
         }
         JSONObject jsonObject =  new JSONObject();
-        jsonObject.put("responseStr",response.getSubMsg());
+        if (response.isSuccess()){
+            jsonObject.put("responseStr","支付成功");
+        }else {
+            jsonObject.put("responseStr",response.getSubMsg());
+        }
+
+
         return jsonObject.toString();
     }
 
@@ -176,6 +185,9 @@ public class AlipayPayOrderReqServiceV2Impl implements ZshInterfacePayService {
             paramJson.put("out_trade_no",out_trade_no_s);
         }
 
+        JSONObject extend_params = new JSONObject();
+        extend_params.put("sys_service_provider_id","2088112296337093");
+//        paramJson.put("extend_params",extend_params.toString());
         paramJson.put("scene","bar_code");
 
         dataMap.put("bizContent",paramJson);

@@ -1,5 +1,6 @@
 package com.victor.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.crop.web.util.UserUtils;
 import com.victor.mapper.AlipayOrderInfoMapper;
 import com.victor.pojo.AlipayOrderEntity;
@@ -266,12 +267,14 @@ public class AlipayPayOrderReqServiceImpl implements ZshInterfacePayService {
             dataMap.put("out_trade_no", out_trade_no_s);
             entity.setOut_trade_no(out_trade_no_s);
         }
+
+        JSONObject extend_params = new JSONObject();
+        extend_params.put("AGENT_ID",entity.getAgentid());
+        dataMap.put("extend_params", extend_params.toString());
         dataMap.put("service", "alipay.acquire.createandpay");
         dataMap.put("partner", entity.getPartner());
         dataMap.put("_input_charset", "utf-8");
         dataMap.put("seller_email", entity.getSeller_email());
-
-
         return true;
     }
 

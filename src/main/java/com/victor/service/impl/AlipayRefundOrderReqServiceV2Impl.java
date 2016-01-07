@@ -59,6 +59,9 @@ public class AlipayRefundOrderReqServiceV2Impl implements ZshInterfacePayService
         try {
             response = alipayClient.execute(request);
                         // 退款成功,资金有变动,做业务及账务处理
+            if (response.isSuccess()){
+                updateMobilePayOrder(bean,response);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             LogUtil.debug("【支付宝退款接口V2】" + e.fillInStackTrace());
@@ -66,7 +69,11 @@ public class AlipayRefundOrderReqServiceV2Impl implements ZshInterfacePayService
         }
         LogUtil.debug("【支付宝退款接口V2】退款结束");
         JSONObject jsonObject =  new JSONObject();
-        jsonObject.put("responseStr", response.getSubMsg());
+        if (response.isSuccess()){
+            jsonObject.put("responseStr","退款成功");
+        }else {
+            jsonObject.put("responseStr",response.getSubMsg());
+        }
         return jsonObject.toString();
     }
 
@@ -86,23 +93,23 @@ public class AlipayRefundOrderReqServiceV2Impl implements ZshInterfacePayService
      */
     public boolean validateRequest(Map<String, Object> requestMap, AlipayOrderEntity bean, Map<String, Object> dataMap) {
         JSONObject paramJson  = new JSONObject();
-        String trade_no = requestMap.get("trade_no").toString();
-        if (StringTools.isNotEmpty(trade_no)) {
+        Object trade_no = requestMap.get("trade_no");
+        if (trade_no!=null) {
             paramJson.put("trade_no", trade_no);
-            bean.setTrade_no(trade_no);
+            bean.setTrade_no(trade_no.toString());
         } else {
             LogUtil.debug("【支付宝退款接口V2】out_trade_no为空为空");
             bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean, "0004", "【支付宝退款接口V2】关键数据为空", "out_trade_no参数为空").outputXMLStr());
         }
 
-        String refund_fee = requestMap.get("refund_fee").toString();
-        if (StringTools.isEmpty(refund_fee)) {
+        Object refund_fee = requestMap.get("refund_fee");
+        if (refund_fee!=null) {
             LogUtil.debug("【支付宝退款接口V2】refund_amount");
             bean.setValidateResult(uigXmlMgr.initErrorXMLNoKey(bean, "0004", "【支付宝退款接口V2】关键数据为空", "refund_fee参数为空").outputXMLStr());
             return false;
         } else {
             paramJson.put("refund_amount", refund_fee);
-            bean.setRefund_fee(refund_fee);
+            bean.setRefund_fee(refund_fee.toString());
         }
         Object userid = requestMap.get("userid");
         if (userid==null) {
